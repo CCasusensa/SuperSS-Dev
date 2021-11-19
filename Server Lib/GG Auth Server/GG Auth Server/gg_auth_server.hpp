@@ -1,6 +1,6 @@
 // Arquivo gg_auth_server.hpp
 // Criado em 02/02/2021 as 16:47 por Acrisio
-// Definição da classe gg_auth_server
+// Definiï¿½ï¿½o da classe gg_auth_server
 
 #pragma once
 #ifndef _STDA_GG_AUTH_SERVER_HPP
@@ -43,7 +43,7 @@ namespace stdA {
 
 			virtual bool checkPacket(session& _session, packet *_packet) override;
 
-			virtual void shutdown_time(long _time_sec) override;
+			virtual void shutdown_time(int32_t _time_sec) override;
 
 			virtual void config_init() override;
 			virtual void reload_files();
@@ -61,25 +61,25 @@ namespace stdA {
 
 		// Auth Server Comandos
 		public:
-			virtual void authCmdShutdown(long _time_sec);
+			virtual void authCmdShutdown(int32_t _time_sec);
 			virtual void authCmdBroadcastNotice(std::string _notice);
 			virtual void authCmdBroadcastTicker(std::string _nickname, std::string _msg);
-			virtual void authCmdBroadcastCubeWinRare(std::string _msg, unsigned long _option);
-			virtual void authCmdDisconnectPlayer(unsigned long _req_server_uid, unsigned long _player_uid, unsigned char _force);
-			virtual void authCmdConfirmDisconnectPlayer(unsigned long _player_uid);
-			virtual void authCmdNewMailArrivedMailBox(unsigned long _player_uid, unsigned long _mail_id);
-			virtual void authCmdNewRate(unsigned long _tipo, unsigned long _qntd);
-			virtual void authCmdReloadGlobalSystem(unsigned long _tipo);
-			virtual void authCmdInfoPlayerOnline(unsigned long _req_server_uid, unsigned long _player_uid);
-			virtual void authCmdConfirmSendInfoPlayerOnline(unsigned long _req_server_uid, AuthServerPlayerInfo _aspi);
+			virtual void authCmdBroadcastCubeWinRare(std::string _msg, uint32_t _option);
+			virtual void authCmdDisconnectPlayer(uint32_t _req_server_uid, uint32_t _player_uid, unsigned char _force);
+			virtual void authCmdConfirmDisconnectPlayer(uint32_t _player_uid);
+			virtual void authCmdNewMailArrivedMailBox(uint32_t _player_uid, uint32_t _mail_id);
+			virtual void authCmdNewRate(uint32_t _tipo, uint32_t _qntd);
+			virtual void authCmdReloadGlobalSystem(uint32_t _tipo);
+			virtual void authCmdInfoPlayerOnline(uint32_t _req_server_uid, uint32_t _player_uid);
+			virtual void authCmdConfirmSendInfoPlayerOnline(uint32_t _req_server_uid, AuthServerPlayerInfo _aspi);
 
-			// requests Comandos e respostas dinâmicas
+			// requests Comandos e respostas dinï¿½micas
 			virtual void authCmdSendCommandToOtherServer(packet& _packet);
 			virtual void authCmdSendReplyToOtherServer(packet& _packet);
 
 			// Server envia comandos e resposta para outros server com o Auth Server
-			virtual void sendCommandToOtherServerWithAuthServer(packet& _packet, unsigned long _send_server_uid_or_type);
-			virtual void sendReplyToOtherServerWithAuthServer(packet& _packet, unsigned long _send_server_uid_or_type);
+			virtual void sendCommandToOtherServerWithAuthServer(packet& _packet, uint32_t _send_server_uid_or_type);
+			virtual void sendReplyToOtherServerWithAuthServer(packet& _packet, uint32_t _send_server_uid_or_type);
 	};
 
 	typedef Singleton< gg_auth_server > sgg_as;

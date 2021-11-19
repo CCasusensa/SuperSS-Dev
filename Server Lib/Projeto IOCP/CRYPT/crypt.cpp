@@ -17,21 +17,11 @@ crypt::crypt() {
 
 crypt::~crypt() {};
 
-unsigned char crypt::init_key(unsigned char _key_high, unsigned char _key_low, /*New Modify Beta*/size_t _size) {
+unsigned char crypt::init_key(unsigned char _key_high, unsigned char _key_low) {
     unsigned short pos_dic = (_key_high << 8) | _key_low;
    
     m_key[0] = Keys[pos_dic];
     m_key[1] = Keys[4096 + pos_dic];
-
-	// New Modify Beta
-	if (_size > 0) {
-		m_key[0] <<= 8;
-		m_key[0] |= (unsigned char)(Keys[pos_dic] ^ (unsigned char)_size);
-		m_key[0] <<= 8;
-		m_key[0] |= Keys[4096 + pos_dic];
-		m_key[0] <<= 8;
-		m_key[0] |= (unsigned char)(Keys[4096 + pos_dic] ^ _key_low);
-	}
 
     return (unsigned char)m_key[1];
 };
@@ -83,8 +73,4 @@ void crypt::encrypt(unsigned char* _plain, size_t _size, unsigned char* _cipher)
 
 bool crypt::check_key(unsigned char _key) {
     return (_key == (unsigned char)m_key[1]);
-};
-
-unsigned char crypt::getHashKey() {
-	return ((unsigned char*)&m_key[0])[3] ^ (unsigned char)m_key[1];
 };

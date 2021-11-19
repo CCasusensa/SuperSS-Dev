@@ -1,6 +1,6 @@
 // Arquivo player.hpp
 // Criado em 02/02/2021 as 17:15 por Acrisio
-// Definição da classe player
+// Definiï¿½ï¿½o da classe player
 
 #pragma once
 #ifndef _STDA_PLAYER_HPP
@@ -25,8 +25,8 @@ namespace stdA {
 
 			virtual unsigned char getStateLogged() override;
 
-			virtual unsigned long getUID() override;
-			virtual unsigned long getCapability() override;	// Tipo
+			virtual uint32_t getUID() override;
+			virtual uint32_t getCapability() override;	// Tipo
 			virtual char* getNickname() override;
 			virtual char* getID() override;
 

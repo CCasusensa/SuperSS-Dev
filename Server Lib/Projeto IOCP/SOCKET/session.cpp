@@ -335,11 +335,7 @@ void session::requestSendBuffer(void* _buff, size_t _size, bool _raw) {
 
 				sz_write += m_buff_s.buff.write((void*)((unsigned char*)_buff + sz_write), _size - sz_write);
 
-#if defined(_WIN32)
-				m_threadpool.postIoOperation(this, &m_buff_s.buff, (_raw ? STDA_OT_SEND_RAW_REQUEST : STDA_OT_SEND_REQUEST));
-#elif defined(__linux__)
 				m_threadpool.postIoOperation(this, &m_buff_s.buff, 0, (_raw ? STDA_OT_SEND_RAW_REQUEST : STDA_OT_SEND_REQUEST));
-#endif
 
 				// Buffer já chegou ao seu limite, libera o parcial send, para o buffer ser esvaziado(Enviado)
 				if (sz_write < _size)
@@ -437,9 +433,8 @@ void session::requestSendBuffer(void* _buff, size_t _size, bool _raw) {
 
 void session::requestRecvBuffer() {
 #if defined(_WIN32)
-	m_threadpool.postIoOperation(this, &m_buff_r.buff, STDA_OT_RECV_REQUEST);
+	m_threadpool.postIoOperation(this, &m_buff_r.buff, 0, STDA_OT_RECV_REQUEST);
 #elif defined(__linux__)
-	//m_threadpool.postIoOperation(this, &m_buff_r.buff, 0, STDA_OT_RECV_REQUEST);
 	setRecv();
 #endif
 };
@@ -464,12 +459,10 @@ void session::releaseRecv() {
 
 	m_buff_r.lock();
 
-#if defined(_WIN32)
-	m_threadpool.postIoOperation(this, &m_buff_r.buff, 0, STDA_OT_RECV_REQUEST);
-#elif defined(__linux__)
+#if defined(__linux__)
 	if (--m_request_recv > 0ll)
-		m_threadpool.postIoOperation(this, &m_buff_r.buff, 0, STDA_OT_RECV_REQUEST);
 #endif
+		m_threadpool.postIoOperation(this, &m_buff_r.buff, 0, STDA_OT_RECV_REQUEST);
 
 	m_buff_r.unlock();
 };

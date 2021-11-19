@@ -42,7 +42,7 @@ namespace stdA {
 			stPlayerState m_player;
 
 			const char* m_szConsulta[2] = { 
-				R"1(SELECT index
+				R"1(SELECT [index]
 					,uid
 					,count_days
 					,count_seq

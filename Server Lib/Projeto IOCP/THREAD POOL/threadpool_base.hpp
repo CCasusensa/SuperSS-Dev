@@ -78,11 +78,7 @@ namespace stdA {
 
     class threadpool_base {
         public:
-#if defined(_WIN32)
-           virtual void postIoOperation(session *_session, Buffer* lpBuffer, DWORD operation) = 0;
-#elif defined(__linux__)
            virtual void postIoOperation(session *_session, Buffer* lpBuffer, DWORD dwIOsize, DWORD operation) = 0;
-#endif
     };
 }
 

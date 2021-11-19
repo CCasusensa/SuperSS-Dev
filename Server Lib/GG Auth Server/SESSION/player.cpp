@@ -1,6 +1,6 @@
 // Arquivo player.cpp
 // Criado em 02/02/2021 as 17:17 por Acrisio
-// Implementação da classe player
+// Implementaï¿½ï¿½o da classe player
 
 #pragma pack(1)
 #include <WinSock2.h>
@@ -49,11 +49,11 @@ unsigned char player::getStateLogged() {
 	return m_pi.m_state;
 }
 
-unsigned long player::getUID() {
+uint32_t player::getUID() {
 	return m_pi.uid;
 }
 
-unsigned long player::getCapability() {
+uint32_t player::getCapability() {
 	return m_pi.tipo;
 }
 

@@ -458,7 +458,7 @@ bool gg_auth_server::checkPacket(session& _session, packet* _packet) {
 	return true;
 }
 
-void gg_auth_server::shutdown_time(long _time_sec) {
+void gg_auth_server::shutdown_time(int32_t _time_sec) {
 
 	if (_time_sec <= 0)	// Desliga o Server Imediatemente
 		shutdown();
@@ -503,7 +503,7 @@ void gg_auth_server::destroy_unit() {
 	m_unit_connect = nullptr;
 }
 
-void gg_auth_server::authCmdShutdown(long _time_sec) {
+void gg_auth_server::authCmdShutdown(int32_t _time_sec) {
 
 	try {
 
@@ -536,12 +536,12 @@ void gg_auth_server::authCmdBroadcastTicker(std::string /*_nickname*/, std::stri
 	return;
 }
 
-void gg_auth_server::authCmdBroadcastCubeWinRare(std::string /*_msg*/, unsigned long /*_option*/) {
+void gg_auth_server::authCmdBroadcastCubeWinRare(std::string /*_msg*/, uint32_t /*_option*/) {
 	// Game Guard Auth n�o usa esse Comando
 	return;
 }
 
-void gg_auth_server::authCmdDisconnectPlayer(unsigned long _req_server_uid, unsigned long _player_uid, unsigned char _force) {
+void gg_auth_server::authCmdDisconnectPlayer(uint32_t _req_server_uid, uint32_t _player_uid, unsigned char _force) {
 
 	// Aqui no Login Server Ainda n�o usa o force, ele desconecta o player do mesmo jeito
 	UNREFERENCED_PARAMETER(_force);
@@ -572,27 +572,27 @@ void gg_auth_server::authCmdDisconnectPlayer(unsigned long _req_server_uid, unsi
 	}
 }
 
-void gg_auth_server::authCmdConfirmDisconnectPlayer(unsigned long /*_player_uid*/) {
+void gg_auth_server::authCmdConfirmDisconnectPlayer(uint32_t /*_player_uid*/) {
 	// Game Guard Auth n�o usa esse Comando
 	return;
 }
 
-void gg_auth_server::authCmdNewMailArrivedMailBox(unsigned long /*_player_uid*/, unsigned long /*_mail_id*/) {
+void gg_auth_server::authCmdNewMailArrivedMailBox(uint32_t /*_player_uid*/, uint32_t /*_mail_id*/) {
 	// Game Guard Auth n�o usa esse Comando
 	return;
 }
 
-void gg_auth_server::authCmdNewRate(unsigned long /*_tipo*/, unsigned long /*_qntd*/) {
+void gg_auth_server::authCmdNewRate(uint32_t /*_tipo*/, uint32_t /*_qntd*/) {
 	// Game Guard Auth n�o usa esse Comando
 	return;
 }
 
-void gg_auth_server::authCmdReloadGlobalSystem(unsigned long /*_tipo*/) {
+void gg_auth_server::authCmdReloadGlobalSystem(uint32_t /*_tipo*/) {
 	// Game Guard Auth n�o usa esse Comando
 	return;
 }
 
-void gg_auth_server::authCmdInfoPlayerOnline(unsigned long _req_server_uid, unsigned long _player_uid) {
+void gg_auth_server::authCmdInfoPlayerOnline(uint32_t _req_server_uid, uint32_t _player_uid) {
 
 	try {
 
@@ -628,7 +628,7 @@ void gg_auth_server::authCmdInfoPlayerOnline(unsigned long _req_server_uid, unsi
 	}
 }
 
-void gg_auth_server::authCmdConfirmSendInfoPlayerOnline(unsigned long _req_server_uid, AuthServerPlayerInfo _aspi) {
+void gg_auth_server::authCmdConfirmSendInfoPlayerOnline(uint32_t _req_server_uid, AuthServerPlayerInfo _aspi) {
 
 	// Game Guard Auth Server ainda n�o usa esse funcionalidade de pedir o info do player que est� conectado em outro server
 	UNREFERENCED_PARAMETER(_req_server_uid);
@@ -731,7 +731,7 @@ void gg_auth_server::authCmdSendReplyToOtherServer(packet& _packet) {
 	}
 }
 
-void gg_auth_server::sendCommandToOtherServerWithAuthServer(packet& _packet, unsigned long _send_server_uid_or_type) {
+void gg_auth_server::sendCommandToOtherServerWithAuthServer(packet& _packet, uint32_t _send_server_uid_or_type) {
 
 	try {
 
@@ -744,7 +744,7 @@ void gg_auth_server::sendCommandToOtherServerWithAuthServer(packet& _packet, uns
 	}
 }
 
-void gg_auth_server::sendReplyToOtherServerWithAuthServer(packet& _packet, unsigned long _send_server_uid_or_type) {
+void gg_auth_server::sendReplyToOtherServerWithAuthServer(packet& _packet, uint32_t _send_server_uid_or_type) {
 
 	try {
 

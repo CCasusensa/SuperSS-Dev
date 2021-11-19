@@ -188,6 +188,9 @@
 								throw; \
 						 } \
 
+#define CHECK_SESSION_BEGIN(method) if (!_session.getState()) \
+										throw exception("[unit_connect_base::" + std::string((method)) +"][Error] player nao esta connectado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::UNIT_CONNECT, 1, 0)); \
+
 using namespace stdA;
 
 unit_connect_base::unit_connect_base(ServerInfoEx& _si) 
@@ -435,11 +438,7 @@ void unit_connect_base::waitAllThreadFinish(DWORD dwMilleseconds) {
 			m_threads[i]->waitThreadFinish(dwMilleseconds);
 }
 
-#if defined(_WIN32)
-void unit_connect_base::postIoOperation(session* _session, Buffer* lpBuffer, DWORD operation) {
-#elif defined(__linux__)
 void unit_connect_base::postIoOperation(session* _session, Buffer* lpBuffer, DWORD dwIOsize, DWORD operation) {
-#endif
 
 	myOver *tmp = new myOver;
 
@@ -448,6 +447,7 @@ void unit_connect_base::postIoOperation(session* _session, Buffer* lpBuffer, DWO
 	tmp->buffer = lpBuffer;
 
 #if defined(_WIN32)
+	UNREFERENCED_PARAMETER(dwIOsize);
 	m_iocp_send.postStatus((ULONG_PTR)_session, 0, (LPOVERLAPPED)tmp);		// Esse tinha Index[session->m_key], era um array de 16 iocp
 #elif defined(__linux__)
 	m_iocp_send.push(new stThreadpoolMessage(_session, (Buffer*)tmp, dwIOsize));	// Esse tinha Index[session->m_key], era um array de 16 iocp
@@ -996,6 +996,8 @@ void* unit_connect_base::monitor() {
 }
 
 inline void unit_connect_base::dispach_packet_same_thread(session& _session, packet *_packet) {
+	CHECK_SESSION_BEGIN("dispach_packet_same_thread");
+
 	func_arr::func_arr_ex* func = nullptr;
 
 	try {
@@ -1056,6 +1058,8 @@ inline void unit_connect_base::dispach_packet_same_thread(session& _session, pac
 };
 
 inline void unit_connect_base::dispach_packet_sv_same_thread(session& _session, packet *_packet) {
+	CHECK_SESSION_BEGIN("dispach_packet_sv_same_thread");
+	
 	func_arr::func_arr_ex* func = nullptr;
 
 	try {
@@ -1160,11 +1164,7 @@ void unit_connect_base::send_new(session* _session, Buffer* lpBuffer, DWORD oper
 
 			if (_session->isCreated())
 				// Send 0 Bytes, Session desconnected
-#if defined(_WIN32)
-				postIoOperation(_session, lpBuffer, STDA_OT_RECV_COMPLETED);
-#elif defined(__linux__)
 				postIoOperation(_session, lpBuffer, 0, STDA_OT_RECV_COMPLETED);
-#endif
 
 			return;
 		}
@@ -1177,11 +1177,7 @@ void unit_connect_base::send_new(session* _session, Buffer* lpBuffer, DWORD oper
 
 				if (_session->isCreated())
 					// Send 0 Bytes, Session desconnected
-#if defined(_WIN32)
-					postIoOperation(_session, lpBuffer, STDA_OT_RECV_COMPLETED);
-#elif defined(__linux__)
 					postIoOperation(_session, lpBuffer, 0, STDA_OT_RECV_COMPLETED);
-#endif
 
 				return;
 			}
@@ -1215,7 +1211,7 @@ void unit_connect_base::send_new(session* _session, Buffer* lpBuffer, DWORD oper
 
 			if (_session->isCreated())
 				// Send 0 Bytes, Session desconnected
-				postIoOperation(_session, lpBuffer, STDA_OT_RECV_COMPLETED);
+				postIoOperation(_session, lpBuffer, 0, STDA_OT_RECV_COMPLETED);
 			
 			if (error != WSAESHUTDOWN && error != WSAECONNRESET)
 				throw exception("Erro no WSASend() -> unit_connect_base::send_new()", STDA_MAKE_ERROR(STDA_ERROR_TYPE::THREADPOOL, 1, error));
@@ -1339,7 +1335,7 @@ void unit_connect_base::recv_new(session* _session, Buffer* lpBuffer, DWORD oper
 			
 			if (_session->isCreated())
 				// Send 0 Bytes, Session desconnected
-				postIoOperation(_session, lpBuffer, operation);
+				postIoOperation(_session, lpBuffer, 0, operation);
 
 			if (error != WSAESHUTDOWN && error != WSAECONNRESET)
 				throw exception("Erro no WSARecv() -> unit_connect_base::recv_new()", STDA_MAKE_ERROR(STDA_ERROR_TYPE::THREADPOOL, 2, error));

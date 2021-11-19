@@ -210,7 +210,7 @@ namespace stdA {
 
 		protected:
 #if defined(_WIN32)
-			LONG volatile m_continue_accpet;
+			LONG volatile m_continue_accept;
 #elif defined(__linux__)
 			int32_t volatile m_continue_accept;
 #endif

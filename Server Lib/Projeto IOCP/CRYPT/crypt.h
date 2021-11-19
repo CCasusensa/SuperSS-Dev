@@ -20,16 +20,13 @@ namespace stdA {
             crypt();
             ~crypt();
 
-        unsigned char init_key(unsigned char _key_high, unsigned char _key_low, size_t _size = 0);
+        unsigned char init_key(unsigned char _key_high, unsigned char _key_low);
 
         void decrypt(unsigned char* _cipher, size_t _size, unsigned char* _plain);
 
         void encrypt(unsigned char* _plain, size_t _size, unsigned char* cipher);
 
         bool check_key(unsigned char _key);
-
-		// Beta Version
-		unsigned char getHashKey();
 
         protected:
             uint32_t m_key[2];

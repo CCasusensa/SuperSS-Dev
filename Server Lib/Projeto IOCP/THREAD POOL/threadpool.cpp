@@ -33,9 +33,9 @@ using namespace stdA;
 threadpool::threadpool(size_t _num_thread_workers_io, size_t _num_thread_workers_logical, uint32_t _job_thread_num) 
 		: m_iocp_io_accept(0), 
 #if defined(_WIN32)
-		m_iocp_io{ iocp(0) }, 
-		m_iocp_io_send{ iocp(0) }, 
-		m_iocp_io_recv{ iocp(0) }, 
+		m_iocp_io{ iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0), iocp(0) },
+		m_iocp_io_send(), 
+		m_iocp_io_recv(), 
 		m_iocp_logical(0) /*{ iocp(0) }*/, 
 		m_iocp_send(0)/*{ iocp(0) }*/ 
 #elif defined(__linux__)
@@ -1561,11 +1561,7 @@ void threadpool::recv_new(session *_session, Buffer *lpBuffer, DWORD operation) 
 	//_session->unlock();
 };
 
-#if defined(_WIN32)
-void threadpool::postIoOperation(session *_session, Buffer* lpBuffer, DWORD operation) {
-#elif defined(__linux__)
 void threadpool::postIoOperation(session *_session, Buffer* lpBuffer, DWORD dwIOsize, DWORD operation) {
-#endif
 	myOver *tmp = new myOver;
 
 	tmp->clear();
@@ -1573,6 +1569,7 @@ void threadpool::postIoOperation(session *_session, Buffer* lpBuffer, DWORD dwIO
 	tmp->buffer = lpBuffer;
 	
 #if defined(_WIN32)
+	UNREFERENCED_PARAMETER(dwIOsize);
 	m_iocp_send.postStatus((ULONG_PTR)_session, 0, (LPOVERLAPPED)tmp);	// Esse tinha Index[session->m_key], era um array de 16 iocp
 #elif defined(__linux__)
 	m_iocp_send.push(new stThreadpoolMessage(_session, (Buffer*)tmp, dwIOsize));

@@ -8,6 +8,7 @@
 
 #if defined(_WIN32)
 #include <Windows.h>
+#include <iostream>
 #elif defined(__linux__)
 #include "../../Projeto IOCP/UTIL/WinPort.h"
 #include <pthread.h>

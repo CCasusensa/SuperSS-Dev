@@ -162,11 +162,7 @@ namespace stdA {
 
 			virtual void waitAllThreadFinish(DWORD dwMilleseconds);
 
-#if defined(_WIN32)
-			virtual void postIoOperation(session *_session, Buffer* lpBuffer, DWORD operation) override;
-#elif defined(__linux__)
 			virtual void postIoOperation(session *_session, Buffer* lpBuffer, DWORD dwIOsize, DWORD operation) override;
-#endif
 
 			virtual void DisconnectSession(session *_session);
 

@@ -165,8 +165,10 @@
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\database.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\exec_query.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\mssql.cpp" />
+    <ClCompile Include="..\..\Projeto IOCP\DATABASE\mysql_db.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\normal_db.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\normal_manager_db.cpp" />
+    <ClCompile Include="..\..\Projeto IOCP\DATABASE\postgresql.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\response.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\DATABASE\result_set.cpp" />
     <ClCompile Include="..\..\Projeto IOCP\IOCP\iocp.cpp" />

@@ -30,9 +30,9 @@ namespace stdA {
 		private:
 			std::vector< stLoginReward > m_lr;
 
-			const char* m_szConsulta = R"1(SELECT index
-												, name
-												, type
+			const char* m_szConsulta = R"1(SELECT [index]
+												, [name]
+												, [type]
 												, days_to_gift
 												, n_times_gift
 												, item_typeid

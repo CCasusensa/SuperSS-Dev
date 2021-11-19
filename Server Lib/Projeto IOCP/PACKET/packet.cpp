@@ -211,25 +211,18 @@ void packet::unMake(unsigned char _key) {
 	if (m_maked.m_buf == nullptr)
 		throw exception("Error buf is nullptr em packet::unMake()", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PACKET, 15, 0));
 
-    memcpy(&phc, &m_maked.m_buf[index], sizeof(packet_head_client_beta));	index += sizeof(packet_head_client_beta);
+    memcpy(&phc, &m_maked.m_buf[index], sizeof(packet_head_client));	index += sizeof(packet_head_client);
 
-    if (phc.getSize() > (m_maked.m_index_w - 4/*head of packet*/))
+    if (phc.size > m_maked.m_index_w)
         throw exception("Erro: Unknown Packet. packet::unMake()", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PACKET, 11, 0));
 
     crypt _crypt;
-    _crypt.init_key(_key, phc.low_key, phc.getSize() + 1);
+    _crypt.init_key(_key, phc.low_key);
 
-	// Beta Version, ERROR_TYPE::PACKET, 200
-	unsigned char hash = phc.makeHash(_crypt.getHashKey());
-
-	if (hash != phc.hash_packet)
-		throw exception("[packet::unMake][Error] Hash is not valid[REQ=" + std::to_string((unsigned short)hash) 
-				+ ", SND=" + std::to_string((unsigned short)phc.hash_packet) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::CRYPT, 3, 0));
-
-    unsigned char *decrypt = new unsigned char[phc.getSize()];
+    unsigned char *decrypt = new unsigned char[phc.size];
 
     try {
-        _crypt.decrypt(&m_maked.m_buf[index], phc.getSize(), decrypt);
+        _crypt.decrypt(&m_maked.m_buf[index], phc.size, decrypt);
     }catch (exception& e) {
 		UNREFERENCED_PARAMETER(e);
 
@@ -242,7 +235,7 @@ void packet::unMake(unsigned char _key) {
 	// Reset Plain
 	m_plain.reset();
 
-    add_plain(&decrypt[9], phc.getSize() - 9);
+    add_plain(&decrypt[1], phc.size - 1);
 
     delete[] decrypt;
 };
@@ -290,7 +283,7 @@ void packet::unMakeFull(unsigned char _key) {
 
 	_crypt = new crypt();
 
-    _crypt->init_key(_key, ph.low_key, ph.size/*Size to New Key Beta*/);
+    _crypt->init_key(_key, ph.low_key);
 
     unsigned char *decrypt = new unsigned char[ph.size];
 
@@ -318,9 +311,6 @@ void packet::unMakeFull(unsigned char _key) {
     }
 
     index = 1;	// Depois de decryptado não usa a chave que fica
-
-	// New Key Beta
-	index += 8;	// Não usa as key aleatória que fica no packet decrypetd
 
     conversionByte cb(decrypt + index, CB_BASE_255);	index += sizeof(conversionByte::unionConvertido);
 
@@ -418,27 +408,20 @@ void packet::make(unsigned char _key) {
 
     std::srand((uint32_t)std::time(nullptr) * 7 * (uint32_t)m_plain.m_index_w);
 
-    phc.setSize((unsigned short)m_plain.m_index_w + 1/*key sec*/ + 1/*New Value*/ + 8/*First Key encrypt*/);
+    phc.size = (unsigned short)m_plain.m_index_w + 1/*key sec*/;
     phc.low_key = std::rand() & 255;
     phc.seq = 0;
 
-    tmp = new unsigned char[phc.getSize() + 2];
+    tmp = new unsigned char[phc.size];
 
-	alloc(m_plain, m_plain.m_index_w + 2);
+	alloc(m_plain, m_plain.m_index_w + 1);
 
-    memmove(&m_plain.m_buf[9], &m_plain.m_buf[0], m_plain.m_index_w);
+    memmove(&m_plain.m_buf[1], &m_plain.m_buf[0], m_plain.m_index_w);
 
-	m_plain.m_buf[0] = _crypt.init_key(_key, phc.low_key, phc.getSize() + 1);
-
-	// First Key Encrypt
-	for (auto i = 1u; i <= 8u; ++i)
-		m_plain.m_buf[i] = std::rand() & 0xFF;
-
-	// Beta new value
-	phc.hash_packet = phc.makeHash(_crypt.getHashKey());
+	m_plain.m_buf[0] = _crypt.init_key(_key, phc.low_key);
 
     try {
-        _crypt.encrypt(&m_plain.m_buf[0], phc.getSize(), tmp);
+        _crypt.encrypt(&m_plain.m_buf[0], phc.size, tmp);
     }catch (exception& e) {
 		UNREFERENCED_PARAMETER(e);
 
@@ -451,8 +434,8 @@ void packet::make(unsigned char _key) {
 	// Maked Reset
 	m_maked.reset();
 
-    add_maked(&phc, sizeof(packet_head_client_beta));
-    add_maked(tmp, phc.getSize());
+    add_maked(&phc, sizeof(packet_head_client));
+    add_maked(tmp, phc.size);
 
     if (tmp != nullptr)
         delete[] tmp;
@@ -472,13 +455,13 @@ void packet::makeFull(unsigned char _key) {
 
     conversionByte cb((const uint32_t)m_plain.m_index_w, CB_BASE_256);
 
-    unsigned char* tmp = new unsigned char[cb.getNumberIS() + 5 + 5 + 8];
+    unsigned char* tmp = new unsigned char[cb.getNumberIS() + 5 + 5];
     size_t compress_out = 0;
 
 	_compress = new compress();
 
     try {
-        _compress->compress_data(m_plain.m_buf, m_plain.m_index_w, &tmp[13], &compress_out);
+        _compress->compress_data(m_plain.m_buf, m_plain.m_index_w, &tmp[5], &compress_out);
     }catch (exception& e) {
 		UNREFERENCED_PARAMETER(e);
 
@@ -501,7 +484,7 @@ void packet::makeFull(unsigned char _key) {
     }
 
     // Make Packet Head
-    ph.size = (unsigned short)compress_out + 5/*key low and size raw decompressed*/ + 8/*First Key Encrypt*/;
+    ph.size = (unsigned short)compress_out + 5/*key low and size raw decompressed*/;
 
     std::srand((uint32_t)std::time(nullptr) * 7 * ph.size);
 
@@ -510,13 +493,9 @@ void packet::makeFull(unsigned char _key) {
 
 	_crypt = new crypt();
 
-    tmp[0] = _crypt->init_key(_key, ph.low_key, ph.size/*Size to new Key Beta*/);
+    tmp[0] = _crypt->init_key(_key, ph.low_key);
 
-    cb.putNumberBuffer(&tmp[9]);
-
-	// First Key Encrypt
-	for (auto i = 1u; i <= 8u; ++i)
-		tmp[i] = std::rand() & 0xFF;
+    cb.putNumberBuffer(&tmp[1]);
 
 	// Maked Reset
 	m_maked.reset();
