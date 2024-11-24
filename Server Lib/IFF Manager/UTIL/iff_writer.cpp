@@ -1,6 +1,6 @@
 // Arquivo iff_writer.cpp
 // Criado em 03/06/2019 as 19:48 por Acrisio
-// Implementaï¿½ï¿½o da classe iff_writer
+// Implementação da classe iff_writer
 
 #pragma pack(1)
 
@@ -41,14 +41,14 @@
 					break; \
 		} \
 \
-		/* Cabeï¿½ï¿½rio */ \
+		/* Cabeçário */ \
 		IFF::Head head{ 0 }; \
 \
 		/* External Attributes */ \
 		zip_uint8_t opsys; \
 		zip_uint32_t attr; \
 \
-		/* Encontrou o arquivo ele existe, abre para ler o cabeï¿½ï¿½rio */ \
+		/* Encontrou o arquivo ele existe, abre para ler o cabeçário */ \
 		if (index < num_entries) { \
 \
 			zip_file *file = zip_fopen_index(z, index, ZIP_FL_UNCHANGED); \
@@ -64,10 +64,10 @@
 \
 				zip_fread(file, (char*)&head, sizeof(IFF::Head)); \
 \
-				/* Fecha o file depois que pegou o cabeï¿½ario */ \
+				/* Fecha o file depois que pegou o cabeçario */ \
 				zip_fclose(file); \
 \
-				/* Verifica a versï¿½o do cabeï¿½alho */ \
+				/* Verifica a versão do cabeçalho */ \
 				if (head.version != IFF_VERSION/*13*/ || (head.count_element * sizeof(_type) + sizeof(IFF::Head)) != ZIP_GET_REAL_SIZE(st.size)) { \
 \
 					_smp::message_pool::getInstance().push(new message("[iff_writer::" + std::string((_method)) + "][Error] " + std::string((_iff_name))  \
@@ -97,7 +97,7 @@
 				return; \
 			} \
 \
-		}else {	/* Nï¿½o existe cria um cabeï¿½ario e seta o file attributos */ \
+		}else {	/* Não existe cria um cabeçario e seta o file attributos */ \
 \
 			_smp::message_pool::getInstance().push(new message("[iff_writer::" + std::string((_method)) + "][Log] nao tinha o arquivo "  \
 					+ std::string((_iff_name)) + ", cria um novo.", CL_FILE_LOG_AND_CONSOLE)); \
@@ -135,7 +135,7 @@
 			zip_source_free(s); \
 \
 		}else \
-			_smp::message_pool::getInstance().push(new message("[iff_writer::" + std::string((_method)) + "][Log] salvo o arquivo source " + std::string((_iff_name)) + " com sucesso", CL_FILE_LOG_AND_CONSOLE)); \
+			_smp::message_pool::getInstance().push(new message("[iff_writer::" + std::string((_method)) + "][Log] salvo o arquivo sourse " + std::string((_iff_name)) + " com source ", CL_FILE_LOG_AND_CONSOLE)); \
 \
 		/* Set File Attibute */ \
 		if (zip_file_set_external_attributes(z, index, ZIP_FL_UNCHANGED, opsys, attr) < 0) \

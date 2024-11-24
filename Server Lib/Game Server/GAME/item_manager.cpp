@@ -91,7 +91,7 @@ using namespace stdA;
 							_item._typeid = _bi._typeid; \
 							_item.date = *(stItem::stDate*)&item->date; \
 							_item.price = item->shop.price; \
-							_item.desconto = item->shop.desconto; \
+							_item.desconto = item->shop.sale_price; \
 							_item.qntd = (uint32_t)_bi.qntd; \
 							_item.is_cash = item->shop.flag_shop.uFlagShop.stFlagShop.is_cash; \
  \
@@ -176,20 +176,20 @@ item_manager::~item_manager() {
 };
 
 std::vector< stItem > item_manager::getItemOfSetItem(player& _session, uint32_t _typeid, bool _shop, int _chk_level) {
-	
+
 	if (!isSetItem(_typeid))
-		throw exception("[item_manager::getItemOfSetItem][Error] item[TYPEID=" + std::to_string(_typeid) 
+		throw exception("[item_manager::getItemOfSetItem][Error] item[TYPEID=" + std::to_string(_typeid)
 			+ "] not is a valid SetItem. Player: " + std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 1, 0));
 
 	std::vector< stItem > v_item;
 	stItem item;
 	BuyItem bi{ 0 };
-	IFF::Base *base = nullptr;
+	IFF::Base* base = nullptr;
 
-	IFF::SetItem *set_item = sIff::getInstance().findSetItem(_typeid);
+	IFF::SetItem* set_item = sIff::getInstance().findSetItem(_typeid);
 
 	if (set_item == nullptr)
-		throw exception("[item_manager::getItemOfSetItem][Error] item[TYPEID=" + std::to_string(_typeid) 
+		throw exception("[item_manager::getItemOfSetItem][Error] item[TYPEID=" + std::to_string(_typeid)
 			+ "] nao foi encontrado. Player: " + std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2, 0));
 
 	for (auto i = 0u; i < (sizeof(set_item->packege.item_typeid) / sizeof(set_item->packege.item_typeid[0])); ++i) {
@@ -227,7 +227,7 @@ std::vector< stItem > item_manager::getItemOfSetItem(player& _session, uint32_t 
 			if (item._typeid != 0)
 				v_item.push_back(item);
 			else
-				throw exception("[item_manager::getItemOfSetItem][Error] erro ao inicializar item[TYPEID=" 
+				throw exception("[item_manager::getItemOfSetItem][Error] erro ao inicializar item[TYPEID="
 					+ std::to_string(set_item->packege.item_typeid[i]) + "]. Player: " + std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 25, 0));
 		}
 	}
@@ -263,12 +263,13 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x60;	// dias Rental(acho)
 			// time tipo 6 rental, 4, 2,
 			_item.flag_time = 6;
-		}else if (_bi.time > 0) {	// Roupa de tempo do CadieCauldron
+		}
+		else if (_bi.time > 0) {	// Roupa de tempo do CadieCauldron
 
 			if (item->shop.flag_shop.time_shop.active)
-				_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNIG] Player[UID=" + std::to_string(_pi.uid) 
-						+ "] inicializou Part[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo[VALUE=" + std::to_string(_bi.time)
-						+ "], mas no IFF_STRUCT do server ele nao eh um item por tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNIG] Player[UID=" + std::to_string(_pi.uid)
+					+ "] inicializou Part[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo[VALUE=" + std::to_string(_bi.time)
+					+ "], mas no IFF_STRUCT do server ele nao eh um item por tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			_item.STDA_C_ITEM_TIME = _bi.time;
 			_item.flag = 0x20;
@@ -323,12 +324,13 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 		if (_chk_lvl)
 			_item.STDA_C_ITEM_QNTD = (short)_item.qntd;
 		else if (_item.qntd != item->STDA_C_ITEM_QNTD) {
-			
+
 			_item.STDA_C_ITEM_QNTD = (short)_item.qntd;
 
 			_item.qntd = 1;
 
-		}else {
+		}
+		else {
 
 			if (!_chk_lvl && _item.qntd > 0 && item->STDA_C_ITEM_QNTD != 0)
 				_item.qntd /= item->STDA_C_ITEM_QNTD;
@@ -394,14 +396,15 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 				_item.STDA_C_ITEM_TIME = _bi.time * 24;	// Premium Ticket
 
 				if (_bi.time > 365)
-					_smp::message_pool::getInstance().push(new message("[WARNING] Player[UID=" + std::to_string(_pi.uid) + "]. Queria colocar mais[request=" 
-							+ std::to_string(_bi.time) + "] que 365 dia na compra do Premium Ticket. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+					_smp::message_pool::getInstance().push(new message("[WARNING] Player[UID=" + std::to_string(_pi.uid) + "]. Queria colocar mais[request="
+						+ std::to_string(_bi.time) + "] que 365 dia na compra do Premium Ticket. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 			}
-		
-		}else if (_bi.time == 0 && !empty_price && sIff::getInstance().getEnchantSlotStat(_item._typeid) == 0x21/*Item por tempo, enchante é ~0xFC000000 >> 20*/ && _bi.qntd > 0) {
+
+		}
+		else if (_bi.time == 0 && !empty_price && sIff::getInstance().getEnchantSlotStat(_item._typeid) == 0x21/*Item por tempo, enchante é ~0xFC000000 >> 20*/ && _bi.qntd > 0) {
 
 			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
-					+ "] tentou inicializar Item[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou inicializar Item[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_bi.time = (unsigned short)(_bi.qntd > 365 ? 365 : _bi.qntd);
 
@@ -444,7 +447,7 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 
 				if (_bi.time > 365)
 					_smp::message_pool::getInstance().push(new message("[WARNING] Player[UID=" + std::to_string(_pi.uid) + "]. Queria colocar mais[request="
-							+ std::to_string(_bi.time) + "] que 365 dia na compra do Premium Ticket. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+						+ std::to_string(_bi.time) + "] que 365 dia na compra do Premium Ticket. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 			}
 		}
 
@@ -461,8 +464,9 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 		}
 
 		if (sIff::getInstance().IsItemEquipable(_bi._typeid)) {	// Equiável
-		}else {	// Passivo
-			
+		}
+		else {	// Passivo
+
 		}
 
 		END_INIT_BUYITEM;
@@ -500,7 +504,7 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 		auto empty_price = EMPTY_ARRAY_PRICE(item->price);
 
 		if (_bi.time > 0 && !empty_price) {
-			
+
 			switch (_bi.time) {	// Dias
 			case 1:
 				if (_item.is_cash ? _bi.cookie == item->price[0] : _bi.pang == item->price[0])
@@ -524,11 +528,12 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag_time = 2;
 			_item.flag = 0x20;
 			_item.STDA_C_ITEM_TIME = _bi.time * 24;	// Horas
-		
-		}else if (_bi.time > 0 && (item->shop.flag_shop.time_shop.active || item->shop.flag_shop.time_shop.dia > 0)) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid) 
-					+ "] inicializou Caddie Item[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo no jogo e no IFF_STRUCT, mas ele nao tem os precos de tempo no IFF_STRUCT. Box ou Comando GM", CL_FILE_LOG_AND_CONSOLE));
+		}
+		else if (_bi.time > 0 && (item->shop.flag_shop.time_shop.active || item->shop.flag_shop.time_shop.dia > 0)) {
+
+			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
+				+ "] inicializou Caddie Item[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo no jogo e no IFF_STRUCT, mas ele nao tem os precos de tempo no IFF_STRUCT. Box ou Comando GM", CL_FILE_LOG_AND_CONSOLE));
 
 			// Qntd tem que ser 1 por que o item é por tempo
 			if (_bi.qntd > 1)
@@ -539,17 +544,18 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x40;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
 
-		}else if (_bi.time == 0 && !empty_price && _bi.qntd > 0) {
+		}
+		else if (_bi.time == 0 && !empty_price && _bi.qntd > 0) {
 
 			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
-					+ "] tentou inicializar Caddie Item[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou inicializar Caddie Item[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_bi.time = (unsigned short)(_bi.qntd > 30 ? 30 : _bi.qntd);
 
 			// Qntd tem que ser 1 por que o item é por tempo
 			if (_bi.qntd > 1)
 				_item.qntd = _bi.qntd = 1;
-		
+
 			switch (_bi.time) {	// Dias
 			case 1:
 				if (_item.is_cash ? _bi.cookie == item->price[0] : _bi.pang == item->price[0])
@@ -577,10 +583,11 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x20;
 			_item.STDA_C_ITEM_TIME = _bi.time * 24;	// Horas
 
-		}else if (_bi.time == 0 && !empty_price && _bi.qntd == 0) {
-			
+		}
+		else if (_bi.time == 0 && !empty_price && _bi.qntd == 0) {
+
 			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][Error] Player[UID=" + std::to_string(_pi.uid)
-					+ "] tentou inicializar Caddie Item[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo e sem quantidade no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou inicializar Caddie Item[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo e sem quantidade no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_item._typeid = 0u;
 
@@ -612,7 +619,7 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 		auto empty_price = EMPTY_ARRAY_PRICE(item->price);
 
 		if (_bi.time > 0 && !empty_price) {
-			
+
 			switch (_bi.time) {	// Dias
 			case 1:
 				if (_item.is_cash ? _bi.cookie == item->price[0] : _bi.pang == item->price[0])
@@ -644,10 +651,11 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x20;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
 
-		}else if (_bi.time > 0 && (item->shop.flag_shop.time_shop.active || item->shop.flag_shop.time_shop.dia > 0)) {
+		}
+		else if (_bi.time > 0 && (item->shop.flag_shop.time_shop.active || item->shop.flag_shop.time_shop.dia > 0)) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid) 
-					+ "] inicializou Skin[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo no jogo e no IFF_STRUCT, mas ele nao tem os precos de tempo no IFF_STRUCT. Box ou Comando GM", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
+				+ "] inicializou Skin[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo no jogo e no IFF_STRUCT, mas ele nao tem os precos de tempo no IFF_STRUCT. Box ou Comando GM", CL_FILE_LOG_AND_CONSOLE));
 
 			// Qntd tem que ser 1 por que o item é por tempo
 			if (_bi.qntd > 1)
@@ -658,10 +666,11 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x40;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
 
-		}else if (_bi.time == 0 && !empty_price && _bi.qntd > 0) {
-			
-			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid) 
-					+ "] tentou inicializar Skin[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+		}
+		else if (_bi.time == 0 && !empty_price && _bi.qntd > 0) {
+
+			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
+				+ "] tentou inicializar Skin[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_bi.time = (unsigned short)(_bi.qntd > 365 ? 365 : _bi.qntd);
 
@@ -699,11 +708,12 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag_time = 4;
 			_item.flag = 0x20;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
-		
-		}else if (_bi.time == 0 && !empty_price && _bi.qntd == 0) {
+
+		}
+		else if (_bi.time == 0 && !empty_price && _bi.qntd == 0) {
 
 			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][Error] Player[UID=" + std::to_string(_pi.uid)
-					+ "] tentou inicializar Skin[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo e sem quantidade no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou inicializar Skin[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo e sem quantidade no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_item._typeid = 0u;
 
@@ -733,7 +743,7 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 		auto empty_price = EMPTY_ARRAY_PRICE(item->price);
 
 		if (_bi.time > 0 && !empty_price) {
-			
+
 			switch (_bi.time) {
 			case 1:
 				if (_item.is_cash ? _bi.cookie == item->price[0] : _bi.pang == item->price[0])
@@ -761,12 +771,13 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag_time = 4;
 			_item.flag = 0x40;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
-		
-		}else if (_bi.time > 0 && (item->shop.flag_shop.time_shop.active || item->shop.flag_shop.time_shop.dia > 0)) {
+
+		}
+		else if (_bi.time > 0 && (item->shop.flag_shop.time_shop.active || item->shop.flag_shop.time_shop.dia > 0)) {
 
 			if (_shop && !sIff::getInstance().IsBuyItem(item->_typeid) && !sIff::getInstance().IsGiftItem(item->_typeid))
-				_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid) 
-						+ "] inicializou Mascot[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo no jogo e no IFF_STRUCT, mas ele nao tem os precos de tempo no IFF_STRUCT. Box ou Comando GM", CL_FILE_LOG_AND_CONSOLE));
+				_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
+					+ "] inicializou Mascot[TYPEID=" + std::to_string(_bi._typeid) + "] com tempo no jogo e no IFF_STRUCT, mas ele nao tem os precos de tempo no IFF_STRUCT. Box ou Comando GM", CL_FILE_LOG_AND_CONSOLE));
 
 			// Qntd tem que ser 1 por que o item é por tempo
 			if (_bi.qntd > 1)
@@ -777,10 +788,11 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x40;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
 
-		}else if (_bi.time == 0 && !empty_price && _bi.qntd > 0) {
+		}
+		else if (_bi.time == 0 && !empty_price && _bi.qntd > 0) {
 
 			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][WARNING] Player[UID=" + std::to_string(_pi.uid)
-					+ "] tentou inicializar Mascot[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou inicializar Mascot[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_bi.time = (unsigned short)(_bi.qntd > 365 ? 365 : _bi.qntd);
 
@@ -819,10 +831,11 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 			_item.flag = 0x40;
 			_item.STDA_C_ITEM_TIME = _bi.time;	// Dias
 
-		}else if (_bi.time == 0 && !empty_price && _bi.qntd == 0) {
+		}
+		else if (_bi.time == 0 && !empty_price && _bi.qntd == 0) {
 
 			_smp::message_pool::getInstance().push(new message("[item_manager::initItemFromBuyItem][Error] Player[UID=" + std::to_string(_pi.uid)
-					+ "] tentou inicializar Mascot[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo e sem quantidade no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou inicializar Mascot[TYPEID=" + std::to_string(_bi._typeid) + "] sem tempo e sem quantidade no jogo e no IFF_STRUCT ele tem tempo. Hacker ou Command GM.", CL_FILE_LOG_AND_CONSOLE));
 
 			_item._typeid = 0u;
 
@@ -892,7 +905,7 @@ void item_manager::initItemFromBuyItem(PlayerInfo& _pi, stItem& _item, BuyItem& 
 };
 
 void item_manager::initItemFromEmailItem(PlayerInfo& _pi, stItem& _item, EmailInfo::item& _ei_item) {
-	
+
 	BuyItem item{ 0 };
 
 	item.id = _ei_item.id;
@@ -927,11 +940,11 @@ void item_manager::checkSetItemOnEmail(player& _session, EmailInfo& _ei) {
 };
 
 item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _uid, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
-	
-	#ifdef _DEBUG
-	#define MSG_ACTIVE_DEBUG	CL_FILE_LOG_AND_CONSOLE
+
+#ifdef _DEBUG
+#define MSG_ACTIVE_DEBUG	CL_FILE_LOG_AND_CONSOLE
 #else
-	#define MSG_ACTIVE_DEBUG	CL_ONLY_FILE_LOG
+#define MSG_ACTIVE_DEBUG	CL_ONLY_FILE_LOG
 #endif
 
 #define STATIC_ADD_ITEM_SUCESS_MSG_LOG(__item) { \
@@ -958,8 +971,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 		{
 
 			if (ownerItem(_uid, _item._typeid))
-				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] add um character[TYPEID=" 
-							+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] add um character[TYPEID="
+					+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			CharacterInfo ce{ 0 };
 			ce.id = _item.id;
@@ -974,7 +987,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			CmdAddCharacter cmd_ac(_uid, ce, _purchase, 0/*_gift_flag*/, true);	// Waitable
 
 			snmdb::NormalManagerDB::getInstance().add(0, &cmd_ac, nullptr, nullptr);
-		
+
 			cmd_ac.waitEvent();
 
 			if (cmd_ac.getException().getCodeError() != 0)
@@ -984,13 +997,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			_item.id = ce.id;
 
 			if (ce.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o character[TYPEID=" + std::to_string(ce._typeid) + "] para o player: " 
-						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o character[TYPEID=" + std::to_string(ce._typeid) + "] para o player: "
+					+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			_item.STDA_C_ITEM_QNTD = 1;
 			_item.stat.qntd_ant = 0;
 			_item.stat.qntd_dep = 1;
-		
+
 			ret_id = (RetAddItem::TYPE)ce.id;
 
 			STATIC_ADD_ITEM_SUCESS_MSG_LOG("Adicionou Character");
@@ -1002,7 +1015,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 			if (ownerItem(_uid, _item._typeid))
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add um caddie[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja possi.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ std::to_string(_item._typeid) + "] que ele ja possi.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			CaddieInfoEx ci{ 0 };
 			ci.id = _item.id;
@@ -1014,7 +1027,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				ci.rent_flag = 2;
 				ci.end_date_unix = _item.date_reserve;//(_item.flag == 0x20/*dia*/) ? _item.STDA_C_ITEM_TIME : (_item.flag == 0x40/*minutos*/) ? _item.STDA_C_ITEM_TIME * 60 * 60 : _item.STDA_C_ITEM_TIME;
 			}
-		
+
 			CmdAddCaddie cmd_ac(_uid, ci, _purchase, 0/*_gift_flag*/, true);	// Waitable
 
 			snmdb::NormalManagerDB::getInstance().add(2, &cmd_ac, nullptr, nullptr);
@@ -1028,13 +1041,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			_item.id = ci.id;
 
 			if (ci.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o caddie[TYPEID=" + std::to_string(ci._typeid) + "] para o player: " 
-						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-		
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o caddie[TYPEID=" + std::to_string(ci._typeid) + "] para o player: "
+					+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 			_item.STDA_C_ITEM_QNTD = 1;
 			_item.stat.qntd_ant = 0;
 			_item.stat.qntd_dep = 1;
-		
+
 			ret_id = (RetAddItem::TYPE)ci.id;
 
 			STATIC_ADD_ITEM_SUCESS_MSG_LOG("Adicionou Caddie");
@@ -1049,16 +1062,16 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 			if (!(ci.id > 0)/*!hasFound*/)
 				throw exception("[itme_manager::addItem][Log] Player[UID=" + std::to_string(_uid)
-						+ "] tentou comprar um caddie item[TYPEID=" + std::to_string(_item._typeid) + "] sem o caddie[TYPEID=" 
-						+ std::to_string(cad_typeid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 14, 0));
+					+ "] tentou comprar um caddie item[TYPEID=" + std::to_string(_item._typeid) + "] sem o caddie[TYPEID="
+					+ std::to_string(cad_typeid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 14, 0));
 
 			time_t end_date = 0;
 
 			if (ci.parts_typeid == _item._typeid) {	// Já tem o parts caddie, atualiza o tempo
-			
+
 				// Adiciona o Tempo em Unix Time Stamp
 				end_date = SystemTimeToUnix(ci.end_parts_date) + STDA_TRANSLATE_FLAG_TIME(_item.flag_time, _item.STDA_C_ITEM_TIME); //(((_item.flag_time == 2) ? _item.STDA_C_ITEM_TIME : _item.STDA_C_ITEM_TIME * 24) * 60 * 60);
-				
+
 				// Converte para System Time novamente
 				ci.end_parts_date = UnixToSystemTime(end_date);
 
@@ -1072,12 +1085,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				ret_id = (RetAddItem::TYPE)ci.id;
 
 				STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou Caddie Item");
-				
-			}else {
+
+			}
+			else {
 
 				// Não tem o caddie parts ainda, add
 				ci.parts_typeid = _item._typeid;
-				
+
 				end_date = GetLocalTimeAsUnix() + ((ci.parts_end_date_unix = STDA_TRANSLATE_FLAG_TIME_TO_HOUR(_item.flag_time, _item.STDA_C_ITEM_TIME)) * 60 * 60);
 
 				// Converte para System Time novamente
@@ -1103,10 +1117,10 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 			if (mascot == nullptr)
 				throw exception("[item_manager::addItem][Erorr] mascot[TYPEID=" + std::to_string(_item._typeid)
-						+ "] nao foi encontrado no IFF_STRUCT do server, para o player[UID=" + std::to_string(_uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ "] nao foi encontrado no IFF_STRUCT do server, para o player[UID=" + std::to_string(_uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			auto pMi = _ownerMascot(_uid, _item._typeid);
-		
+
 			if ((pMi.id > 0)/*hasFound*/) {	// Player já tem o mascot, só add mais tempo à ele
 
 				if (mascot->shop.flag_shop.time_shop.active && _item.STDA_C_ITEM_TIME > 0) {
@@ -1130,7 +1144,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					_item.date.date.sysDate[1] = pMi.data;
 
 					auto str_date = _formatDate(pMi.data);
-				
+
 					// Cmd update time mascot db
 					snmdb::NormalManagerDB::getInstance().add(6, new CmdUpdateMascotTime(_uid, pMi.id, str_date), item_manager::SQLDBResponse, nullptr/*o item_manager é static*/);
 				}
@@ -1140,7 +1154,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				ret_id = (RetAddItem::TYPE)_item.id;
 
 				STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou o tempo[Dia(s)=" + std::to_string(_item.STDA_C_ITEM_TIME) + "] do Mascot");
-			} else {
+			}
+			else {
 				MascotInfoEx mi{};
 				mi.id = _item.id;
 				mi._typeid = _item._typeid;
@@ -1176,8 +1191,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = mi.id;
 
 				if (mi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Mascot[TYPEID=" + std::to_string(mi._typeid) + "] para o player: " 
-							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Mascot[TYPEID=" + std::to_string(mi._typeid) + "] para o player: "
+						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 				_item.STDA_C_ITEM_QNTD = 1;
 				_item.stat.qntd_ant = 0;
@@ -1216,11 +1231,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			auto pWi = _ownerBall(_uid, _item._typeid);
 
 			if ((pWi.id > 0)/*hasFound*/) {	// já tem atualiza quantidade
-			
+
 				_item.stat.qntd_ant = pWi.STDA_C_ITEM_QNTD;
 
 				pWi.STDA_C_ITEM_QNTD += _item.STDA_C_ITEM_QNTD;
-			
+
 				_item.stat.qntd_dep = pWi.STDA_C_ITEM_QNTD;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pWi.id;
@@ -1228,7 +1243,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				snmdb::NormalManagerDB::getInstance().add(7, new CmdUpdateBallQntd(_uid, pWi.id, pWi.STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
 				STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou Ball");
-			}else {	// não tem, add
+			}
+			else {	// não tem, add
 
 				WarehouseItemEx wi{ 0 };
 				wi.id = _item.id;
@@ -1257,8 +1273,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Ball[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Ball[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 				_item.stat.qntd_ant = 0;
 				_item.stat.qntd_dep = wi.STDA_C_ITEM_QNTD;
@@ -1272,12 +1288,12 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 		}
 		case iff::CLUBSET:
 		{
-			
+
 			auto clubset = sIff::getInstance().findClubSet(_item._typeid);
 
 			if (clubset == nullptr)
 				throw exception("[item_manager::addItem][Error] clubset[TYPEID=" + std::to_string(_item._typeid)
-						+ "] set nao foi encontrado no IFF_STRUCT do server, para o player: " + std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
+					+ "] set nao foi encontrado no IFF_STRUCT do server, para o player: " + std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
 
 			auto pWi = _ownerItem(_uid, _item._typeid);
 
@@ -1321,11 +1337,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 					STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou ClubSet");
 
-				}else
+				}
+				else
 					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add clubset[TYPEID="
-							+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
-				
-			}else {
+						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+
+			}
+			else {
 
 				WarehouseItemEx wi{ 0 };
 
@@ -1358,10 +1376,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					_item.id = wi.id;
 
 					if (wi.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de ClubSet[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID=" 
-								+ std::to_string(_uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
-				
-				}else {
+						throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de ClubSet[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID="
+							+ std::to_string(_uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
+
+				}
+				else {
 					CmdAddClubSet cmd_acs(_uid, wi, _purchase, 0/*_gift_flag*/, true);	// Waiter
 
 					snmdb::NormalManagerDB::getInstance().add(0, &cmd_acs, nullptr, nullptr);
@@ -1375,9 +1394,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					_item.id = wi.id;
 
 					if (wi.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o ClubSet[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-								+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-				
+						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o ClubSet[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 				}
 
 				if (_item.STDA_C_ITEM_TIME > 0) {
@@ -1417,9 +1436,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			if ((pCi.id > 0)/*hasFound*/) {	// Já tem o item atualiza quantidade
 
 				_item.stat.qntd_ant = pCi.qntd;
-			
+
 				pCi.qntd += _item.qntd;
-			
+
 				_item.stat.qntd_dep = pCi.qntd;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pCi.id;
@@ -1427,8 +1446,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				snmdb::NormalManagerDB::getInstance().add(8, new CmdUpdateCardQntd(_uid, pCi.id, pCi.qntd), item_manager::SQLDBResponse, nullptr);
 
 				STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou Card");
-			
-			}else {
+
+			}
+			else {
 
 				CardInfo ci{ 0 };
 
@@ -1450,8 +1470,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = ci.id;
 
 				if (ci.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Card[TYPEID=" + std::to_string(ci._typeid) + "] para o player: " 
-							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Card[TYPEID=" + std::to_string(ci._typeid) + "] para o player: "
+						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 				_item.stat.qntd_ant = 0;
 				_item.stat.qntd_dep = _item.qntd;
@@ -1470,11 +1490,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 			if (furniture == nullptr)
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add um Furniture[TYPEID="
-						+ std::to_string(_item._typeid) + "] que nao existe no IFF_STRUCT do server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
+					+ std::to_string(_item._typeid) + "] que nao existe no IFF_STRUCT do server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
 
 			if (ownerItem(_uid, _item._typeid))
-				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) +"] tentou add um Furniture[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja tem", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add um Furniture[TYPEID="
+					+ std::to_string(_item._typeid) + "] que ele ja tem", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			MyRoomItem mri{ 0 };
 
@@ -1496,8 +1516,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			_item.id = mri.id;
 
 			if (mri.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Furniture[TYPEID=" + std::to_string(mri._typeid) + "] para o player: " 
-						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Furniture[TYPEID=" + std::to_string(mri._typeid) + "] para o player: "
+					+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			_item.stat.qntd_ant = 0;
 			_item.stat.qntd_dep = _item.STDA_C_ITEM_QNTD;
@@ -1519,12 +1539,12 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 				if (!sIff::getInstance().IsCanOverlapped(pWi._typeid))
 					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add AuxPart[TYPEID="
-							+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
-			
+						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+
 				_item.stat.qntd_ant = pWi.STDA_C_ITEM_QNTD;
-			
+
 				pWi.STDA_C_ITEM_QNTD += _item.STDA_C_ITEM_QNTD;
-			
+
 				_item.stat.qntd_dep = pWi.STDA_C_ITEM_QNTD;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pWi.id;
@@ -1532,7 +1552,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_uid, pWi.id, pWi.STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
 				STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou AuxPart");
-			}else {
+			}
+			else {
 
 				WarehouseItemEx wi{ 0 };
 				wi.id = _item.id;
@@ -1564,9 +1585,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o AuxPart[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-		
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o AuxPart[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 				if (_item.STDA_C_ITEM_TIME > 0) {
 					_item.date.active = 1;
 
@@ -1599,42 +1620,44 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 		{
 			// CHECK FOR POUCH [PANG OR EXP]
 			if (_item._typeid == PANG_POUCH_TYPEID/*Pang Pouch*/) {
-			
+
 				// Pang Pouch para o player
 				PlayerInfo::addPang(_uid, (_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD);
 
-	#ifdef _DEBUG
-				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou Pang Pouch. item[TYPEID=" 
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
-	#else
+#ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou Pang Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
-	#endif
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
+#else
+				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou Pang Pouch. item[TYPEID="
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
+#endif
 
 				// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
 				BlockMemoryManager::unblockUID(_uid);
 
 				return item_manager::RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 
-			}else if (_item._typeid == EXP_POUCH_TYPEID/*Exp Pouch*/) {
-			
+			}
+			else if (_item._typeid == EXP_POUCH_TYPEID/*Exp Pouch*/) {
+
 				// Exp Pouch para o player
 				player::addExp(_uid, (uint32_t)((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD));
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou Exp Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
-	#else
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
+#else
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou Exp Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
-	#endif
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
+#endif
 
 				// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
 				BlockMemoryManager::unblockUID(_uid);
 
 				return item_manager::RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 
-			}else if (_item._typeid == CP_POUCH_TYPEID/*Cookie Point Pouch*/) {
+			}
+			else if (_item._typeid == CP_POUCH_TYPEID/*Cookie Point Pouch*/) {
 
 				// Log Ganhos de CP
 				CPLog cp_log;
@@ -1651,10 +1674,10 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 #ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou CP Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
 #else
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_uid) + "] Adicionou CP Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
 #endif
 
 				// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
@@ -1671,12 +1694,12 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 				if (sPremiumSystem::getInstance().isPremiumTicket(pWi._typeid) && pWi.ano > 0)
 					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add Item[TYPEID="
-							+ std::to_string(_item._typeid) + "] 'Premium Ticket' que ele ja possui, com tempo, tem que esperar acabar o tempo", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 15, 0));
+						+ std::to_string(_item._typeid) + "] 'Premium Ticket' que ele ja possui, com tempo, tem que esperar acabar o tempo", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 15, 0));
 
 				_item.stat.qntd_ant = pWi.STDA_C_ITEM_QNTD;
-			
+
 				pWi.STDA_C_ITEM_QNTD += _item.STDA_C_ITEM_QNTD;
-			
+
 				_item.stat.qntd_dep = pWi.STDA_C_ITEM_QNTD;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pWi.id;
@@ -1684,7 +1707,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_uid, pWi.id, pWi.STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
 				STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou Item");
-			}else {
+			}
+			else {
 
 				WarehouseItemEx wi{ 0 };
 				wi.id = _item.id;
@@ -1716,9 +1740,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Item[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-		
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Item[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 				if (_item.STDA_C_ITEM_TIME > 0) {
 					_item.date.active = 1;
 
@@ -1752,7 +1776,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 			if (ownerItem(_uid, _item._typeid))
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add Skin[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			WarehouseItemEx wi{ 0 };
 			wi.id = _item.id;
@@ -1779,8 +1803,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 			_item.id = wi.id;
 
 			if (wi.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Skin[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Skin[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+					+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			if (_item.STDA_C_ITEM_TIME > 0) {
 				_item.date.active = 1;
@@ -1813,7 +1837,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 		{
 			if (ownerItem(_uid, _item._typeid) && !sIff::getInstance().IsCanOverlapped(_item._typeid))
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] tentou add Part[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			// Ainda falta as parte por tempo, aquelas do couldron de cor dourada
 			WarehouseItemEx wi{ 0 };
@@ -1855,10 +1879,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de Part[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID=" 
-							+ std::to_string(_uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
-				
-			}else {
+					throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de Part[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID="
+						+ std::to_string(_uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
+
+			}
+			else {
 				CmdAddPart cmd_ap(_uid, wi, _purchase, 0/*_gift_flag*/, _item.type_iff, true);	// Waiter
 
 				snmdb::NormalManagerDB::getInstance().add(3, &cmd_ap, nullptr, nullptr);
@@ -1872,9 +1897,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Parts[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-				
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Parts[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 			}
 
 			if (_item.type_iff == IFF::Part::UCC_BLANK || _item.type_iff == IFF::Part::UCC_COPY) {
@@ -1915,7 +1940,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				if (_item.flag_time == 2)
 					_item.STDA_C_ITEM_TIME *= 24;	// Horas
 			}
-		
+
 			ret_id = (RetAddItem::TYPE)wi.id;
 
 			STATIC_ADD_ITEM_SUCESS_MSG_LOG("Adicionou Part" + (wi.ano > 0 && (wi.ano / 24) == 7/*Dias*/ && wi.flag == 0x60/*Rental*/ ? " Rental[Dia(s)=" + std::to_string(wi.STDA_C_ITEM_TIME) + "]" : std::string("")));
@@ -1932,7 +1957,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				auto ce = _ownerHairStyle(_uid, _item._typeid);
 
 				if ((ce.id > 0)/*hasFound*/) {	// Tem o Character
-					
+
 					ce.default_hair = hair->cor;
 
 					snmdb::NormalManagerDB::getInstance().add(4, new CmdAddCharacterHairStyle(_uid, ce, _purchase, 0/*_gift_flag*/), item_manager::SQLDBResponse, nullptr);
@@ -1940,15 +1965,17 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					ret_id = (RetAddItem::TYPE)ce.id;
 
 					STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou HairStyle");
-				
-				}else
-					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] nao tem esse character.", 
-							STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 16, 0));
 
-			}else
-				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] hairstyle[TYPEID=" 
-						+ std::to_string(_item._typeid) + "] nao tem no IFF_STRUCT.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 17, 0));
-		
+				}
+				else
+					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] nao tem esse character.",
+						STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 16, 0));
+
+			}
+			else
+				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_uid) + "] hairstyle[TYPEID="
+					+ std::to_string(_item._typeid) + "] nao tem no IFF_STRUCT.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 17, 0));
+
 			break;
 		}
 		case iff::COUNTER_ITEM:
@@ -1967,9 +1994,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 				if (tsi.id > 0) {	// Já tem item add quantidade do Troféu especial
 
 					_item.stat.qntd_ant = tsi.qntd;
-			
+
 					tsi.qntd += _item.STDA_C_ITEM_QNTD;
-			
+
 					_item.stat.qntd_dep = tsi.qntd;
 
 					_item.id = ret_id = (RetAddItem::TYPE)tsi.id;
@@ -1977,7 +2004,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					snmdb::NormalManagerDB::getInstance().add(18, new CmdUpdateTrofelEspecialQntd(_uid, tsi.id, tsi.qntd, CmdUpdateTrofelEspecialQntd::eTYPE::ESPECIAL), item_manager::SQLDBResponse, nullptr);
 
 					STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou Trofel Especial");
-				}else {
+				}
+				else {
 
 					TrofelEspecialInfo ts{ 0 };
 					ts.id = _item.id;
@@ -1997,8 +2025,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					_item.id = ts.id;
 
 					if (ts.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Especial[TYPEID=" + std::to_string(ts._typeid) + "] para o player: " 
-								+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Especial[TYPEID=" + std::to_string(ts._typeid) + "] para o player: "
+							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 					_item.stat.qntd_ant = 0;
 					_item.stat.qntd_dep = ts.qntd;
@@ -2007,17 +2035,18 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 
 					STATIC_ADD_ITEM_SUCESS_MSG_LOG("Adicionou Trofel Especial");
 				}
-			
-			}else if (type_trofel == 3) {	// Grand Prix
+
+			}
+			else if (type_trofel == 3) {	// Grand Prix
 
 				auto tsi = _ownerTrofelEspecial(_uid, _item._typeid);
 
 				if (tsi.id > 0) {	// Já tem item add quantidade do Troféu Grand Prix
 
 					_item.stat.qntd_ant = tsi.qntd;
-			
+
 					tsi.qntd += _item.STDA_C_ITEM_QNTD;
-			
+
 					_item.stat.qntd_dep = tsi.qntd;
 
 					_item.id = ret_id = (RetAddItem::TYPE)tsi.id;
@@ -2025,7 +2054,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					snmdb::NormalManagerDB::getInstance().add(18, new CmdUpdateTrofelEspecialQntd(_uid, tsi.id, tsi.qntd, CmdUpdateTrofelEspecialQntd::eTYPE::GRAND_PRIX), item_manager::SQLDBResponse, nullptr);
 
 					STATIC_ADD_ITEM_SUCESS_MSG_LOG("Atualizou Trofel Grand Prix");
-				}else {
+				}
+				else {
 
 					TrofelEspecialInfo ts{ 0 };
 					ts.id = _item.id;
@@ -2045,8 +2075,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 					_item.id = ts.id;
 
 					if (ts.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Grand Prix[TYPEID=" + std::to_string(ts._typeid) + "] para o player: " 
-								+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Grand Prix[TYPEID=" + std::to_string(ts._typeid) + "] para o player: "
+							+ std::to_string(_uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 					_item.stat.qntd_ant = 0;
 					_item.stat.qntd_dep = ts.qntd;
@@ -2064,7 +2094,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 		// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
 		BlockMemoryManager::unblockUID(_uid);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[item_manager::addItem][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -2078,7 +2109,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, uint32_t _ui
 }
 
 item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, uint32_t _uid, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
-	
+
 	RetAddItem rai{ 0 };
 	RetAddItem::TYPE type = RetAddItem::T_INIT_VALUE;
 
@@ -2086,9 +2117,9 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, u
 
 		if ((type = addItem(*it, _uid, _gift_flag, _purchase, _dup)) <= 0) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_uid) + "] tentou adicionar o item[TYPEID=" 
-					+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], " 
-					+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_uid) + "] tentou adicionar o item[TYPEID="
+				+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], "
+				+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
 
 			rai.fails.push_back(*it);
 
@@ -2105,15 +2136,17 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, u
 				else if (rai.type != RetAddItem::TR_SUCCESS_WITH_ERROR && rai.type != RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR)
 					rai.type = type;
 
-			}else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
-				
+			}
+			else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
+
 				if (rai.type == RetAddItem::T_ERROR || rai.type == RetAddItem::TR_SUCCESS_WITH_ERROR)
 					rai.type = RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR;
 				else if (rai.type == RetAddItem::T_SUCCESS)
 					rai.type = RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 			}
 
-		}else {
+		}
+		else {
 
 			// Incrementa
 			++it;
@@ -2137,9 +2170,9 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item,
 
 		if ((type = addItem(*it, _uid, _gift_flag, _purchase, _dup)) <= 0) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_uid) + "] tentou adicionar o item[TYPEID=" 
-					+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], " 
-					+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_uid) + "] tentou adicionar o item[TYPEID="
+				+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], "
+				+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
 
 			rai.fails.push_back(*it);
 
@@ -2156,15 +2189,17 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item,
 				else if (rai.type != RetAddItem::TR_SUCCESS_WITH_ERROR && rai.type != RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR)
 					rai.type = type;
 
-			}else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
-				
+			}
+			else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
+
 				if (rai.type == RetAddItem::T_ERROR || rai.type == RetAddItem::TR_SUCCESS_WITH_ERROR)
 					rai.type = RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR;
 				else if (rai.type == RetAddItem::T_SUCCESS)
 					rai.type = RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 			}
 
-		}else {
+		}
+		else {
 
 			// Incrementa
 			++it;
@@ -2182,9 +2217,9 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item,
 item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _session, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
 
 #ifdef _DEBUG
-	#define MSG_ACTIVE_DEBUG	CL_FILE_LOG_AND_CONSOLE
+#define MSG_ACTIVE_DEBUG	CL_FILE_LOG_AND_CONSOLE
 #else
-	#define MSG_ACTIVE_DEBUG	CL_ONLY_FILE_LOG
+#define MSG_ACTIVE_DEBUG	CL_ONLY_FILE_LOG
 #endif
 
 #define ADD_ITEM_SUCESS_MSG_LOG(__item) { \
@@ -2212,8 +2247,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			auto pCi = _session.m_pi.findCharacterByTypeid(_item._typeid);
 
 			if (pCi != nullptr)
-				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] add um character[TYPEID=" 
-							+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] add um character[TYPEID="
+					+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			CharacterInfo ce{ 0 };
 			ce.id = _item.id;
@@ -2228,7 +2263,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			CmdAddCharacter cmd_ac(_session.m_pi.uid, ce, _purchase, 0/*_gift_flag*/, true);	// Waitable
 
 			snmdb::NormalManagerDB::getInstance().add(0, &cmd_ac, nullptr, nullptr);
-		
+
 			cmd_ac.waitEvent();
 
 			if (cmd_ac.getException().getCodeError() != 0)
@@ -2238,8 +2273,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			_item.id = ce.id;
 
 			if (ce.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o character[TYPEID=" + std::to_string(ce._typeid) + "] para o player: " 
-						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o character[TYPEID=" + std::to_string(ce._typeid) + "] para o player: "
+					+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			_item.STDA_C_ITEM_QNTD = 1;
 			_item.stat.qntd_ant = 0;
@@ -2253,7 +2288,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			_session.m_pi.ei.char_info = &it_char->second;
 
 			snmdb::NormalManagerDB::getInstance().add(17, new CmdUpdateCharacterEquiped(_session.m_pi.uid, _session.m_pi.ue.character_id), item_manager::SQLDBResponse, nullptr);
-		
+
 			ret_id = (RetAddItem::TYPE)ce.id;
 
 			ADD_ITEM_SUCESS_MSG_LOG("Adicionou Character");
@@ -2266,7 +2301,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			if (pCi != nullptr)
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um caddie[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja possi.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ std::to_string(_item._typeid) + "] que ele ja possi.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			CaddieInfoEx ci{ 0 };
 			ci.id = _item.id;
@@ -2278,7 +2313,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				ci.rent_flag = 2;
 				ci.end_date_unix = _item.date_reserve;//(_item.flag == 0x20/*dia*/) ? _item.STDA_C_ITEM_TIME : (_item.flag == 0x40/*minutos*/) ? _item.STDA_C_ITEM_TIME * 60 * 60 : _item.STDA_C_ITEM_TIME;
 			}
-		
+
 			CmdAddCaddie cmd_ac(_session.m_pi.uid, ci, _purchase, 0/*_gift_flag*/, true);	// Waitable
 
 			snmdb::NormalManagerDB::getInstance().add(2, &cmd_ac, nullptr, nullptr);
@@ -2292,17 +2327,17 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			_item.id = ci.id;
 
 			if (ci.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o caddie[TYPEID=" + std::to_string(ci._typeid) + "] para o player: " 
-						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-			
-		
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o caddie[TYPEID=" + std::to_string(ci._typeid) + "] para o player: "
+					+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
+
 			_item.STDA_C_ITEM_QNTD = 1;
 			_item.stat.qntd_ant = 0;
 			_item.stat.qntd_dep = 1;
 
 			// Add List Item ON Server
 			_session.m_pi.mp_ci.insert(std::make_pair(ci.id, ci));
-		
+
 			ret_id = (RetAddItem::TYPE)ci.id;
 
 			ADD_ITEM_SUCESS_MSG_LOG("Adicionou Caddie");
@@ -2316,13 +2351,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			auto ci = _session.m_pi.findCaddieByTypeid(cad_typeid);
 
 			if (ci == nullptr)
-				throw exception("[item_manager::addItem][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar um caddie item[TYPEID=" 
-						+ std::to_string(_item._typeid) + "] sem o caddie[TYPEID=" + std::to_string(cad_typeid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 14, 0));
+				throw exception("[item_manager::addItem][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar um caddie item[TYPEID="
+					+ std::to_string(_item._typeid) + "] sem o caddie[TYPEID=" + std::to_string(cad_typeid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 14, 0));
 
 			time_t end_date = 0;
 
 			if (ci->parts_typeid == _item._typeid) {	// Já tem o parts caddie, atualiza o tempo
-			
+
 				end_date = SystemTimeToUnix(ci->end_parts_date) + STDA_TRANSLATE_FLAG_TIME(_item.flag_time, _item.STDA_C_ITEM_TIME); //(((_item.flag_time == 2) ? _item.STDA_C_ITEM_TIME : _item.STDA_C_ITEM_TIME * 24) * 60 * 60);
 
 				// Converte para System Time novamente
@@ -2340,7 +2375,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 				ADD_ITEM_SUCESS_MSG_LOG("Atualizou Caddie Item");
 
-			}else {
+			}
+			else {
 
 				// Não tem o caddie parts ainda, add
 				ci->parts_typeid = _item._typeid;
@@ -2384,10 +2420,10 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			if (mascot == nullptr)
 				throw exception("[item_manager::addItem][Erorr] mascot[TYPEID=" + std::to_string(_item._typeid)
-						+ "] nao foi encontrado no IFF_STRUCT do server, para o player[UID=" + std::to_string(_session.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ "] nao foi encontrado no IFF_STRUCT do server, para o player[UID=" + std::to_string(_session.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			auto pMi = _session.m_pi.findMascotByTypeid(_item._typeid);
-		
+
 			if (pMi != nullptr) {	// Player já tem o mascot, só add mais tempo à ele
 
 				if (mascot->shop.flag_shop.time_shop.active && _item.STDA_C_ITEM_TIME > 0) {
@@ -2412,7 +2448,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					_item.date.date.sysDate[1] = pMi->data;
 
 					auto str_date = _formatDate(pMi->data);
-				
+
 					// Cmd update time mascot db
 					snmdb::NormalManagerDB::getInstance().add(6, new CmdUpdateMascotTime(_session.m_pi.uid, pMi->id, str_date), item_manager::SQLDBResponse, nullptr/*o item_manager é static*/);
 				}
@@ -2436,9 +2472,10 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 				}
 				// ---- fim do verifica se o Mascot está no update item ----
-			
-			}else {
-			
+
+			}
+			else {
+
 				MascotInfoEx mi{};
 				mi.id = _item.id;
 				mi._typeid = _item._typeid;
@@ -2474,8 +2511,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = mi.id;
 
 				if (mi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Mascot[TYPEID=" + std::to_string(mi._typeid) + "] para o player: " 
-							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Mascot[TYPEID=" + std::to_string(mi._typeid) + "] para o player: "
+						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 				_item.STDA_C_ITEM_QNTD = 1;
 				_item.stat.qntd_ant = 0;
@@ -2495,13 +2532,14 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					_item.stat.qntd_dep = (uint32_t)unix_time;
 
 					_item.date.active = 1;
-					
+
 					// System Time Struct is Local Time
 					GetLocalTime(&_item.date.date.sysDate[0]);
 
 					_item.date.date.sysDate[1] = mi.data;
-				
-				}else // O Mascot não é por tempo, mas precisa do end data, por que é a mesma da data que ele foi adicionado no banco de dados, precisa na hora de atualizar o mascot
+
+				}
+				else // O Mascot não é por tempo, mas precisa do end data, por que é a mesma da data que ele foi adicionado no banco de dados, precisa na hora de atualizar o mascot
 					GetLocalTime(&mi.data);
 
 				// Add List Item ON Server
@@ -2519,11 +2557,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			auto pWi = _session.m_pi.findWarehouseItemByTypeid(_item._typeid);
 
 			if (pWi != nullptr) {	// já tem atualiza quantidade
-			
+
 				_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
 
 				pWi->STDA_C_ITEM_QNTD += _item.STDA_C_ITEM_QNTD;
-			
+
 				_item.stat.qntd_dep = pWi->STDA_C_ITEM_QNTD;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pWi->id;
@@ -2531,7 +2569,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				snmdb::NormalManagerDB::getInstance().add(7, new CmdUpdateBallQntd(_session.m_pi.uid, pWi->id, pWi->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
 				ADD_ITEM_SUCESS_MSG_LOG("Atualizou Ball");
-			}else {	// não tem, add
+			}
+			else {	// não tem, add
 
 				WarehouseItemEx wi{ 0 };
 				wi.id = _item.id;
@@ -2560,8 +2599,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Ball[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Ball[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 				_item.stat.qntd_ant = 0;
 				_item.stat.qntd_dep = wi.STDA_C_ITEM_QNTD;
@@ -2583,7 +2622,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			if (clubset == nullptr)
 				throw exception("[item_manager::addItem][Error] clubset[TYPEID=" + std::to_string(_item._typeid)
-						+ "] set nao foi encontrado no IFF_STRUCT do server, para o player: " + std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
+					+ "] set nao foi encontrado no IFF_STRUCT do server, para o player: " + std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
 
 			auto pWi = _session.m_pi.findWarehouseItemByTypeid(_item._typeid);
 
@@ -2640,10 +2679,12 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					}
 					// ---- fim do verifica se o ClubSet está no update item ----
 
-				}else
+				}
+				else
 					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add clubset[TYPEID="
-							+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
-			}else {
+						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+			}
+			else {
 
 				WarehouseItemEx wi{ 0 };
 
@@ -2677,10 +2718,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					_item.id = wi.id;
 
 					if (wi.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de ClubSet[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID=" 
-								+ std::to_string(_session.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
-				
-				}else {
+						throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de ClubSet[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID="
+							+ std::to_string(_session.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
+
+				}
+				else {
 					CmdAddClubSet cmd_acs(_session.m_pi.uid, wi, _purchase, 0/*_gift_flag*/, true);	// Waiter
 
 					snmdb::NormalManagerDB::getInstance().add(0, &cmd_acs, nullptr, nullptr);
@@ -2694,8 +2736,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					_item.id = wi.id;
 
 					if (wi.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o ClubSet[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-								+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o ClubSet[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 				}
 
 				if (_item.STDA_C_ITEM_TIME > 0) {
@@ -2739,9 +2781,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			if (pCi != nullptr) {	// Já tem item add quantidade ao card
 
 				_item.stat.qntd_ant = pCi->qntd;
-			
+
 				pCi->qntd += _item.qntd;
-			
+
 				_item.stat.qntd_dep = pCi->qntd;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pCi->id;
@@ -2749,8 +2791,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				snmdb::NormalManagerDB::getInstance().add(8, new CmdUpdateCardQntd(_session.m_pi.uid, pCi->id, pCi->qntd), item_manager::SQLDBResponse, nullptr);
 
 				ADD_ITEM_SUCESS_MSG_LOG("Atualizou Card");
-			
-			}else {
+
+			}
+			else {
 
 				CardInfo ci{ 0 };
 
@@ -2772,8 +2815,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = ci.id;
 
 				if (ci.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Card[TYPEID=" + std::to_string(ci._typeid) + "] para o player: " 
-							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Card[TYPEID=" + std::to_string(ci._typeid) + "] para o player: "
+						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 				_item.stat.qntd_ant = 0;
 				_item.stat.qntd_dep = _item.qntd;
@@ -2795,13 +2838,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			if (furniture == nullptr)
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um Furniture[TYPEID="
-						+ std::to_string(_item._typeid) + "] que nao existe no IFF_STRUCT do server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
+					+ std::to_string(_item._typeid) + "] que nao existe no IFF_STRUCT do server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 12, 0));
 
 			auto pFi = _session.m_pi.findMyRoomItemByTypeid(_item._typeid);
 
 			if (pFi != nullptr)
-				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) +"] tentou add um Furniture[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja tem", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um Furniture[TYPEID="
+					+ std::to_string(_item._typeid) + "] que ele ja tem", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			MyRoomItem mri{ 0 };
 
@@ -2823,8 +2866,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			_item.id = mri.id;
 
 			if (mri.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Furniture[TYPEID=" + std::to_string(mri._typeid) + "] para o player: " 
-						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Furniture[TYPEID=" + std::to_string(mri._typeid) + "] para o player: "
+					+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			_item.stat.qntd_ant = 0;
 			_item.stat.qntd_dep = _item.STDA_C_ITEM_QNTD;
@@ -2849,12 +2892,12 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 				if (!sIff::getInstance().IsCanOverlapped(pWi->_typeid))
 					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add AuxPart[TYPEID="
-							+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
-			
+						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+
 				_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
-			
+
 				pWi->STDA_C_ITEM_QNTD += _item.STDA_C_ITEM_QNTD;
-			
+
 				_item.stat.qntd_dep = pWi->STDA_C_ITEM_QNTD;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pWi->id;
@@ -2862,7 +2905,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_session.m_pi.uid, pWi->id, pWi->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
 				ADD_ITEM_SUCESS_MSG_LOG("Atualizou AuxPart");
-			}else {
+			}
+			else {
 
 				WarehouseItemEx wi{ 0 };
 				wi.id = _item.id;
@@ -2894,9 +2938,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o AuxPart[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-		
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o AuxPart[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 				if (_item.STDA_C_ITEM_TIME > 0) {
 					_item.date.active = 1;
 
@@ -2932,42 +2976,44 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 		{
 			// CHECK FOR POUCH [PANG, EXP OR CP]
 			if (_item._typeid == PANG_POUCH_TYPEID/*Pang Pouch*/) {
-			
+
 				// Pang Pouch para o player
 				_session.addPang((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD);
 
-	#ifdef _DEBUG
-				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou Pang Pouch. item[TYPEID=" 
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
-	#else
+#ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou Pang Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
-	#endif
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
+#else
+				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou Pang Pouch. item[TYPEID="
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
+#endif
 
 				// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
 				BlockMemoryManager::unblockUID(_session.m_pi.uid);
 
 				return RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 
-			}else if (_item._typeid == EXP_POUCH_TYPEID/*Exp Pouch*/) {
-			
+			}
+			else if (_item._typeid == EXP_POUCH_TYPEID/*Exp Pouch*/) {
+
 				// Exp Pouch para o player
 				_session.addExp((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD, true/*Send packet for update level and exp in game*/);
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou Exp Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
-	#else
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
+#else
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou Exp Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
-	#endif
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
+#endif
 
 				// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
 				BlockMemoryManager::unblockUID(_session.m_pi.uid);
 
 				return RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
-			
-			}else if (_item._typeid == CP_POUCH_TYPEID/*Cookie Point Pouch*/) {
+
+			}
+			else if (_item._typeid == CP_POUCH_TYPEID/*Cookie Point Pouch*/) {
 
 				// Log Ganhos de CP
 				CPLog cp_log;
@@ -2984,10 +3030,10 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 #ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou CP Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_FILE_LOG_AND_CONSOLE));
 #else
 				_smp::message_pool::getInstance().push(new message("[Pangya Shop][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] Adicionou CP Pouch. item[TYPEID="
-						+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
+					+ std::to_string(_item._typeid) + "] Qntd[value=" + std::to_string((_item.qntd > 0xFFu) ? _item.qntd : _item.STDA_C_ITEM_QNTD) + "]", CL_ONLY_FILE_LOG));
 #endif
 
 				// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
@@ -3008,13 +3054,13 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 					if (getLocalTimeDiffDESC(st) > 0ll || _session.m_pi.m_cap.stBit.premium_user)
 						throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add Item[TYPEID="
-								+ std::to_string(_item._typeid) + "] 'Premium Ticket' que ele ja possui com tempo, tem que esperar acabar o tempo.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 15, 0));
+							+ std::to_string(_item._typeid) + "] 'Premium Ticket' que ele ja possui com tempo, tem que esperar acabar o tempo.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 15, 0));
 				}
 
 				_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
-			
+
 				pWi->STDA_C_ITEM_QNTD += _item.STDA_C_ITEM_QNTD;
-			
+
 				_item.stat.qntd_dep = pWi->STDA_C_ITEM_QNTD;
 
 				_item.id = ret_id = (RetAddItem::TYPE)pWi->id;
@@ -3054,9 +3100,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					}
 
 					if (sPremiumSystem::getInstance().isPremiumTicket(_item._typeid)) {
-						
+
 						_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] renovou premium ticket[TYPEID="
-								+ std::to_string(pWi->_typeid) + "] por " + std::to_string(_item.STDA_C_ITEM_TIME / 24u) + " Dias", CL_FILE_LOG_AND_CONSOLE));
+							+ std::to_string(pWi->_typeid) + "] por " + std::to_string(_item.STDA_C_ITEM_TIME / 24u) + " Dias", CL_FILE_LOG_AND_CONSOLE));
 
 						sPremiumSystem::getInstance().addPremiumUser(_session, *pWi, _item.STDA_C_ITEM_TIME / 24u/*Dias*/);
 					}
@@ -3074,7 +3120,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					}
 					// ---- fim do verifica se o Premium Ticket está no update item ----
 
-				}else // Atualiza a quantidade do item normal
+				}
+				else // Atualiza a quantidade do item normal
 					snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_session.m_pi.uid, pWi->id, pWi->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
 				// Atualiza Gacha Coupon
@@ -3087,7 +3134,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				}
 
 				ADD_ITEM_SUCESS_MSG_LOG("Atualizou Item");
-			}else {
+			}
+			else {
 
 				if (sPremiumSystem::getInstance().isPremiumTicket(_item._typeid)) {
 
@@ -3099,8 +3147,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 						if (getLocalTimeDiffDESC(st) > 0ll || _session.m_pi.m_cap.stBit.premium_user)
 							throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add Item[TYPEID="
-									+ std::to_string(_item._typeid) + "] 'Premium Ticket' que ele ja possui outro Premium Ticket[TYPEID=" 
-									+ std::to_string(pWi->_typeid) + "] com tempo, tem que esperar acabar o tempo.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 15, 0));
+								+ std::to_string(_item._typeid) + "] 'Premium Ticket' que ele ja possui outro Premium Ticket[TYPEID="
+								+ std::to_string(pWi->_typeid) + "] com tempo, tem que esperar acabar o tempo.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 15, 0));
 					}
 				}
 
@@ -3134,9 +3182,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Item[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
-	
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Item[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+
 
 				if (_item.STDA_C_ITEM_TIME > 0) {
 					_item.date.active = 1;
@@ -3172,7 +3220,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				if (sPremiumSystem::getInstance().isPremiumTicket(_item._typeid)) {
 
 					_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "] comprou premium ticket[TYPEID="
-							+ std::to_string(wi._typeid) + "] por " + std::to_string(_item.STDA_C_ITEM_TIME / 24u) + " Dias", CL_FILE_LOG_AND_CONSOLE));
+						+ std::to_string(wi._typeid) + "] por " + std::to_string(_item.STDA_C_ITEM_TIME / 24u) + " Dias", CL_FILE_LOG_AND_CONSOLE));
 
 					sPremiumSystem::getInstance().addPremiumUser(_session, wi, _item.STDA_C_ITEM_TIME / 24u);
 				}
@@ -3190,7 +3238,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			if (pWi != nullptr)
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add Skin[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			WarehouseItemEx wi{ 0 };
 			wi.id = _item.id;
@@ -3217,8 +3265,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			_item.id = wi.id;
 
 			if (wi.id <= 0)
-				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Skin[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+				throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Skin[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+					+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			if (_item.STDA_C_ITEM_TIME > 0) {
 				_item.date.active = 1;
@@ -3256,7 +3304,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			if (pWi != nullptr && !sIff::getInstance().IsCanOverlapped(pWi->_typeid))
 				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add Part[TYPEID="
-						+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
+					+ std::to_string(_item._typeid) + "] que ele ja possui", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 10, 0));
 
 			// Ainda falta as parte por tempo, aquelas do couldron de cor dourada, Já Fiz
 			WarehouseItemEx wi{ 0 };
@@ -3298,10 +3346,11 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de Part[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID=" 
-							+ std::to_string(_session.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu pegar o presente de Part[TYPEID=" + std::to_string(_item._typeid) + "] para o player[UID="
+						+ std::to_string(_session.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 13, 0));
 
-			}else {
+			}
+			else {
 				CmdAddPart cmd_ap(_session.m_pi.uid, wi, _purchase, 0/*_gift_flag*/, _item.type_iff, true);	// Waiter
 
 				snmdb::NormalManagerDB::getInstance().add(3, &cmd_ap, nullptr, nullptr);
@@ -3315,8 +3364,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				_item.id = wi.id;
 
 				if (wi.id <= 0)
-					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Parts[TYPEID=" + std::to_string(wi._typeid) + "] para o player: " 
-							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+					throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Parts[TYPEID=" + std::to_string(wi._typeid) + "] para o player: "
+						+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 			}
 
@@ -3361,7 +3410,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 			// Add List Item ON Server
 			_session.m_pi.mp_wi.insert(std::make_pair(wi.id, wi));
-		
+
 			ret_id = (RetAddItem::TYPE)wi.id;
 
 			ADD_ITEM_SUCESS_MSG_LOG("Adicionou Part" + (wi.ano > 0 && (wi.ano / 24) == 7/*Dia*/ && wi.flag == 0x60/*Rental*/ ? " Rental[Dia(s)=" + std::to_string(wi.STDA_C_ITEM_TIME) + "]" : std::string("")));
@@ -3377,7 +3426,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 			if (hair != nullptr) {
 				uint32_t char_typeid = (iff::CHARACTER << 26) | hair->character;
 
-				CharacterInfo *ce = _session.m_pi.findCharacterByTypeid(char_typeid);
+				CharacterInfo* ce = _session.m_pi.findCharacterByTypeid(char_typeid);
 
 				if (ce != nullptr) {
 
@@ -3389,14 +3438,16 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 					ADD_ITEM_SUCESS_MSG_LOG("Atualizou HairStyle");
 
-				}else
-					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem esse character[TYPEID=" 
-							+ std::to_string(char_typeid) + "].", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 16, 0));
+				}
+				else
+					throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem esse character[TYPEID="
+						+ std::to_string(char_typeid) + "].", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 16, 0));
 
-			}else
-				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] hairstyle[TYPEID=" 
-						+ std::to_string(_item._typeid) + "] nao tem no IFF_STRUCT.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 17, 0));
-		
+			}
+			else
+				throw exception("[item_manager::addItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] hairstyle[TYPEID="
+					+ std::to_string(_item._typeid) + "] nao tem no IFF_STRUCT.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 17, 0));
+
 			break;
 		}
 		case iff::COUNTER_ITEM:
@@ -3415,9 +3466,9 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 				if (tsi != nullptr) {	// Já tem item add quantidade do Troféu Especial
 
 					_item.stat.qntd_ant = tsi->qntd;
-			
+
 					tsi->qntd += _item.STDA_C_ITEM_QNTD;
-			
+
 					_item.stat.qntd_dep = tsi->qntd;
 
 					_item.id = ret_id = (RetAddItem::TYPE)tsi->id;
@@ -3425,7 +3476,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					snmdb::NormalManagerDB::getInstance().add(18, new CmdUpdateTrofelEspecialQntd(_session.m_pi.uid, tsi->id, tsi->qntd, CmdUpdateTrofelEspecialQntd::eTYPE::ESPECIAL), item_manager::SQLDBResponse, nullptr);
 
 					ADD_ITEM_SUCESS_MSG_LOG("Atualizou Trofel Especial");
-				}else {
+				}
+				else {
 
 					TrofelEspecialInfo ts{ 0 };
 					ts.id = _item.id;
@@ -3445,8 +3497,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					_item.id = ts.id;
 
 					if (ts.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Especial[TYPEID=" + std::to_string(ts._typeid) + "] para o player: " 
-								+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Especial[TYPEID=" + std::to_string(ts._typeid) + "] para o player: "
+							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 					_item.stat.qntd_ant = 0;
 					_item.stat.qntd_dep = ts.qntd;
@@ -3458,17 +3510,18 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 
 					ADD_ITEM_SUCESS_MSG_LOG("Adicionou Trofel Especial");
 				}
-			
-			}else if (type_trofel == 3) {	// Grand Prix
+
+			}
+			else if (type_trofel == 3) {	// Grand Prix
 
 				auto tsi = _session.m_pi.findTrofelGrandPrixByTypeid(_item._typeid);
 
 				if (tsi != nullptr) {	// Já tem item add quantidade do Troféu Grand Prix
 
 					_item.stat.qntd_ant = tsi->qntd;
-			
+
 					tsi->qntd += _item.STDA_C_ITEM_QNTD;
-			
+
 					_item.stat.qntd_dep = tsi->qntd;
 
 					_item.id = ret_id = (RetAddItem::TYPE)tsi->id;
@@ -3476,7 +3529,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					snmdb::NormalManagerDB::getInstance().add(18, new CmdUpdateTrofelEspecialQntd(_session.m_pi.uid, tsi->id, tsi->qntd, CmdUpdateTrofelEspecialQntd::eTYPE::GRAND_PRIX), item_manager::SQLDBResponse, nullptr);
 
 					ADD_ITEM_SUCESS_MSG_LOG("Atualizou Trofel Grand Prix");
-				}else {
+				}
+				else {
 
 					TrofelEspecialInfo ts{ 0 };
 					ts.id = _item.id;
@@ -3496,8 +3550,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 					_item.id = ts.id;
 
 					if (ts.id <= 0)
-						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Grand Prix[TYPEID=" + std::to_string(ts._typeid) + "] para o player: " 
-								+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
+						throw exception("[item_manager::addItem][Log] nao conseguiu adicionar o Trofel Grand Prix[TYPEID=" + std::to_string(ts._typeid) + "] para o player: "
+							+ std::to_string(_session.m_pi.uid), STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 11, 0));
 
 					_item.stat.qntd_ant = 0;
 					_item.stat.qntd_dep = ts.qntd;
@@ -3518,7 +3572,8 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 		// Libera Block memória para o UID, previne de add mais de um item simuntaneamente, para não gerar valores errados
 		BlockMemoryManager::unblockUID(_session.m_pi.uid);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[item_manager::addItem][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -3532,7 +3587,7 @@ item_manager::RetAddItem::TYPE item_manager::addItem(stItem& _item, player& _ses
 };
 
 item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, player& _session, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
-	
+
 	RetAddItem rai{ 0 };
 	RetAddItem::TYPE type = RetAddItem::T_INIT_VALUE;
 
@@ -3540,9 +3595,9 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, p
 
 		if ((type = addItem(*it, _session, _gift_flag, _purchase, _dup)) <= 0) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID=" 
-					+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], " 
-					+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu. Bug"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID="
+				+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], "
+				+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu. Bug"), CL_FILE_LOG_AND_CONSOLE));
 
 			rai.fails.push_back(*it);
 
@@ -3559,19 +3614,21 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, p
 				else if (rai.type != RetAddItem::TR_SUCCESS_WITH_ERROR && rai.type != RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR)
 					rai.type = type;
 
-			}else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
-				
+			}
+			else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
+
 				if (rai.type == RetAddItem::T_ERROR || rai.type == RetAddItem::TR_SUCCESS_WITH_ERROR)
 					rai.type = RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR;
 				else if (rai.type == RetAddItem::T_SUCCESS)
 					rai.type = RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 			}
 
-		}else {
+		}
+		else {
 
 			// Incrementa
 			++it;
-			
+
 			if (rai.type == RetAddItem::T_INIT_VALUE)
 				rai.type = RetAddItem::T_SUCCESS;
 			else if (rai.type == RetAddItem::T_ERROR)
@@ -3583,7 +3640,7 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItem >& _v_item, p
 };
 
 item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item, player& _session, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
-	
+
 	RetAddItem rai{ 0 };
 	RetAddItem::TYPE type = RetAddItem::T_INIT_VALUE;
 
@@ -3591,9 +3648,9 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item,
 
 		if ((type = addItem(*it, _session, _gift_flag, _purchase, _dup)) <= 0) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID=" 
-					+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], " 
-					+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu. Bug"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID="
+				+ std::to_string(it->_typeid) + ", ID=" + std::to_string(it->id) + "], "
+				+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu. Bug"), CL_FILE_LOG_AND_CONSOLE));
 
 			rai.fails.push_back(*it);
 
@@ -3610,15 +3667,17 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item,
 				else if (rai.type != RetAddItem::TR_SUCCESS_WITH_ERROR && rai.type != RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR)
 					rai.type = type;
 
-			}else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
-				
+			}
+			else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
+
 				if (rai.type == RetAddItem::T_ERROR || rai.type == RetAddItem::TR_SUCCESS_WITH_ERROR)
 					rai.type = RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR;
 				else if (rai.type == RetAddItem::T_SUCCESS)
 					rai.type = RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 			}
 
-		}else {
+		}
+		else {
 
 			// Incrementa
 			++it;
@@ -3634,7 +3693,7 @@ item_manager::RetAddItem item_manager::addItem(std::vector< stItemEx >& _v_item,
 };
 
 item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItem >& _v_item, player& _session, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
-	
+
 	RetAddItem rai{ 0 };
 	RetAddItem::TYPE type = RetAddItem::T_INIT_VALUE;
 
@@ -3642,9 +3701,9 @@ item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItem >& _v_
 
 		if ((type = addItem(it->second, _session, _gift_flag, _purchase, _dup)) <= 0) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID=" 
-					+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "], " 
-					+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID="
+				+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "], "
+				+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
 
 			rai.fails.push_back(it->second);
 
@@ -3661,15 +3720,17 @@ item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItem >& _v_
 				else if (rai.type != RetAddItem::TR_SUCCESS_WITH_ERROR && rai.type != RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR)
 					rai.type = type;
 
-			}else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
-				
+			}
+			else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
+
 				if (rai.type == RetAddItem::T_ERROR || rai.type == RetAddItem::TR_SUCCESS_WITH_ERROR)
 					rai.type = RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR;
 				else if (rai.type == RetAddItem::T_SUCCESS)
 					rai.type = RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 			}
 
-		}else {
+		}
+		else {
 
 			// Incrementa
 			++it;
@@ -3685,7 +3746,7 @@ item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItem >& _v_
 };
 
 item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItemEx >& _v_item, player& _session, unsigned char _gift_flag, unsigned char _purchase, bool _dup) {
-	
+
 	RetAddItem rai{ 0 };
 	RetAddItem::TYPE type = RetAddItem::T_INIT_VALUE;
 
@@ -3693,9 +3754,9 @@ item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItemEx >& _
 
 		if ((type = addItem(it->second, _session, _gift_flag, _purchase, _dup)) <= 0) {
 
-			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID=" 
-					+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "], " 
-					+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::addItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou adicionar o item[TYPEID="
+				+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "], "
+				+ ((type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) ? "mas era pang, exp ou CP pouch" : "mas nao conseguiu.Bug"), CL_FILE_LOG_AND_CONSOLE));
 
 			rai.fails.push_back(it->second);
 
@@ -3712,15 +3773,17 @@ item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItemEx >& _
 				else if (rai.type != RetAddItem::TR_SUCCESS_WITH_ERROR && rai.type != RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR)
 					rai.type = type;
 
-			}else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
-				
+			}
+			else if (type == RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH) {
+
 				if (rai.type == RetAddItem::T_ERROR || rai.type == RetAddItem::TR_SUCCESS_WITH_ERROR)
 					rai.type = RetAddItem::TR_SUCCESS_PANG_AND_EXP_AND_CP_POUCH_WITH_ERROR;
 				else if (rai.type == RetAddItem::T_SUCCESS)
 					rai.type = RetAddItem::T_SUCCESS_PANG_AND_EXP_AND_CP_POUCH;
 			}
 
-		}else {
+		}
+		else {
 
 			// Incrementa
 			++it;
@@ -3736,7 +3799,7 @@ item_manager::RetAddItem item_manager::addItem(std::map< uint32_t, stItemEx >& _
 };
 
 int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _gift_flag) {
-	
+
 	if (!_session.getState())
 		throw exception("[item_manager::giveItem][Error] session nao esta conectada.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 0, 8));
 
@@ -3745,16 +3808,16 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 	switch (sIff::getInstance().getItemGroupIdentify(_item._typeid)) {
 	case iff::CHARACTER:
 		// Não pode deletar Character
-		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Character[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Character[TYPEID="
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::CADDIE:
-		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Caddie[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Caddie[TYPEID="
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::CAD_ITEM:
-		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um CaddieItem[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um CaddieItem[TYPEID="
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::CARD:
 	{
@@ -3783,7 +3846,8 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 
 			if (it != _session.m_pi.mp_ci.end())
 				_session.m_pi.mp_ci.erase(it);
-		}else
+		}
+		else
 			snmdb::NormalManagerDB::getInstance().add(8, new CmdUpdateCardQntd(_session.m_pi.uid, pCi->id, pCi->qntd), item_manager::SQLDBResponse, nullptr);	// Update
 
 		break;
@@ -3817,13 +3881,13 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 		auto pWi = _session.m_pi.findWarehouseItemById(_item.id);
 
 		if (pWi == nullptr)
-			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Ball[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] para ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 21, 0));
+			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Ball[TYPEID="
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] para ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 21, 0));
 
 		if (_item.STDA_C_ITEM_QNTD > pWi->STDA_C_ITEM_QNTD)
-			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem quantidade[value=" 
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", req=" + std::to_string(_item.STDA_C_ITEM_QNTD) + "] suficiente para o Ball[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 22, 0));
+			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem quantidade[value="
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", req=" + std::to_string(_item.STDA_C_ITEM_QNTD) + "] suficiente para o Ball[TYPEID="
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 22, 0));
 
 		_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
 
@@ -3844,31 +3908,32 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 
 			if (it != _session.m_pi.mp_wi.end())
 				_session.m_pi.mp_wi.erase(it);
-		}else
+		}
+		else
 			snmdb::NormalManagerDB::getInstance().add(7, new CmdUpdateBallQntd(_session.m_pi.uid, pWi->id, pWi->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);	// Update
 
 		break;
 	}
 	case iff::FURNITURE:
 		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Furniture[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::HAIR_STYLE:
 		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um HairStyle[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::ITEM:
 	{
 		auto pWi = _session.m_pi.findWarehouseItemById(_item.id);
 
 		if (pWi == nullptr)
-			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o item[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] para ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 21, 0));
+			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o item[TYPEID="
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] para ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 21, 0));
 
 		if (_item.STDA_C_ITEM_QNTD > pWi->STDA_C_ITEM_QNTD)
-			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem quantidade[value=" 
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", req=" + std::to_string(_item.STDA_C_ITEM_QNTD) + "] suficiente para o item[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 22, 0));
+			throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem quantidade[value="
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", req=" + std::to_string(_item.STDA_C_ITEM_QNTD) + "] suficiente para o item[TYPEID="
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ser presenteado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 22, 0));
 
 		_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
 
@@ -3889,7 +3954,8 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 
 			if (it != _session.m_pi.mp_wi.end())
 				_session.m_pi.mp_wi.erase(it);
-		}else
+		}
+		else
 			snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_session.m_pi.uid, pWi->id, pWi->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);	// Update
 
 		break;
@@ -3900,11 +3966,11 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 		break;
 	case iff::SKIN:
 		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Skin[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::MASCOT:
 		throw exception("[item_manager::giveItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode presentear um Mascot[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] ja comprado", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 20, 0));
 		break;
 	case iff::PART:
 	{
@@ -3932,12 +3998,12 @@ int32_t item_manager::giveItem(stItem& _item, player& _session, unsigned char _g
 		break;
 	}	// Case iff::PART End
 	}	// Switch End
-	
+
 	return ret_id;
 };
 
 int32_t item_manager::giveItem(std::vector< stItem >& _v_item, player& _session, unsigned char _gift_flag) {
-	
+
 	uint32_t i;
 
 	for (i = 0u; i < _v_item.size(); ++i)
@@ -3983,8 +4049,8 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 		auto pWi = _session.m_pi.findWarehouseItemById(_item.id);
 
 		if (pWi == nullptr) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um AuxPart[TYPEID=" 
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um AuxPart[TYPEID="
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4026,9 +4092,9 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 						snmdb::NormalManagerDB::getInstance().add(0, new CmdUpdateCharacterAllPartEquiped(_session.m_pi.uid, *el), item_manager::SQLDBResponse, nullptr);
 
 #ifdef _DEBUG
-						_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) 
-								+ "] desequipou o AuxPart[TYPEID=" + std::to_string(_item._typeid) + "] do Character[TYPEID=" + std::to_string(el->_typeid) 
-								+ ", ID=" + std::to_string(el->id) + "] por que ele foi deletado.", CL_FILE_LOG_AND_CONSOLE));
+						_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Log] player[UID=" + std::to_string(_session.m_pi.uid)
+							+ "] desequipou o AuxPart[TYPEID=" + std::to_string(_item._typeid) + "] do Character[TYPEID=" + std::to_string(el->_typeid)
+							+ ", ID=" + std::to_string(el->id) + "] por que ele foi deletado.", CL_FILE_LOG_AND_CONSOLE));
 #endif // _DEBUG
 
 						// Update ON GAME
@@ -4046,7 +4112,8 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 			DEL_ITEM_SUCESS_MSG_LOG("Deletou AuxPart");
 
-		}else {	// Att quantidade do Item
+		}
+		else {	// Att quantidade do Item
 
 			_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
 
@@ -4069,7 +4136,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Ball[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4086,7 +4153,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 			// Passa o typeid do Warehouse para o _item para garantir, se não tiver colocado o typeid, na estrutura
 			_item._typeid = pWi->_typeid;
-			
+
 			snmdb::NormalManagerDB::getInstance().add(0, new CmdDeleteBall(_session.m_pi.uid, pWi->id), item_manager::SQLDBResponse, nullptr);
 
 			//auto it = VECTOR_FIND_ITEM(_session.m_pi.v_wi, id, == , pWi->id);
@@ -4101,13 +4168,13 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 			// troca para a bola padrão
 			if (_session.m_pi.ue.ball_typeid == _item._typeid) {
 
-				WarehouseItemEx *pBall = nullptr;
+				WarehouseItemEx* pBall = nullptr;
 				packet p;
 
 				if ((pBall = _session.m_pi.findWarehouseItemByTypeid(0x14000000/*Comet Padrão*/)) == nullptr)
-					_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error][WARNING] player[UID=" 
-							+ std::to_string(_session.m_pi.uid) + "] nao tem a Comet padrao para substituir a bola[TYPEID=" 
-							+ std::to_string(_item._typeid) + "] deletada. Bug", CL_FILE_LOG_AND_CONSOLE));
+					_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error][WARNING] player[UID="
+						+ std::to_string(_session.m_pi.uid) + "] nao tem a Comet padrao para substituir a bola[TYPEID="
+						+ std::to_string(_item._typeid) + "] deletada. Bug", CL_FILE_LOG_AND_CONSOLE));
 				else {	// Substitui
 
 					// Update ON SERVER
@@ -4120,7 +4187,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 #ifdef _DEBUG
 					_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] substitui a bola[TYPEID="
-							+ std::to_string(_item._typeid) + "] deletada pela COMET PADRAO[TYPEID=" + std::to_string(DEFAULT_COMET_TYPEID) + "]", CL_FILE_LOG_AND_CONSOLE));
+						+ std::to_string(_item._typeid) + "] deletada pela COMET PADRAO[TYPEID=" + std::to_string(DEFAULT_COMET_TYPEID) + "]", CL_FILE_LOG_AND_CONSOLE));
 #endif // _DEBUG
 
 					// Update ON GAME
@@ -4130,8 +4197,9 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 			}
 
 			DEL_ITEM_SUCESS_MSG_LOG("Deletou Ball");
-			
-		}else {	// Att quantidade do Item
+
+		}
+		else {	// Att quantidade do Item
 
 			_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
 
@@ -4154,7 +4222,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pCi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Caddie[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4181,8 +4249,8 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 	}
 	case iff::IFF_GROUP_ID::CAD_ITEM:
 		// por hora nao exclui esse por que ainda nao vi nenhum que exclui caddie item
-		_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um caddie item[TYPEID=" 
-				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um caddie item[TYPEID="
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	case iff::IFF_GROUP_ID::CARD:
 	{
@@ -4190,7 +4258,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pCi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Card[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4218,7 +4286,8 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 			DEL_ITEM_SUCESS_MSG_LOG("Deletou Card");
 
-		}else {	// Att quantidade do Item
+		}
+		else {	// Att quantidade do Item
 
 			_item.stat.qntd_ant = pCi->qntd;
 
@@ -4237,7 +4306,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 	}
 	case iff::IFF_GROUP_ID::CHARACTER:
 		_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um character[TYPEID="
-				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	case iff::IFF_GROUP_ID::CLUBSET:	// Warehouse
 	{
@@ -4245,7 +4314,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um ClubSet[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4276,7 +4345,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pFi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Furniture[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4303,7 +4372,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 	}
 	case iff::IFF_GROUP_ID::HAIR_STYLE:
 		_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um hairstyle[TYPEID="
-				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	case iff::IFF_GROUP_ID::ITEM:	// Warehouse
 	{
@@ -4311,7 +4380,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Item[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4337,8 +4406,9 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 			ret_id = _item.id;
 
 			DEL_ITEM_SUCESS_MSG_LOG("Deletou Item");
-			
-		}else {	// Att quantidade do Item
+
+		}
+		else {	// Att quantidade do Item
 
 			_item.stat.qntd_ant = pWi->STDA_C_ITEM_QNTD;
 
@@ -4361,7 +4431,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pMi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Mascot[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4392,7 +4462,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Part[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4400,7 +4470,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 		_item.stat.qntd_ant = 1;
 
 		_item.STDA_C_ITEM_QNTD = -1;
-		
+
 		_item.stat.qntd_dep = 0;
 
 		snmdb::NormalManagerDB::getInstance().add(0, new CmdDeleteItem(_session.m_pi.uid, pWi->id), item_manager::SQLDBResponse, nullptr);
@@ -4427,7 +4497,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 #ifdef _DEBUG
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] desequipou o Part[TYPEID="
-					+ std::to_string(_item._typeid) + "] por que ele foi deletado.", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + "] por que ele foi deletado.", CL_FILE_LOG_AND_CONSOLE));
 #endif // _DEBUG
 
 			// Update ON GAME
@@ -4447,7 +4517,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 	}
 	case iff::IFF_GROUP_ID::SET_ITEM:
 		_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um SetItem[TYPEID="
-				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] mas nao e permitido. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	case iff::IFF_GROUP_ID::SKIN:	// Warehouse
 	{
@@ -4455,7 +4525,7 @@ int32_t item_manager::removeItem(stItem& _item, player& _session) {
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::removeItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou remover um Skin[TYPEID="
-					+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_item._typeid) + ", ID=" + std::to_string(_item.id) + "] que ele nao tem. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4537,16 +4607,16 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 		if (pWi_s == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player send[UID=" + std::to_string(_s_snd.m_pi.uid) + "] nao tem o item[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] para enviar para transferir para o player recv[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug",
-					CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] para enviar para transferir para o player recv[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug",
+				CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
 
 		if (pWi_s->STDA_C_ITEM_QNTD < (int)_psi.item.qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player send[UID=" + std::to_string(_s_snd.m_pi.uid) + "] nao tem quantidade de item[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + ", QNTD=" + std::to_string(_psi.item.qntd) + "] para transferir para o player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug",
-					CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + ", QNTD=" + std::to_string(_psi.item.qntd) + "] para transferir para o player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug",
+				CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
@@ -4563,7 +4633,8 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 			snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_s_rcv.m_pi.uid, pWi_r->id, pWi_r->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);
 
-		}else {	// Cria um novo item para ele
+		}
+		else {	// Cria um novo item para ele
 
 			WarehouseItemEx wi{ 0 };
 			wi.id = _psi.item.id;
@@ -4611,7 +4682,8 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 			if (it != _s_snd.m_pi.mp_wi.end())
 				_s_snd.m_pi.mp_wi.erase(it);
 
-		}else
+		}
+		else
 			snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateItemQntd(_s_snd.m_pi.uid, pWi_s->id, pWi_s->STDA_C_ITEM_QNTD), item_manager::SQLDBResponse, nullptr);	// Update
 
 		TRANSFER_ITEM_SUCESS_MSG_LOG("Transferiu Item");
@@ -4625,7 +4697,7 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 		if (pWi_s == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player send[UID=" + std::to_string(_s_snd.m_pi.uid) + "] nao tem o Part[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] para enviar para transferir para o player recv[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] para enviar para transferir para o player recv[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
@@ -4634,16 +4706,17 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 		if (pWi_r != nullptr && !sIff::getInstance().IsCanOverlapped(pWi_r->_typeid)) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "] tentou comprar o Part[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que ele ja possui do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que ele ja possui do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
-		}else {
+		}
+		else {
 
 			auto part = sIff::getInstance().findPart(_psi.item._typeid);
 
 			if (part == nullptr) {
 				_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "] tentou comprar o Part[TYPEID="
-						+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao esta no IFF_STRUCT do server, do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao esta no IFF_STRUCT do server, do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 				return nullptr;
 			}
@@ -4673,14 +4746,14 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 		if (base == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "] tentou comprar ClubSet[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao existe no IFF_STRUCT do server, do player[UID=" + std::to_string(_s_snd.m_pi.uid) +"]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao existe no IFF_STRUCT do server, do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
 
-		_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Log][WARNING] Player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "] tentou comprar ClubSet[TYPEID=" 
-				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] no Personal Shop[Owner UID=" + std::to_string(_s_snd.m_pi.uid) + "], mas eu ainda nao liberei " 
-				+ (base->shop.flag_shop.uFlagShop.stFlagShop.can_send_mail_and_personal_shop ? std::string("") : std::string("no cliente e")) + " no server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Log][WARNING] Player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "] tentou comprar ClubSet[TYPEID="
+			+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] no Personal Shop[Owner UID=" + std::to_string(_s_snd.m_pi.uid) + "], mas eu ainda nao liberei "
+			+ (base->shop.flag_shop.uFlagShop.stFlagShop.can_send_mail_and_personal_shop ? std::string("") : std::string("no cliente e")) + " no server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	}
 	case iff::CARD:
@@ -4688,9 +4761,9 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 		// Vai ter mas só quando eu liberar no cliente
 		auto base = sIff::getInstance().findCommomItem(_psi.item._typeid);
 
-		if(base == nullptr) {
+		if (base == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "] tentou comprar Card[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao existe no IFF_STRUCT do server, do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao existe no IFF_STRUCT do server, do player[UID=" + std::to_string(_s_snd.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
@@ -4699,16 +4772,16 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 		if (pCi_s == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player send[UID=" + std::to_string(_s_snd.m_pi.uid) + "] nao tem o Card[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] para enviar para transferir para o player recv[UID=" 
-					+ std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] para enviar para transferir para o player recv[UID="
+				+ std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
 
 		if (pCi_s->qntd < (int)_psi.item.qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player send[UID=" + std::to_string(_s_snd.m_pi.uid) + "] nao tem quantidade do Card[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + ", QNTD=" + std::to_string(_psi.item.qntd) 
-					+ "] para transferir para o player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + ", QNTD=" + std::to_string(_psi.item.qntd)
+				+ "] para transferir para o player[UID=" + std::to_string(_s_rcv.m_pi.uid) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return nullptr;
 		}
@@ -4725,7 +4798,8 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 
 			snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateCardQntd(_s_rcv.m_pi.uid, pCi_r->id, pCi_r->qntd), item_manager::SQLDBResponse, nullptr);
 
-		}else {	// Cria um novo item para ele
+		}
+		else {	// Cria um novo item para ele
 
 			CardInfo ci{ 0 };
 			ci.id = _psi.item.id;
@@ -4767,7 +4841,8 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 			if (it != _s_snd.m_pi.v_card_info.end())
 				_s_snd.m_pi.v_card_info.erase(it);
 
-		}else
+		}
+		else
 			snmdb::NormalManagerDB::getInstance().add(9, new CmdUpdateCardQntd(_s_snd.m_pi.uid, pCi_s->id, pCi_s->qntd), item_manager::SQLDBResponse, nullptr);	// Update
 
 		TRANSFER_ITEM_SUCESS_MSG_LOG("Transferiu Card");
@@ -4778,8 +4853,8 @@ void* item_manager::transferItem(player& _s_snd, player& _s_rcv, PersonalShopIte
 		break;
 	}
 	default:	// Não suporta todos os outros, [não é permitido vender no Personal Shop]
-		_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player_rcv[UID=" + std::to_string(_s_rcv.m_pi.uid) + "], player_snd[UID=" + std::to_string(_s_snd.m_pi.uid) + "] Esse Item[TYPEID=" 
-				+ std::to_string(_psi.item._typeid) + "] nao pode ser vendido no Personal Shop", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[item_manager::transferItem][Error] player_rcv[UID=" + std::to_string(_s_rcv.m_pi.uid) + "], player_snd[UID=" + std::to_string(_s_snd.m_pi.uid) + "] Esse Item[TYPEID="
+			+ std::to_string(_psi.item._typeid) + "] nao pode ser vendido no Personal Shop", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	}
 
@@ -4802,8 +4877,8 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 		auto pCi = _session.m_pi.findCaddieById(_id);
 
 		if (pCi == nullptr) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Caddie[TYPEID=" 
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Caddie[TYPEID="
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4818,8 +4893,8 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 		}
 
 		if (caddie->valor_mensal > 0) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um caddie[TYPEID=" 
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que eh por tempo, isso nao eh permitido pelo server", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um caddie[TYPEID="
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que eh por tempo, isso nao eh permitido pelo server", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4834,14 +4909,14 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pMi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Mascot[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
 
 		if (_qntd != 1) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] quantidade[value=" 
-					+ std::to_string(_qntd) + "] de mascot eh errado, nao pode mais que 1. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] quantidade[value="
+				+ std::to_string(_qntd) + "] de mascot eh errado, nao pode mais que 1. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4849,15 +4924,15 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 		auto mascot = sIff::getInstance().findMascot(_typeid);
 
 		if (mascot == nullptr) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Mascot[TYPEID=" 
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Mascot[TYPEID="
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
 
 		if (mascot->shop.flag_shop.time_shop.dia > 0 && mascot->shop.flag_shop.time_shop.active) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um Mascot[TYPEID=" 
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao eh permitido[de tempo] trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um Mascot[TYPEID="
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao eh permitido[de tempo] trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4872,14 +4947,14 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pCi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Card[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
 
 		if (pCi->qntd < (int)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Card no CadiCauldron mais nao tem quantidade[have="
-					+ std::to_string(pCi->qntd) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pCi->qntd) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4888,7 +4963,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (card == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Card[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4904,14 +4979,14 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o AuxPart[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
 
 		if (pWi->STDA_C_ITEM_QNTD < (short)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar AuxPart no CadiCauldron mais nao tem quantidade[have="
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4920,7 +4995,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (auxPart == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o AuxPart[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4935,14 +5010,14 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Ball[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
 
 		if (pWi->STDA_C_ITEM_QNTD < (short)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Ball no CadiCauldron mais nao tem quantidade[have="
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4951,7 +5026,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (ball == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Ball[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4966,14 +5041,14 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
 
 		if (pWi->STDA_C_ITEM_QNTD < (short)_qntd) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Item no CadiCauldron mais nao tem quantidade[have=" 
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Item no CadiCauldron mais nao tem quantidade[have="
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -4982,11 +5057,11 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (item == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
-		
+
 		ret_id = 1;	// Passa
 
 		break;
@@ -4997,7 +5072,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o ClubSet no Warehouse Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -5006,7 +5081,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (clubset == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o ClubSet[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -5021,16 +5096,16 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Part no Warehouse Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
-		
+
 		auto part = sIff::getInstance().findPart(_typeid);
 
 		if (part == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Part[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -5045,7 +5120,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Skin no Warehouse Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -5054,7 +5129,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 
 		if (skin == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Skin[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return -1;
 		}
@@ -5065,8 +5140,8 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 	}	// End Warehouse Item
 	default:
 	{
-		_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um item[TYPEID=" 
-				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao pode no CadieCauldron. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[item_manager::exchangeCadieMagicBox][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um item[TYPEID="
+			+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao pode no CadieCauldron. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	}	// End Default
 	}	// End Switch
@@ -5075,7 +5150,7 @@ int32_t item_manager::exchangeCadieMagicBox(player& _session, uint32_t _typeid, 
 };
 
 std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t _typeid, int32_t _id, uint32_t _qntd) {
-	
+
 	if (!_session.getState())
 		throw exception("[item_manager::exchangeTikiShop][Error] player& _session is not connected", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 8, 0));
 
@@ -5088,7 +5163,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (_qntd > 1) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem duplicata de Caddie[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5097,7 +5172,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pCi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Caddie[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5106,14 +5181,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (caddie == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Caddie[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (caddie->valor_mensal > 0) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um caddie[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que eh por tempo, isso nao eh permitido pelo server", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que eh por tempo, isso nao eh permitido pelo server", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5135,7 +5210,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (_qntd > 1) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem duplicata de Mascot[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5144,14 +5219,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pMi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Mascot[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (_qntd != 1) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] quantidade[value="
-					+ std::to_string(_qntd) + "] de mascot eh errado, nao pode mais que 1. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_qntd) + "] de mascot eh errado, nao pode mais que 1. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5160,14 +5235,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (mascot == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Mascot[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (mascot->shop.flag_shop.time_shop.dia > 0 && mascot->shop.flag_shop.time_shop.active) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um Mascot[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao eh permitido[de tempo] trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao eh permitido[de tempo] trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5190,14 +5265,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pCi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Card[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (pCi->qntd < (int)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Card no Tiki Shop mais nao tem quantidade[have="
-					+ std::to_string(pCi->qntd) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pCi->qntd) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5206,7 +5281,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (card == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Card[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5230,21 +5305,21 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o AuxPart[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if ((pWi->flag & 0x20) == 0x20 || (pWi->flag & 0x40) == 0x40 || (pWi->flag & 0x60) == 0x60) {
-			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] tentou trocar AuxPart no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] tentou trocar AuxPart no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (pWi->STDA_C_ITEM_QNTD < (short)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar AuxPart no Tiki Shop mais nao tem quantidade[have="
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5253,14 +5328,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (auxPart == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o AuxPart[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (_session.m_pi.isAuxPartEquiped(_typeid)) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode trocar o AuxPart[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] equipado no Tiki Shop. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] equipado no Tiki Shop. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5283,21 +5358,21 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Ball[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if ((pWi->flag & 0x20) == 0x20 || (pWi->flag & 0x40) == 0x40 || (pWi->flag & 0x60) == 0x60) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] tentou trocar Ball no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou trocar Ball no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (pWi->STDA_C_ITEM_QNTD < (short)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Ball no Tiki Shop mais nao tem quantidade[have="
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5306,7 +5381,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (ball == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Ball[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5329,21 +5404,21 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if ((pWi->flag & 0x20) == 0x20 || (pWi->flag & 0x40) == 0x40 || (pWi->flag & 0x60) == 0x60) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] tentou trocar Item no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou trocar Item no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if (pWi->STDA_C_ITEM_QNTD < (short)_qntd) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar Item no Tiki Shop mais nao tem quantidade[have="
-					+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(pWi->STDA_C_ITEM_QNTD) + ", request=" + std::to_string(_qntd) + "] de item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "]. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5352,7 +5427,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (iff_item == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5374,7 +5449,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (_qntd > 1) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem duplicata de ClubSet[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5383,14 +5458,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o ClubSet no Warehouse Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if ((pWi->flag & 0x20) == 0x20 || (pWi->flag & 0x40) == 0x40 || (pWi->flag & 0x60) == 0x60) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] tentou trocar ClubSet no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou trocar ClubSet no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5399,7 +5474,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (clubset == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o ClubSet[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5422,7 +5497,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (part == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Part[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5432,7 +5507,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 			if (pWi_all.size() < _qntd) {
 				_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Part no Warehouse Item[TYPEID="
-						+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] quantidade[resq=" + std::to_string(_qntd) + ", value=" + std::to_string(pWi_all.size()) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] quantidade[resq=" + std::to_string(_qntd) + ", value=" + std::to_string(pWi_all.size()) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 				return std::vector< stItem >();
 			}
@@ -5442,14 +5517,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 				if (pWi == nullptr) {
 					_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Warehouse Item[TYPEID="
-							+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+						+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 					return std::vector< stItem >();
 				}
 
 				if ((pWi->flag & 96) == 96/*Rental não pode trocar no Tiki Shop*/ || (pWi->flag & 0x20) == 0x20 || (pWi->flag & 0x40) == 0x40) {
 					_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao pode trocar Part Rental[TYPEID="
-							+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no Tiki Shop. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+						+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no Tiki Shop. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 					return std::vector< stItem >();
 				}
@@ -5463,7 +5538,8 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 				item.STDA_C_ITEM_QNTD = (short)item.qntd * -1;
 
 				v_item.push_back(item);
-			}else  {
+			}
+			else {
 				for (auto i = 0u; i < _qntd; ++i) {
 					item.clear();
 
@@ -5484,7 +5560,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 	{
 		if (_qntd > 1) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem duplicata de Skin[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5493,14 +5569,14 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (pWi == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Skin no Warehouse Item[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] para trocar. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
 
 		if ((pWi->flag & 0x20) == 0x20 || (pWi->flag & 0x40) == 0x40 || (pWi->flag & 0x60) == 0x60) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] tentou trocar Skin no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ "] tentou trocar Skin no Tiki Shop mais nao pode trocar item[TYPEID=" + std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] de tempo. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5509,7 +5585,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 
 		if (skin == nullptr) {
 			_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao tem o Skin[TYPEID="
-					+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] no IFF_STRUCT do server. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 
 			return std::vector< stItem >();
 		}
@@ -5529,7 +5605,7 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 	default:
 	{
 		_smp::message_pool::getInstance().push(new message("[item_manager::exchangeTikiShop][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou trocar um item[TYPEID="
-				+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao pode no CadieCauldron. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(_typeid) + ", ID=" + std::to_string(_id) + "] que nao pode no CadieCauldron. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	}	// End Default
 	}	// End Switch
@@ -5538,29 +5614,29 @@ std::vector< stItem > item_manager::exchangeTikiShop(player& _session, uint32_t 
 };
 
 void item_manager::openTicketReportScroll(player& _session, int32_t _ticket_scroll_item_id, int32_t _ticket_scroll_id, bool _upt_on_game) {
-	
+
 	if (!_session.getState())
-		throw exception("[item_manager::openTicketReportScrool][Error] player[UID=" + std::to_string(_session.m_pi.uid) + ", OID=" 
-				+ std::to_string(_session.m_oid) + "] mas a session is invalid.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2550, 0));
+		throw exception("[item_manager::openTicketReportScrool][Error] player[UID=" + std::to_string(_session.m_pi.uid) + ", OID="
+			+ std::to_string(_session.m_oid) + "] mas a session is invalid.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2550, 0));
 
 	packet p;
 
 	try {
 
 		if (_ticket_scroll_item_id < 0 || _ticket_scroll_id < 0)
-			throw exception("[item_manager::openTicketReportScroll][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou abrir Ticket Teport Scroll[ITEM_ID=" 
-					+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas o ticket_scroll item ou id is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2500, 0));
+			throw exception("[item_manager::openTicketReportScroll][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou abrir Ticket Teport Scroll[ITEM_ID="
+				+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas o ticket_scroll item ou id is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2500, 0));
 
 		auto pWi = _session.m_pi.findWarehouseItemById(_ticket_scroll_item_id);
 
 		if (pWi == nullptr)
 			throw exception("[item_manager::openTicketReportScroll][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou abrir Ticket Teport Scroll[ITEM_ID="
-					+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas ele nao tem o ticket_scroll item. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2501, 0));
+				+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas ele nao tem o ticket_scroll item. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2501, 0));
 
 		if (((pWi->c[1] * 0x800) | pWi->c[2]) != _ticket_scroll_id)
 			throw exception("[item_manager::openTicketReportScroll][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou abrir Ticket Teport Scroll[ITEM_ID="
-					+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas ticket_scroll id nao bate com o do item[VALUE="
-					+ std::to_string((pWi->c[1] * 0x800) | pWi->c[2]) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2502, 0));
+				+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas ticket_scroll id nao bate com o do item[VALUE="
+				+ std::to_string((pWi->c[1] * 0x800) | pWi->c[2]) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2502, 0));
 
 		CmdTicketReportDadosInfo cmd_trdi(_ticket_scroll_id, true);	// Waiter
 
@@ -5584,8 +5660,8 @@ void item_manager::openTicketReportScroll(player& _session, int32_t _ticket_scro
 
 		if (item_manager::removeItem(item, _session) <= 0)
 			throw exception("[item_manager::openTicketReportScroll][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou abrir Ticket Teport Scroll[ITEM_ID="
-					+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas nao conseguiu deletar Ticket Report Scroll item. Bug",
-					STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2503, 0));
+				+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + "], mas nao conseguiu deletar Ticket Report Scroll item. Bug",
+				STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2503, 0));
 
 		// Check if it is on Update Item Map
 		auto ui_it = _session.m_pi.findUpdateItemByIdAndType(_ticket_scroll_item_id, UpdateItem::WAREHOUSE);
@@ -5593,7 +5669,7 @@ void item_manager::openTicketReportScroll(player& _session, int32_t _ticket_scro
 		// Add Experiencia se ele ganhou
 		auto it = std::find_if(trsi.v_players.begin(), trsi.v_players.end(), [&](auto& _el) {
 			return _el.uid == _session.m_pi.uid;
-		});
+			});
 
 		uint32_t exp = 0u;
 
@@ -5631,15 +5707,15 @@ void item_manager::openTicketReportScroll(player& _session, int32_t _ticket_scro
 
 			// Resposta para o cliente
 			throw exception("[item_manager::openTicketReportScroll][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] tentou abrir Ticket Report Scroll[ITEM_ID=" + std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + ", END_DATE="
-					+ formatDateLocal(pWi->end_date_unix_local) + ", EXP=" + std::to_string(exp) 
-					+ "], mas o tempo do item expirou. Da so a exp para o player.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2504, 0));
+				+ "] tentou abrir Ticket Report Scroll[ITEM_ID=" + std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + ", END_DATE="
+				+ formatDateLocal(pWi->end_date_unix_local) + ", EXP=" + std::to_string(exp)
+				+ "], mas o tempo do item expirou. Da so a exp para o player.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::_ITEM_MANAGER, 2504, 0));
 		}
 		// End Check Time Item Ticket Scroll
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[item_manager::openTicketReportScroll][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] abriu Ticket Report Scroll[ITEM_ID=" 
-				+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + ", EXP=" + std::to_string(exp) + "]", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[item_manager::openTicketReportScroll][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] abriu Ticket Report Scroll[ITEM_ID="
+			+ std::to_string(_ticket_scroll_item_id) + ", ID=" + std::to_string(_ticket_scroll_id) + ", EXP=" + std::to_string(exp) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 		// Reposta para o cliente
 		p.init_plain((unsigned short)0x11A);
@@ -5659,7 +5735,8 @@ void item_manager::openTicketReportScroll(player& _session, int32_t _ticket_scro
 		if (exp > 0u)
 			_session.addExp(exp, _upt_on_game/*Update ON Game*/);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[item_manager::openTicketReportScroll][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -5691,7 +5768,7 @@ bool item_manager::ownerItem(uint32_t _uid, uint32_t _typeid) {
 
 	// Procura primeiro no Dolfini Locker o item, se for diferente de SetItem
 	if (sIff::getInstance().getItemGroupIdentify(_typeid) != iff::SET_ITEM) {
-		
+
 		CmdFindDolfiniLockerItem cmd_dli(_uid, _typeid, true);	// Waiter
 
 		snmdb::NormalManagerDB::getInstance().add(0, &cmd_dli, nullptr, nullptr);
@@ -5742,7 +5819,7 @@ bool item_manager::ownerItem(uint32_t _uid, uint32_t _typeid) {
 		auto mi = _ownerMascot(_uid, _typeid);
 
 		ret = (mi.id > 0)/*hasFound*/; //cmd_fm.hasFound();
-		
+
 		break;
 	}
 	case iff::CARD:
@@ -5750,7 +5827,7 @@ bool item_manager::ownerItem(uint32_t _uid, uint32_t _typeid) {
 		auto card = _ownerCard(_uid, _typeid);
 
 		ret = (card.id > 0)/*hasFound*/;	//cmd_fc.hasFound();
-		
+
 		break;
 	}
 	case iff::FURNITURE:
@@ -5765,7 +5842,7 @@ bool item_manager::ownerItem(uint32_t _uid, uint32_t _typeid) {
 			throw cmd_ff.getException();
 
 		ret = cmd_ff.hasFound();
-		
+
 		break;
 	}
 	case iff::BALL:
@@ -5778,7 +5855,7 @@ bool item_manager::ownerItem(uint32_t _uid, uint32_t _typeid) {
 		auto aux_part = _ownerAuxPart(_uid, _typeid);
 
 		ret = (aux_part.id > 0)/*hasFound*/; //cmd_fwi.hasFound();
-		
+
 		break;
 	}
 	case iff::SET_ITEM:
@@ -5856,7 +5933,7 @@ CaddieInfoEx item_manager::_ownerCaddieItem(uint32_t _uid, uint32_t _typeid) {
 };
 
 CharacterInfo item_manager::_ownerHairStyle(uint32_t _uid, uint32_t _typeid) {
-	
+
 	auto hair = sIff::getInstance().findHairStyle(_typeid);
 
 	if (hair != nullptr) {
@@ -5873,11 +5950,11 @@ CharacterInfo item_manager::_ownerHairStyle(uint32_t _uid, uint32_t _typeid) {
 		return cmd_fc.getInfo();
 	}
 
-	return {0};/*CharacterInfo Vazio*/
+	return { 0 };/*CharacterInfo Vazio*/
 };
 
 MascotInfoEx item_manager::_ownerMascot(uint32_t _uid, uint32_t _typeid) {
-	
+
 	CmdFindMascot cmd_fm(_uid, _typeid, true);	// Waiter
 
 	snmdb::NormalManagerDB::getInstance().add(0, &cmd_fm, nullptr, nullptr);
@@ -5891,7 +5968,7 @@ MascotInfoEx item_manager::_ownerMascot(uint32_t _uid, uint32_t _typeid) {
 };
 
 WarehouseItemEx item_manager::_ownerBall(uint32_t _uid, uint32_t _typeid) {
-	
+
 	CmdFindWarehouseItem cmd_fwi(_uid, _typeid, true);	// Waiter
 
 	snmdb::NormalManagerDB::getInstance().add(0, &cmd_fwi, nullptr, nullptr);
@@ -5905,7 +5982,7 @@ WarehouseItemEx item_manager::_ownerBall(uint32_t _uid, uint32_t _typeid) {
 };
 
 CardInfo item_manager::_ownerCard(uint32_t _uid, uint32_t _typeid) {
-	
+
 	CmdFindCard cmd_fc(_uid, _typeid, true);	// Waiter
 
 	snmdb::NormalManagerDB::getInstance().add(0, &cmd_fc, nullptr, nullptr);
@@ -5919,7 +5996,7 @@ CardInfo item_manager::_ownerCard(uint32_t _uid, uint32_t _typeid) {
 };
 
 WarehouseItemEx item_manager::_ownerAuxPart(uint32_t _uid, uint32_t _typeid) {
-	
+
 	CmdFindWarehouseItem cmd_fwi(_uid, _typeid, true);	// Waiter
 
 	snmdb::NormalManagerDB::getInstance().add(0, &cmd_fwi, nullptr, nullptr);
@@ -5933,7 +6010,7 @@ WarehouseItemEx item_manager::_ownerAuxPart(uint32_t _uid, uint32_t _typeid) {
 };
 
 WarehouseItemEx item_manager::_ownerItem(uint32_t _uid, uint32_t _typeid) {
-	
+
 	CmdFindWarehouseItem cmd_fwi(_uid, _typeid, true);	// Waiter
 
 	snmdb::NormalManagerDB::getInstance().add(0, &cmd_fwi, nullptr, nullptr);
@@ -5947,9 +6024,9 @@ WarehouseItemEx item_manager::_ownerItem(uint32_t _uid, uint32_t _typeid) {
 };
 
 TrofelEspecialInfo item_manager::_ownerTrofelEspecial(uint32_t _uid, uint32_t _typeid) {
-	
+
 	auto type_trofel = sIff::getInstance().getItemSubGroupIdentify24(_typeid);
-	
+
 	CmdFindTrofelEspecial::eTYPE type = CmdFindTrofelEspecial::eTYPE::ESPECIAL;
 
 	if (type_trofel == 1 || type_trofel == 2)
@@ -5970,7 +6047,7 @@ TrofelEspecialInfo item_manager::_ownerTrofelEspecial(uint32_t _uid, uint32_t _t
 };
 
 bool item_manager::ownerHairStyle(uint32_t _uid, uint32_t _typeid) {
-	
+
 	auto hair = sIff::getInstance().findHairStyle(_typeid);
 
 	if (hair != nullptr) {
@@ -6030,9 +6107,9 @@ bool item_manager::betweenTimeSystem(IFF::DateDados& _date) {
 };
 
 bool item_manager::betweenTimeSystem(stItem::stDate::stDateSys& _date) {
-	
+
 	stItem::stDate date{ 0, _date };
-	
+
 	return betweenTimeSystem(date);
 };
 

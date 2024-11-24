@@ -1082,7 +1082,8 @@ void login_server::onHeartBeat() {
 
 	}catch (exception& e) {
 
-		_smp::message_pool::getInstance().push(new message("[login_server::onHeartBeat][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
+		if (!STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::PANGYA_DB, 6))
+			throw;
 	}
 };
 

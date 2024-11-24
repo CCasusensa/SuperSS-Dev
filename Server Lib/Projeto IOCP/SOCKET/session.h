@@ -29,7 +29,7 @@
 namespace stdA {
 	class threadpool_base;
 
-// Tempo em millisegundos que a session pode ficar conectada sem logar-se, receber a autorização
+	// Tempo em millisegundos que a session pode ficar conectada sem logar-se, receber a autorização
 #define STDA_TIME_LIMIT_NON_AUTHORIZED	10000ul
 
 	// estrutura que guarda os dados do player, de request de packet
@@ -58,20 +58,20 @@ namespace stdA {
 		bool checkPacketId(unsigned short _packet_id) {
 
 #if defined(_WIN32)
-			#define DIFF_TICK(a, b, c) (INT64)(((INT64)((a.QuadPart) - (b.QuadPart)) * 1000000 / (c.QuadPart)) / 1000)
+#define DIFF_TICK(a, b, c) (INT64)(((INT64)((a.QuadPart) - (b.QuadPart)) * 1000000 / (c.QuadPart)) / 1000)
 
 			LARGE_INTEGER frequency;
 			QueryPerformanceFrequency(&frequency);
 #elif defined(__linux__)
-			#define TIMESPEC_TO_NANO_UI64(_timespec) (uint64_t)((uint64_t)(_timespec).tv_sec * (uint64_t)1000000000 + (uint64_t)(_timespec).tv_nsec)
-			#define DIFF_TICK(a, b, c) (int64_t)(((int64_t)(TIMESPEC_TO_NANO_UI64((a)) - TIMESPEC_TO_NANO_UI64((b))) / TIMESPEC_TO_NANO_UI64((c))) / 1000000)
+#define TIMESPEC_TO_NANO_UI64(_timespec) (uint64_t)((uint64_t)(_timespec).tv_sec * (uint64_t)1000000000 + (uint64_t)(_timespec).tv_nsec)
+#define DIFF_TICK(a, b, c) (int64_t)(((int64_t)(TIMESPEC_TO_NANO_UI64((a)) - TIMESPEC_TO_NANO_UI64((b))) / TIMESPEC_TO_NANO_UI64((c))) / 1000000)
 
 			timespec frequency;
 			clock_getres(CLOCK_MONOTONIC_RAW, &frequency);
 #endif
 
 			auto tick = gettick();
-			
+
 			for (auto i = 0u; i < CHK_PCKT_NUM_PCKT_MRY; ++i) {
 				if (ctx[i].packet_id == _packet_id) {
 					if (DIFF_TICK(tick, ctx[i].tick, frequency) <= CHK_PCKT_INTERVAL_LIMIT) {
@@ -82,13 +82,15 @@ namespace stdA {
 						ctx[last_index].tick = tick;
 
 						return true;
-					}else {
+					}
+					else {
 						ctx[i].tick = tick;
 						ctx[i].count = 0;
 
 						return false;
 					}
-				}else if ((i + 1) == CHK_PCKT_NUM_PCKT_MRY) {
+				}
+				else if ((i + 1) == CHK_PCKT_NUM_PCKT_MRY) {
 
 					// ROTATE
 					std::rotate(ctx, ctx + 1, ctx + CHK_PCKT_NUM_PCKT_MRY);
@@ -128,12 +130,12 @@ namespace stdA {
 
 	private:
 		unsigned char last_index;
-	};
+		};
 
 	// Estrutura para sincronizar o uso de buff, para não limpar o socket(session) antes dele ser liberado
 	struct stUseCtx {
 		stUseCtx() {
-			
+
 #if defined(_WIN32)
 			InitializeCriticalSection(&m_cs);
 #elif defined(__linux__)
@@ -141,11 +143,11 @@ namespace stdA {
 			INIT_PTHREAD_MUTEX_RECURSIVE(&m_cs);
 			DESTROY_PTHREAD_MUTEXATTR_RECURSIVE;
 #endif
-			
+
 			clear();
 		};
 		~stUseCtx() {
-			
+
 			clear();
 
 #if defined(_WIN32)
@@ -268,174 +270,174 @@ namespace stdA {
 		bool m_quit;
 	};
 
-    class session {
+	class session {
+	public:
+		class buff_ctx {
 		public:
-			class buff_ctx {
-				public:
-					buff_ctx();
-					~buff_ctx();
+			buff_ctx();
+			~buff_ctx();
 
-					void init();
-					void destroy();
-					
-					void clear();
+			void init();
+			void destroy();
 
-					void lock();
-					void unlock();
-					
-					bool isWritable();
-					bool readyToWrite();
-					
-					bool isSendable();
-					bool readyToSend();
-
-					bool isSetedToSend();
-					bool isSetedToWrite();
-					bool isSetedToPartial();
-					bool isSetedToSendOrPartialSend();
-					
-					void setWrite();
-					void setSend();
-					void setPartialSend();
-					
-					void releaseWrite();
-					void releaseSend();
-					void releasePartial();
-					void releaseSendAndPartialSend();
-					
-					int64_t increseRequestSendCount();
-					int64_t decreaseRequestSendCount();
-
-				public:
-					Buffer buff;
-
-				protected:
-#if defined(_WIN32)
-					CRITICAL_SECTION cs;
-
-					CONDITION_VARIABLE cv_send;
-					CONDITION_VARIABLE cv_write;
-#elif defined(__linux__)
-					pthread_mutex_t cs;
-
-					pthread_cond_t cv_send;
-					pthread_cond_t cv_write;
-#endif
-
-					int64_t request_send_count;
-
-					unsigned char state_send : 1, : 0;
-					unsigned char state_write : 1, : 0;
-					unsigned char state_wr_send : 1, : 0;
-			};
-
-        public:
-			session(threadpool_base& _threadpool);
-			session(threadpool_base& _threadpool, SOCKET _sock, SOCKADDR_IN _addr, unsigned char _key);
-            virtual ~session();
-
-			virtual bool clear();
-			const char* getIP();
+			void clear();
 
 			void lock();
 			void unlock();
 
-			// Usando para syncronizar outras coisas da session, tipo pacotes
-			void lockSync();
-			void unlockSync();
+			bool isWritable();
+			bool readyToWrite();
 
-			void requestSendBuffer(void* _buff, size_t _size, bool _raw = false);
-			void requestRecvBuffer();
+			bool isSendable();
+			bool readyToSend();
 
-			void setRecv();
-			void releaseRecv();
+			bool isSetedToSend();
+			bool isSetedToWrite();
+			bool isSetedToPartial();
+			bool isSetedToSendOrPartialSend();
 
+			void setWrite();
 			void setSend();
-			void setSendPartial();
+			void setPartialSend();
+
+			void releaseWrite();
 			void releaseSend();
+			void releasePartial();
+			void releaseSendAndPartialSend();
 
-			bool isConnected();
-			bool isCreated();
-
-			int getConnectTime();
-
-			//void setThreadpool(threadpool* _threadpool);
-
-			packet* getPacketS();
-			void setPacketS(packet *_packet);
-			packet* getPacketR();
-			void setPacketR(packet *_packet);
-
-			int32_t usa();
-			bool devolve();
-			bool isQuit();
-
-			bool getState();
-			void setState(bool _state);
-
-			void setConnected(bool _connected);
-			void setConnectedToSend(bool _connected_to_send);
-
-			virtual unsigned char getStateLogged() = 0;
-
-			virtual uint32_t getUID() = 0;
-			virtual uint32_t getCapability() = 0;
-			virtual char* getNickname() = 0;
-			virtual char* getID() = 0;
-
-		private:
-			void make_ip();
-
-			bool isConnectedToSend();
+			int64_t increseRequestSendCount();
+			int64_t decreaseRequestSendCount();
 
 		public:
-			std::clock_t m_time_start;
-			std::clock_t m_tick;
-			std::clock_t m_tick_bot;
+			Buffer buff;
 
-			ctx_check_packet m_check_packet;
-
-			// session autorizada pelo server, fez o login corretamente
-			unsigned char m_is_authorized;
-
-			// Marca na session que o socket, levou DC, chegou ao limit de retramission do TCP para transmitir os dados
-			// TCP sockets is that the maximum retransmission count and timeout have been reached on a bad(or broken) link
-			bool m_connection_timeout;
-
-            SOCKET m_sock;
-			SOCKADDR_IN m_addr;
-            unsigned char m_key;
-			
-			char m_ip[32];
-			bool m_ip_maked;
-
-			uint32_t m_oid;
-
-			buff_ctx m_buff_s;
-			buff_ctx m_buff_r;
-
-			threadpool_base& m_threadpool;
-
-			packet *m_packet_s;
-			packet *m_packet_r;
-
-		private:
+		protected:
 #if defined(_WIN32)
-			CRITICAL_SECTION m_cs;
-			CRITICAL_SECTION m_cs_lock_other;	// Usado para bloquear outras coisas (sincronizar os pacotes, por exemplo)
+			CRITICAL_SECTION cs;
+
+			CONDITION_VARIABLE cv_send;
+			CONDITION_VARIABLE cv_write;
 #elif defined(__linux__)
-			pthread_mutex_t m_cs;
-			pthread_mutex_t m_cs_lock_other;	// Usado para bloquear outras coisas (sincronizar os pacotes, por exemplo)
+			pthread_mutex_t cs;
+
+			pthread_cond_t cv_send;
+			pthread_cond_t cv_write;
 #endif
 
-			int64_t m_request_recv;				// Requests recv buff
+			int64_t request_send_count;
 
-			bool m_state;
-			bool m_connected;
-			bool m_connected_to_send;
+			unsigned char state_send : 1, : 0;
+			unsigned char state_write : 1, : 0;
+			unsigned char state_wr_send : 1, : 0;
+		};
 
-			stUseCtx m_use_ctx;
+	public:
+		session(threadpool_base& _threadpool);
+		session(threadpool_base& _threadpool, SOCKET _sock, SOCKADDR_IN _addr, unsigned char _key);
+		virtual ~session();
+
+		virtual bool clear();
+		const char* getIP();
+
+		void lock();
+		void unlock();
+
+		// Usando para syncronizar outras coisas da session, tipo pacotes
+		void lockSync();
+		void unlockSync();
+
+		void requestSendBuffer(void* _buff, size_t _size, bool _raw = false);
+		void requestRecvBuffer();
+
+		void setRecv();
+		void releaseRecv();
+
+		void setSend();
+		void setSendPartial();
+		void releaseSend();
+
+		bool isConnected();
+		bool isCreated();
+
+		int getConnectTime();
+
+		//void setThreadpool(threadpool* _threadpool);
+
+		packet* getPacketS();
+		void setPacketS(packet* _packet);
+		packet* getPacketR();
+		void setPacketR(packet* _packet);
+
+		int32_t usa();
+		bool devolve();
+		bool isQuit();
+
+		bool getState();
+		void setState(bool _state);
+
+		void setConnected(bool _connected);
+		void setConnectedToSend(bool _connected_to_send);
+
+		virtual unsigned char getStateLogged() = 0;
+
+		virtual uint32_t getUID() = 0;
+		virtual uint32_t getCapability() = 0;
+		virtual char* getNickname() = 0;
+		virtual char* getID() = 0;
+
+	private:
+		void make_ip();
+
+		bool isConnectedToSend();
+
+	public:
+		std::clock_t m_time_start;
+		std::clock_t m_tick;
+		std::clock_t m_tick_bot;
+
+		ctx_check_packet m_check_packet;
+
+		// session autorizada pelo server, fez o login corretamente
+		unsigned char m_is_authorized;
+
+		// Marca na session que o socket, levou DC, chegou ao limit de retramission do TCP para transmitir os dados
+		// TCP sockets is that the maximum retransmission count and timeout have been reached on a bad(or broken) link
+		bool m_connection_timeout;
+
+		SOCKET m_sock;
+		SOCKADDR_IN m_addr;
+		unsigned char m_key;
+
+		char m_ip[32];
+		bool m_ip_maked;
+
+		uint32_t m_oid;
+
+		buff_ctx m_buff_s;
+		buff_ctx m_buff_r;
+
+		threadpool_base& m_threadpool;
+
+		packet* m_packet_s;
+		packet* m_packet_r;
+
+	private:
+#if defined(_WIN32)
+		CRITICAL_SECTION m_cs;
+		CRITICAL_SECTION m_cs_lock_other;	// Usado para bloquear outras coisas (sincronizar os pacotes, por exemplo)
+#elif defined(__linux__)
+		pthread_mutex_t m_cs;
+		pthread_mutex_t m_cs_lock_other;	// Usado para bloquear outras coisas (sincronizar os pacotes, por exemplo)
+#endif
+
+		int64_t m_request_recv;				// Requests recv buff
+
+		bool m_state;
+		bool m_connected;
+		bool m_connected_to_send;
+
+		stUseCtx m_use_ctx;
 	};
-}
+	}
 
 #endif

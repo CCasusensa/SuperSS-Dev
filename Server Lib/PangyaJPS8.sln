@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31829.152
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Auth Server", "Auth Server\Auth Server\Auth Server.vcxproj", "{9AAFC559-8C3F-4C46-B7CE-F80F675B8EB9}"
 EndProject
@@ -18,6 +18,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rank Server", "Rank Server\Rank Server\Rank Server.vcxproj", "{B98C9E7A-2BCD-4BE8-84A2-8EF130A33958}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Smart Calculator Lib", "Smart Calculator lib\Smart Calculator Lib\Smart Calculator Lib.vcxproj", "{DAD83347-216A-485C-8EF9-A13297CE409C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GGSrvLib26-1", "GGSrvLib26-1\GGSrvLib26-1\GGSrvLib26-1.vcxproj", "{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ggauth70-1", "ggauth70-1\ggauth70-1\ggauth70-1.vcxproj", "{78E62999-7403-42AF-8141-B22D59E069A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,22 @@ Global
 		{DAD83347-216A-485C-8EF9-A13297CE409C}.Release|x64.Build.0 = Release|x64
 		{DAD83347-216A-485C-8EF9-A13297CE409C}.Release|x86.ActiveCfg = Release|Win32
 		{DAD83347-216A-485C-8EF9-A13297CE409C}.Release|x86.Build.0 = Release|Win32
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Debug|x64.ActiveCfg = Debug|x64
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Debug|x64.Build.0 = Debug|x64
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Debug|x86.ActiveCfg = Debug|Win32
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Debug|x86.Build.0 = Debug|Win32
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Release|x64.ActiveCfg = Release|x64
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Release|x64.Build.0 = Release|x64
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Release|x86.ActiveCfg = Release|Win32
+		{CEBADFF6-17ED-4DED-A70C-2A738F699AB1}.Release|x86.Build.0 = Release|Win32
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Debug|x64.ActiveCfg = Debug|x64
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Debug|x64.Build.0 = Debug|x64
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Debug|x86.ActiveCfg = Debug|Win32
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Debug|x86.Build.0 = Debug|Win32
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Release|x64.ActiveCfg = Release|x64
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Release|x64.Build.0 = Release|x64
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Release|x86.ActiveCfg = Release|Win32
+		{78E62999-7403-42AF-8141-B22D59E069A9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

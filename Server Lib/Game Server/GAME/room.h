@@ -56,9 +56,7 @@ namespace stdA {
 			const uint32_t getPosition(player *_session);
 
 			PlayerRoomInfoEx* getPlayerInfo(player *_session);
-
-			std::vector< player* > getSessions(player *_session = nullptr, bool _with_invited = true);
-
+			std::vector< player* > getSessions(player* _session = nullptr, bool _with_invited = true);
 			uint32_t getRealNumPlayersWithoutInvited();
 			bool haveInvited();
 
@@ -283,7 +281,6 @@ namespace stdA {
 
 			// protected por que é o método unsave(inseguro), sem thread safe
 			uint32_t _getRealNumPlayersWithoutInvited();
-
 			// protected por que é o método unsave(inseguro), sem thread safe
 			bool _haveInvited();
 

@@ -13,7 +13,7 @@
 
 #if defined(_WIN32)
 	#if INTPTR_MAX == INT64_MAX
-		#include "../ZIP/x64/zip.h"
+		#include "../ZIP/zip.h"
 	#elif INTPTR_MAX == INT32_MAX
 		#include "../ZIP/zip.h"
 	#else
@@ -1347,7 +1347,7 @@ bool iff::IsCanOverlapped(uint32_t _typeid) {
 		auto tipo_set_item = getItemSubGroupIdentify21(_typeid);
 		
 		if (tipo_set_item == IFF::SetItem::SUB_TYPE::BALL 
-				|| tipo_set_item == IFF::SetItem::SUB_TYPE::CHARACTER_SET_DUP_AND_ITEM_PASSIVE_AND_ACTIVE
+				|| tipo_set_item == IFF::SetItem::SUB_TYPE::ITEM
 				|| tipo_set_item == IFF::SetItem::SUB_TYPE::CARD)
 			return true;
 		
@@ -1576,115 +1576,87 @@ std::map< uint32_t, IFF::SetEffectTable >& iff::getSetEffectTable() {
 std::map< uint32_t, IFF::QuestStuff >& iff::getQuestStuff() {
 	return m_quest_stuff;
 };
-
 std::map< uint32_t, IFF::Club >& iff::getClub() {
 	return m_club;
 };
-
 std::map< uint32_t, IFF::ClubSetWorkShopLevelUpProb >& iff::getClubSetWorkShopLevelUpProb() {
 	return m_club_set_work_shop_level_up_prob;
 };
-
 std::map< uint32_t, IFF::ClubSetWorkShopRankUpExp >& iff::getClubSetWorkShopRankUpExp() {
 	return m_club_set_work_shop_rank_exp;
 };
-
 std::map< uint32_t, IFF::CutinInfomation >& iff::getCutinInfomation() {
 	return m_cutin_infomation;
 };
-
 std::map< uint32_t, IFF::Enchant >& iff::getEnchant() {
 	return m_enchant;
 };
-
 std::map< uint32_t, IFF::Furniture >& iff::getFurniture() {
 	return m_furniture;
 };
-
 std::map< uint32_t, IFF::Match >& iff::getMatch() {
 	return m_match;
 };
-
 std::map< uint32_t, IFF::GrandPrixConditionEquip >& iff::getGrandPrixConditionEquip() {
 	return m_grand_prix_condition_equip;
 };
-
 std::map< uint32_t, IFF::ArtifactManaInfo >& iff::getArtifactManaInfo() {
 	return m_artifact_mana_info;
 };
-
 std::map< uint32_t, IFF::ErrorCodeInfo >& iff::getErrorCodeInfo() {
 	return m_error_code_info;
 };
-
 std::map< uint32_t, IFF::HoleCupDropItem >& iff::getHoleCupDropItem() {
 	return m_hole_cup_drop_item;
 };
-
 std::map< uint32_t, IFF::NonVisibleItemTable >& iff::getNonVisibleItemTable() {
 	return m_non_visible_item_table;
 };
-
 std::map< uint32_t, IFF::PointShop >& iff::getPointShop() {
 	return m_point_shop;
 };
-
 std::map< uint32_t, IFF::ShopLimitItem >& iff::getShopLimitItem() {
 	return m_shop_limit_item;
 };
-
 std::map< uint32_t, IFF::SpecialPrizeItem >& iff::getSpecialPrizeItem() {
 	return m_special_prize_item;
 };
-
 std::map< uint32_t, IFF::SubscriptionItemTable >& iff::getSubscriptionItemTable() {
 	return m_subscription_item_table;
 };
-
 std::map< uint32_t, IFF::TikiPointTable >& iff::getTikiPointTable() {
 	return m_tiki_point_table;
 };
-
 std::map< uint32_t, IFF::TikiRecipe >& iff::getTikiRecipe() {
 	return m_tiki_recipe;
 };
-
 std::map< uint32_t, IFF::TikiSpecialTable >& iff::getTikiSpecialTable() {
 	return m_tiki_special_table;
 };
-
 std::vector< IFF::AddonPart >& iff::getAddonPart() {
 	return m_addon_part;
 };
-
 std::vector< IFF::CadieMagicBoxRandom >& iff::getCadieMagicBoxRandom() {
 	return m_cadie_magic_box_random;
 };
-
 std::vector< IFF::CharacterMastery >& iff::getCharacterMastery() {
 	return m_character_mastery;
 };
-
 std::vector< IFF::ClubSetWorkShopLevelUpLimit >& iff::getClubSetWorkShopLevelUpLimit() {
 	return m_club_set_work_shop_level_up_limit;
 };
-
 std::vector< IFF::GrandPrixRankReward >& iff::getGrandPrixRankReward() {
 	return m_grand_prix_rank_reward;
 };
-
 std::vector< IFF::GrandPrixSpecialHole >& iff::getGrandPrixSpecialHole() {
 	return m_grand_prix_special_hole;
 };
-
 std::vector< IFF::CaddieVoiceTable >& iff::getCaddieVoiceTable() {
 	return m_caddie_voice_table;
 };
-
 std::vector< IFF::FurnitureAbility >& iff::getFurnitureAbility() {
 	return m_furniture_ability;
 };
-
 std::vector< IFF::TwinsItemTable >& iff::getTwinsItemTable() {
 	return m_twins_item_table;
 };

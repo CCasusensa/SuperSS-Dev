@@ -18,13 +18,11 @@
 #include <ctime>
 
 #include "../TYPE/set_se_exception_with_mini_dump.h"
-
 #if defined(_WIN32)
 #include <DbgHelp.h>
 #endif
 
 using namespace stdA;
-
 #if defined(_WIN32)
 #define BEGIN_THREAD_SETUP(_type_class) DWORD result = 0; \
 						   STDA_SET_SE_EXCEPTION \
@@ -50,8 +48,8 @@ using namespace stdA;
 						return result; \
 
 NormalManagerDB::NormalManagerDB()
-	:	m_state(false), m_dbs(), m_db_instance_num (NUM_DB_THREAD),
-		m_pRevive(nullptr), m_continue_revive() 
+	: m_state(false), m_dbs(), m_db_instance_num(NUM_DB_THREAD),
+	m_pRevive(nullptr), m_continue_revive()
 {
 
 	init();
@@ -102,10 +100,8 @@ void NormalManagerDB::create(uint32_t _db_instance_num) {
 }
 
 void NormalManagerDB::init() {
-
 	if (!m_continue_revive.isLive())
 		m_continue_revive.set(1);
-
 	if (m_pRevive == nullptr)
 		m_pRevive = new thread(0, NormalManagerDB::_Revive, this);
 	else if (!m_pRevive->isLive())
@@ -116,13 +112,9 @@ void NormalManagerDB::destroy() {
 
 	// Down thread revive
 	m_continue_revive.set(0);
-
 	if (m_pRevive != nullptr) {
-
 		m_pRevive->waitThreadFinish(INFINITE);
-
 		delete m_pRevive;
-
 		m_pRevive = nullptr;
 	}
 
@@ -139,7 +131,6 @@ void NormalManagerDB::destroy() {
 
 				// clean memory allocate
 				delete m_dbs[i];
-
 				m_dbs[i] = nullptr;
 			}
 		}
@@ -168,48 +159,40 @@ DWORD CALLBACK NormalManagerDB::_Revive(LPVOID lpParameter) {
 void* NormalManagerDB::_Revive(void* lpParameter) {
 #endif
 	BEGIN_THREAD_SETUP(NormalManagerDB);
-
 	result = pT->Revive();
-
 	END_THREAD_SETUP("Revive");
 }
-
 #if defined(_WIN32)
 DWORD NormalManagerDB::Revive() {
 #elif defined(__linux__)
 void* NormalManagerDB::Revive() {
 #endif
-
 	try {
-
 #ifdef _DEBUG
 		_smp::message_pool::getInstance().push(new message("NormalManagerDB::Revive iniciado com sucesso!", CL_FILE_LOG_AND_CONSOLE));
 #else
 		_smp::message_pool::getInstance().push(new message("NormalManagerDB::Revive iniciado com sucesso!", CL_ONLY_FILE_LOG));
 #endif
-
 		while (m_continue_revive.isLive()) {
-
 			if (m_state)
 				checkIsDeadAndRevive();
-
 #if defined(_WIN32)
 			Sleep(1000); // 1 second para próxima verificação
 #elif defined(__linux__)
 			usleep(1000000); // 1 second para próxima verificação
 #endif
-        }
-
-    }catch (exception& e) {
-        _smp::message_pool::getInstance().push(new message("[NormalManagerDB::Revive][Error][My] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
-    }catch (std::exception& e) {
-        _smp::message_pool::getInstance().push(new message("[NormalManagerDB::Revive][Error][std] " + std::string(e.what()), CL_FILE_LOG_AND_CONSOLE));
-    }catch (...) {
-        _smp::message_pool::getInstance().push(new message("[NormalManagerDB::Revive][Error] Unknown Exception ", CL_FILE_LOG_AND_CONSOLE));
-    }
-
-    _smp::message_pool::getInstance().push(new message("Saindo do NormalManagerDB::Revive...", CL_FILE_LOG_AND_CONSOLE));
-
+		}
+	}
+	catch (exception& e) {
+		_smp::message_pool::getInstance().push(new message("[NormalManagerDB::Revive][Error][My] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
+	}
+	catch (std::exception& e) {
+		_smp::message_pool::getInstance().push(new message("[NormalManagerDB::Revive][Error][std] " + std::string(e.what()), CL_FILE_LOG_AND_CONSOLE));
+	}
+	catch (...) {
+		_smp::message_pool::getInstance().push(new message("[NormalManagerDB::Revive][Error] Unknown Exception ", CL_FILE_LOG_AND_CONSOLE));
+	}
+	_smp::message_pool::getInstance().push(new message("Saindo do NormalManagerDB::Revive...", CL_FILE_LOG_AND_CONSOLE));
 #if defined(_WIN32)
 	return 0;
 #elif defined(__linux__)
@@ -238,7 +221,6 @@ int NormalManagerDB::add(uint32_t _id, pangya_db *_pangya_db, callback_response 
 }
 
 void NormalManagerDB::freeAllWaiting(std::string _msg) {
-
 	for (auto& el : m_dbs)
 		if (el != nullptr)
 			el->freeAllWaiting(_msg);
@@ -258,23 +240,19 @@ inline void NormalManagerDB::checkDBInstanceNumAndFix() {
 }
 
 NormalManagerDB::DownEvent::DownEvent() {
-
 #if defined(_WIN32)
 	InterlockedExchange(&m_continue, 1);
 #elif defined(__linux__)
 	__atomic_store_n(&m_continue, 1, __ATOMIC_RELAXED);
 #endif
 }
-
 void NormalManagerDB::DownEvent::set(_MY_LONG _value) {
-
 #if defined(_WIN32)
 	InterlockedExchange(&m_continue, _value);
 #elif defined(__linux__)
 	__atomic_store_n(&m_continue, _value, __ATOMIC_RELAXED);
 #endif
 }
-
 bool NormalManagerDB::DownEvent::isLive() {
 #if defined(_WIN32)
 	return InterlockedCompareExchange(&m_continue, 1, 1) == 1;

@@ -80,15 +80,11 @@ mssql::~mssql() {
 };
 
 bool mssql::hasGoneAway() {
-
 	if (!m_state || !m_connected || m_ctx.hStmt == SQL_NULL_HANDLE)
 		return true;
-
 	if (!SQL_SUCCEEDED(SQLExecDirectA(m_ctx.hStmt, (SQLCHAR*)"SELECT 1", SQL_NTS)))
 		return true;
-
 	SQLMoreResults(m_ctx.hStmt);
-
 	return false;
 };
 
@@ -498,7 +494,6 @@ std::wstring mssql::makeText(std::wstring _value) {
 std::string mssql::makeEscapeKeyword(std::string _value) {
 	return "[" + _value + "]";
 };
-
 std::wstring mssql::makeEscapeKeyword(std::wstring _value) {
 	return L"[" + _value + L"]";
 };

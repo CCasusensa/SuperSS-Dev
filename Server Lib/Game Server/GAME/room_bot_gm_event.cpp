@@ -292,7 +292,8 @@ void* RoomBotGMEvent::waitTimeStart() {
 
 								m_state_rbge.setState(eSTATE_ROOM_BOT_GM_EVENT_SYNC::WAIT_10_SECONDS_START);
 
-							}else if (_getRealNumPlayersWithoutInvited() == m_ri.max_player) {
+							}
+							else if (_getRealNumPlayersWithoutInvited() == m_ri.max_player) {
 
 								// A sala atingiu o n�mero m�ximo de player
 								// Come�a o Bot GM Event em 10 segundos

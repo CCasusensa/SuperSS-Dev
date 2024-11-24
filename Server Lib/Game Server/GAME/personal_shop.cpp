@@ -24,10 +24,10 @@
 #include "../UTIL/sys_achievement.hpp"
 
 // Card limit price
-constexpr uint32_t CARD_NORMAL_LIMIT_PRICE		= 200000u;
-constexpr uint32_t CARD_RARE_LIMIT_PRICE		= 400000u;
-constexpr uint32_t CARD_SUPER_RARE_LIMIT_PRICE	= 1000000u;
-constexpr uint32_t CARD_SECRET_LIMIT_PRICE		= 2000000u;
+constexpr uint32_t CARD_NORMAL_LIMIT_PRICE = 200000u;
+constexpr uint32_t CARD_RARE_LIMIT_PRICE = 400000u;
+constexpr uint32_t CARD_SUPER_RARE_LIMIT_PRICE = 1000000u;
+constexpr uint32_t CARD_SECRET_LIMIT_PRICE = 2000000u;
 
 // Shop min and max price item
 constexpr uint32_t ITEM_MIN_PRICE = 1u;
@@ -35,9 +35,9 @@ constexpr uint32_t ITEM_MAX_PRICE = 9999999u;
 
 using namespace stdA;
 
-PersonalShop::PersonalShop(player& _session) 
+PersonalShop::PersonalShop(player& _session)
 	: m_owner(_session), m_name(), m_visit_count(0u), m_pang_sale(0ull), m_state(OPEN_EDIT) {
-	
+
 #if defined(_WIN32)
 	InitializeCriticalSection(&m_cs);
 #elif defined(__linux__)
@@ -76,7 +76,7 @@ std::string& PersonalShop::getName() {
 }
 
 uint32_t PersonalShop::getVisitCount() {
-	
+
 	Locker _locker(*this);
 
 	return m_visit_count;
@@ -120,7 +120,7 @@ std::vector< player* >& PersonalShop::getClients() {
 void PersonalShop::setName(std::string& _name) {
 
 	Locker _locker(*this);
-	
+
 	if (_name.empty())
 		throw exception("[PersonalShop::setName][Error] _name is empty", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 1, 0));
 
@@ -151,24 +151,24 @@ void PersonalShop::pushItem(PersonalShopItem& _psi) {
 	// Verifica aqui se esse item por ser colocar no shop
 
 	if (_psi.item._typeid == 0)
-		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um invalid item no Personal Shop dele. Hacker ou Bug", 
-				STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 7, 0));
+		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um invalid item no Personal Shop dele. Hacker ou Bug",
+			STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 7, 0));
 
 	auto base = sIff::getInstance().findCommomItem(_psi.item._typeid);
 
 	if (base == nullptr)
-		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um item[TYPEID=" 
-				+ std::to_string(_psi.item._typeid) + "] que nao existe no IFF_STRUCT do server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 8, 0));
+		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um item[TYPEID="
+			+ std::to_string(_psi.item._typeid) + "] que nao existe no IFF_STRUCT do server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 8, 0));
 
 	if (!base->shop.flag_shop.uFlagShop.stFlagShop.can_send_mail_and_personal_shop)
-		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um item[TYPEID=" 
-				+ std::to_string(_psi.item._typeid) + "] que nao pode ser vendido no Personal Shop. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 9, 0));
+		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um item[TYPEID="
+			+ std::to_string(_psi.item._typeid) + "] que nao pode ser vendido no Personal Shop. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 9, 0));
 
 	// Verifica o pre�o do item
 	if (_psi.item.pang < ITEM_MIN_PRICE || _psi.item.pang > ITEM_MAX_PRICE)
 		throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um item[TYPEID="
-				+ std::to_string(_psi.item._typeid) + ", Price=" + std::to_string(_psi.item.pang) + "] que o preco esta fora do limite[MIN="
-				+ std::to_string(ITEM_MIN_PRICE) + ", MAX=" + std::to_string(ITEM_MAX_PRICE) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 24, 0));
+			+ std::to_string(_psi.item._typeid) + ", Price=" + std::to_string(_psi.item.pang) + "] que o preco esta fora do limite[MIN="
+			+ std::to_string(ITEM_MIN_PRICE) + ", MAX=" + std::to_string(ITEM_MAX_PRICE) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 24, 0));
 
 	// Card pre�o controle
 	if (sIff::getInstance().getItemGroupIdentify(_psi.item._typeid) == iff::CARD) {
@@ -177,37 +177,37 @@ void PersonalShop::pushItem(PersonalShopItem& _psi) {
 
 		if (card == nullptr)
 			throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um card[TYPEID="
-					+ std::to_string(_psi.item._typeid) + "] que nao existe no IFF_STRUCT do server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 21, 0));
+				+ std::to_string(_psi.item._typeid) + "] que nao existe no IFF_STRUCT do server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 21, 0));
 
 		switch (card->tipo) {
 		case 0: // Normal
 			if (_psi.item.pang > CARD_NORMAL_LIMIT_PRICE)
 				throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um card[TYPEID="
-						+ std::to_string(_psi.item._typeid) + ", TYPE=Normal, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite(" 
-						+ std::to_string(CARD_NORMAL_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
+					+ std::to_string(_psi.item._typeid) + ", TYPE=Normal, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
+					+ std::to_string(CARD_NORMAL_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
 			break;
 		case 1:	// Rare
 			if (_psi.item.pang > CARD_RARE_LIMIT_PRICE)
 				throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um card[TYPEID="
-						+ std::to_string(_psi.item._typeid) + ", TYPE=Rare, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
-						+ std::to_string(CARD_RARE_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
+					+ std::to_string(_psi.item._typeid) + ", TYPE=Rare, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
+					+ std::to_string(CARD_RARE_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
 			break;
 		case 2: // Super Rare
 			if (_psi.item.pang > CARD_SUPER_RARE_LIMIT_PRICE)
 				throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um card[TYPEID="
-						+ std::to_string(_psi.item._typeid) + ", TYPE=Super Rare, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
-						+ std::to_string(CARD_SUPER_RARE_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
+					+ std::to_string(_psi.item._typeid) + ", TYPE=Super Rare, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
+					+ std::to_string(CARD_SUPER_RARE_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
 			break;
 		case 3: // Secret
 			if (_psi.item.pang > CARD_SECRET_LIMIT_PRICE)
 				throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um card[TYPEID="
-						+ std::to_string(_psi.item._typeid) + ", TYPE=Secret, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
-						+ std::to_string(CARD_SECRET_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
+					+ std::to_string(_psi.item._typeid) + ", TYPE=Secret, Price=" + std::to_string(_psi.item.pang) + "] que o preco passa do limite("
+					+ std::to_string(CARD_SECRET_LIMIT_PRICE) + "). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 23, 0));
 			break;
 		default: // Unknown Type
 			throw exception("[PersonalShop::pushItem][Error] player[UID=" + std::to_string(m_owner.m_pi.uid) + "] tentou colocar um card[TYPEID="
-					+ std::to_string(_psi.item._typeid) + ", TYPE=" + std::to_string((unsigned short)card->tipo) 
-					+ "] que o tipo eh desconhecido. (N,R,SR e SC) Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 22, 0));
+				+ std::to_string(_psi.item._typeid) + ", TYPE=" + std::to_string((unsigned short)card->tipo)
+				+ "] que o tipo eh desconhecido. (N,R,SR e SC) Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 22, 0));
 			break;
 		}
 	}
@@ -233,8 +233,8 @@ void PersonalShop::deleteItem(PersonalShopItem& _psi) {
 	}
 
 #ifdef _DEBUG
-	_smp::message_pool::getInstance().push(new message("[PersonalShop::deleteItem][Log] Delete Item[TYPEID=" + std::to_string(_psi.item._typeid) 
-			+ "] do Personal Shop[Owner UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+	_smp::message_pool::getInstance().push(new message("[PersonalShop::deleteItem][Log] Delete Item[TYPEID=" + std::to_string(_psi.item._typeid)
+		+ "] do Personal Shop[Owner UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 #endif
 }
 
@@ -257,8 +257,8 @@ PersonalShopItem* PersonalShop::findItemById(int32_t _id) {
 		throw exception("[PersonalShop::findItemById][Error] _id[value=" + std::to_string(_id) + "] is invalid", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 3, 0));
 
 	Locker _locker(*this);
-	
-	PersonalShopItem *psi = nullptr;
+
+	PersonalShopItem* psi = nullptr;
 
 	for (auto& el : v_item) {
 		if (el.item.id == _id) {
@@ -274,7 +274,7 @@ PersonalShopItem* PersonalShop::findItemByIndex(uint32_t _index) {
 
 	Locker _locker(*this);
 
-	PersonalShopItem *psi = nullptr;
+	PersonalShopItem* psi = nullptr;
 
 	for (auto& el : v_item) {
 		if (el.index == _index) {
@@ -339,20 +339,20 @@ void PersonalShop::addClient(player& _session) {
 	Locker _locker(*this);
 
 	if (m_state != STATE::OPEN)
-		throw exception("[PersonalShop::addClient][Error] client[UID=" + std::to_string(_session.m_pi.uid) 
-				+ "] tentou entrar no shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "], mas ele nao esta aberto no momento. Hacker ou Bug.", 
-				STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 25, 0));
+		throw exception("[PersonalShop::addClient][Error] client[UID=" + std::to_string(_session.m_pi.uid)
+			+ "] tentou entrar no shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "], mas ele nao esta aberto no momento. Hacker ou Bug.",
+			STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 25, 0));
 
 	auto client = findClientByUID(_session.m_pi.uid);
 
 	if (client != nullptr)
-		throw exception("[PersonalShop::addClient][Error] client[UID=" + std::to_string(_session.m_pi.uid) + "] ja existe no Personal Shop do player[UID=" 
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 4, 0));
-	
+		throw exception("[PersonalShop::addClient][Error] client[UID=" + std::to_string(_session.m_pi.uid) + "] ja existe no Personal Shop do player[UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 4, 0));
+
 	if (v_open_shop_visit.size() >= LIMIT_VISIT_ON_SAME_TIME)
-		throw exception("[PersonalShop::addClient][Log] client[UID=" + std::to_string(_session.m_pi.uid) 
-				+ "] nao pode entrar no shop por que ja chegou ao limit de clientes ao mesmo tempo no Personal Shop do player[UID=" 
-				+ std::to_string(m_owner.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 6, 0));
+		throw exception("[PersonalShop::addClient][Log] client[UID=" + std::to_string(_session.m_pi.uid)
+			+ "] nao pode entrar no shop por que ja chegou ao limit de clientes ao mesmo tempo no Personal Shop do player[UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 6, 0));
 
 	v_open_shop_visit.push_back(&_session);
 
@@ -360,8 +360,8 @@ void PersonalShop::addClient(player& _session) {
 	m_visit_count++;
 
 #ifdef _DEBUG
-	_smp::message_pool::getInstance().push(new message("[PersonalShop::addClient][Log] Add client[UID=" + std::to_string(_session.m_pi.uid) 
-			+ "] ao Personal Shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+	_smp::message_pool::getInstance().push(new message("[PersonalShop::addClient][Log] Add client[UID=" + std::to_string(_session.m_pi.uid)
+		+ "] ao Personal Shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 #endif
 }
 
@@ -372,8 +372,8 @@ void PersonalShop::deleteClient(player& _session) {
 	auto client = findClientIndexByUID(_session.m_pi.uid);
 
 	if (client == -1)
-		throw exception("[PersonalShop::deleteClient][Error] client[UID=" + std::to_string(_session.m_pi.uid) + "] nao existe no vector de clientes do Personal Shop do player[UID=" 
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 5, 0));
+		throw exception("[PersonalShop::deleteClient][Error] client[UID=" + std::to_string(_session.m_pi.uid) + "] nao existe no vector de clientes do Personal Shop do player[UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 5, 0));
 
 	if (v_open_shop_visit[client]->m_pi.uid == _session.m_pi.uid)
 		v_open_shop_visit.erase(v_open_shop_visit.begin() + client);
@@ -387,8 +387,8 @@ void PersonalShop::deleteClient(player& _session) {
 	}
 
 #ifdef _DEBUG
-	_smp::message_pool::getInstance().push(new message("[PersonalShop::deleteClient][Log] Delete client[UID=" + std::to_string(_session.m_pi.uid) 
-			+ "] do Personal Shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+	_smp::message_pool::getInstance().push(new message("[PersonalShop::deleteClient][Log] Delete client[UID=" + std::to_string(_session.m_pi.uid)
+		+ "] do Personal Shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 #endif
 }
 
@@ -398,56 +398,56 @@ void PersonalShop::buyItem(player& _session, PersonalShopItem& _psi) {
 
 	if (m_state != STATE::OPEN)
 		throw exception("[PersonalShop::buyItem][Error] client[UID=" + std::to_string(_session.m_pi.uid)
-				+ "] tentou comprar no shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "], mas ele nao esta aberto no momento. Hacker ou Bug.",
-				STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 25, 0));
-	
+			+ "] tentou comprar no shop do player[UID=" + std::to_string(m_owner.m_pi.uid) + "], mas ele nao esta aberto no momento. Hacker ou Bug.",
+			STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 25, 0));
+
 	if (findClientByUID(_session.m_pi.uid) == nullptr)
-		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID=" + std::to_string(_psi.item._typeid) 
-				+ ", ID=" + std::to_string(_psi.item.id) + "] no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "], mas ele nao esta no shop do player. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 10, 0));
+		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID=" + std::to_string(_psi.item._typeid)
+			+ ", ID=" + std::to_string(_psi.item.id) + "] no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "], mas ele nao esta no shop do player. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 10, 0));
 
 	auto psi_owner = findItemById(_psi.item.id);
 
 	if (psi_owner == nullptr || psi_owner->index != _psi.index)
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao tem no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 11, 0));
+			+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + "] que nao tem no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 11, 0));
 
 	if (psi_owner->item._typeid == 0)
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] invalido no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 12, 0));
+			+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] invalido no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 12, 0));
 
 	auto base = sIff::getInstance().findCommomItem(psi_owner->item._typeid);
 
 	if (base == nullptr)
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] invalido que nao tem no IFF_STRUCT do server, no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 13, 0));
+			+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] invalido que nao tem no IFF_STRUCT do server, no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 13, 0));
 
 	if (!base->shop.flag_shop.uFlagShop.stFlagShop.can_send_mail_and_personal_shop)
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] que nao pode ser vendido no Personal Shop, no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 14, 0));
+			+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] que nao pode ser vendido no Personal Shop, no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 14, 0));
 
 	if (_session.m_pi.ui.pang < (psi_owner->item.pang * _psi.item.qntd))
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] mas ele nao tem pangs suficiente, no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 15, 0));
+			+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] mas ele nao tem pangs suficiente, no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 15, 0));
 
 	if (!base->level.goodLevel((unsigned char)_session.m_pi.level))
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] mas ele nao tem level suficiente, no Shop[Owner UID="
-				+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 16, 0));
+			+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + "] mas ele nao tem level suficiente, no Shop[Owner UID="
+			+ std::to_string(m_owner.m_pi.uid) + "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 16, 0));
 
 	if (_psi.item.qntd > psi_owner->item.qntd)
 		throw exception("[PersonalShop::buyItem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou comprar item[TYPEID="
-				+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + ", QNTD=" 
-				+ std::to_string(psi_owner->item.qntd) + "] mas ele quer comprar uma quantidade(" 
-				+ std::to_string(_psi.item.qntd) + ") do item maior do que esta a venda. ", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 26, 0));
+			+ std::to_string(psi_owner->item._typeid) + ", ID=" + std::to_string(psi_owner->item.id) + ", QNTD="
+			+ std::to_string(psi_owner->item.qntd) + "] mas ele quer comprar uma quantidade("
+			+ std::to_string(_psi.item.qntd) + ") do item maior do que esta a venda. ", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 26, 0));
 
 	// Depois o Personal Shop vai poder vender card, ent�o tem que procurar nos card tbm
-	
+
 	uint64_t pang = psi_owner->item.pang * _psi.item.qntd;
 
 	// c�pia do personalshopitem, para enviar para o player que comprou que muda o id, quando compra card ou item, part e clubset ele so transfere msm,
@@ -460,8 +460,8 @@ void PersonalShop::buyItem(player& _session, PersonalShopItem& _psi) {
 	if ((pWi = item_manager::transferItem(m_owner, _session, _psi, psi_r)) != nullptr) {
 
 		_smp::message_pool::getInstance().push(new message("[Personal Shop::BuyItemSaleShop][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] comprou item[TYPEID="
-				+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + ", QNTD=" + std::to_string(_psi.item.qntd) + ", PANG(qntd*unit)="
-				+ std::to_string((_psi.item.qntd * psi_owner->item.pang)) + "] do Personal Shop[Owner UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(_psi.item._typeid) + ", ID=" + std::to_string(_psi.item.id) + ", QNTD=" + std::to_string(_psi.item.qntd) + ", PANG(qntd*unit)="
+			+ std::to_string((_psi.item.qntd * psi_owner->item.pang)) + "] do Personal Shop[Owner UID=" + std::to_string(m_owner.m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 		if (psi_owner->item.qntd == _psi.item.qntd)
 			deleteItem(_psi);
@@ -486,7 +486,7 @@ void PersonalShop::buyItem(player& _session, PersonalShopItem& _psi) {
 		// Card
 		if (sIff::getInstance().getItemGroupIdentify(_psi.item._typeid) == iff::CARD) {
 
-			auto ci_r = *reinterpret_cast< CardInfo* >(pWi);
+			auto ci_r = *reinterpret_cast<CardInfo*>(pWi);
 
 			// Tira de quem vendeu
 			p.init_plain((unsigned short)0xEC);
@@ -530,9 +530,10 @@ void PersonalShop::buyItem(player& _session, PersonalShopItem& _psi) {
 
 			packet_func::session_send(p, &_session, 1);
 
-		}else { // WarehouseItem
-			
-			auto wi_r = *reinterpret_cast< WarehouseItemEx* >(pWi);
+		}
+		else { // WarehouseItem
+
+			auto wi_r = *reinterpret_cast<WarehouseItemEx*>(pWi);
 
 			// Tira de quem vendeu
 			p.init_plain((unsigned short)0xEC);
@@ -597,10 +598,11 @@ void PersonalShop::buyItem(player& _session, PersonalShopItem& _psi) {
 
 		sys_achieve.finish_and_update(_session);
 
-	}else
-		throw exception("[PersonalShop::buyItem][Error] nao conseguiu transferir o item[TYPEID=" + std::to_string(_psi.item._typeid) + ", ID=" 
-				+ std::to_string(_psi.item.id) + "] da venda do personal shop, do player[UID=" + std::to_string(m_owner.m_pi.uid) + "] para o player[UID=" + std::to_string(_session.m_pi.uid) + "]", 
-					STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 19, 0));
+	}
+	else
+		throw exception("[PersonalShop::buyItem][Error] nao conseguiu transferir o item[TYPEID=" + std::to_string(_psi.item._typeid) + ", ID="
+			+ std::to_string(_psi.item.id) + "] da venda do personal shop, do player[UID=" + std::to_string(m_owner.m_pi.uid) + "] para o player[UID=" + std::to_string(_session.m_pi.uid) + "]",
+			STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 19, 0));
 }
 
 void PersonalShop::_lock() {
@@ -619,7 +621,7 @@ void PersonalShop::_unlock() {
 #endif
 }
 
-inline void PersonalShop::shop_broadcast(packet& _p, session *_s, unsigned char _debug) {
+inline void PersonalShop::shop_broadcast(packet& _p, session* _s, unsigned char _debug) {
 
 	if (_s == nullptr)
 		throw exception("[PersonalShop::shop_broadcast][Error] Session *_s is nullptr", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 20, 0));
@@ -635,7 +637,7 @@ inline void PersonalShop::shop_broadcast(packet& _p, session *_s, unsigned char 
 		packet_func::session_send(_p, el, _debug);
 }
 
-inline void PersonalShop::shop_broadcast(std::vector< packet* > _v_p, session *_s, unsigned char _debug) {
+inline void PersonalShop::shop_broadcast(std::vector< packet* > _v_p, session* _s, unsigned char _debug) {
 
 	if (_s == nullptr)
 		throw exception("[PersonalShop::shop_broadcast][Error] Session *_s is nullptr", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PERSONAL_SHOP, 20, 0));

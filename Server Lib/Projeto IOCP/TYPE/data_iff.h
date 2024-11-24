@@ -169,8 +169,8 @@ namespace stdA {
 			std::string toString() {
 #ifdef _DEBUG
 				return "Typeid: " + std::to_string(_typeid)
-					 + "(0x" + hex_util::ltoaToHex(_typeid) + ")"
-					 + "\r\nName: " + name + "\r\n";
+					+ "(0x" + hex_util::ltoaToHex(_typeid) + ")"
+					+ "\r\nName: " + name + "\r\n";
 #else
 				return "Typeid: " + std::to_string(_typeid)
 					+ "(0x" + hex_util::ltoaToHex(_typeid) + ")\r\n";
@@ -253,7 +253,7 @@ namespace stdA {
 		// Part IFF
 		struct Part : public Base {
 			// By S4 TH - (Category)
-			enum PART_TYPE : unsigned int  {
+			enum PART_TYPE : unsigned int {
 				TOP,				// By TH S4 - (UPPER)
 				BOTTOM,				// By TH S4 - (LOWER)
 				HEAD,				// By TH S4 - (HEAD)
@@ -352,7 +352,7 @@ namespace stdA {
 						return -1;
 					}
 				};
-			};
+			} part_type;
 			u_part_type position_mask;				// By S4 TH - (PosMask) Position Mask
 			u_part_type hide_mask;					// By S4 TH - (HideMask) Esconde os outros parts do slots
 			char texture[3][40];					// 3 Textura
@@ -373,79 +373,79 @@ namespace stdA {
 					+ "(0x" + hex_util::ltoaToHex(_typeid) + ")"
 					+ "\r\nType: " + std::to_string(type_item)
 					+ "\r\nPosition Slot	1	2	3	4	5	6	7	8	9	10	11	12"
-					+ "\r\n		"	+ std::to_string((unsigned short)position_mask._slots.slot0) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot1) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot2) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot3) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot4) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot5) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot6) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot7) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot8) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot9) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot10) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot11) + "	"
+					+ "\r\n		" + std::to_string((unsigned short)position_mask._slots.slot0) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot1) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot2) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot3) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot4) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot5) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot6) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot7) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot8) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot9) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot10) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot11) + "	"
 					+ "\r\nPosition Slot	13	14	15	16	17	18	16	20	21	22	23	24"
-					+ "\r\n		"	+ std::to_string((unsigned short)position_mask._slots.slot12) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot13) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot14) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot15) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot16) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot17) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot18) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot19) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot20) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot21) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot22) + "	"
-								+ std::to_string((unsigned short)position_mask._slots.slot23) + "	"
+					+ "\r\n		" + std::to_string((unsigned short)position_mask._slots.slot12) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot13) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot14) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot15) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot16) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot17) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot18) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot19) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot20) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot21) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot22) + "	"
+					+ std::to_string((unsigned short)position_mask._slots.slot23) + "	"
 					+ "\r\nHide Slot	1	2	3	4	5	6	7	8	9	10	11	12"
-					+ "\r\n		"	+ std::to_string((unsigned short)hide_mask._slots.slot0) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot1) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot2) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot3) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot4) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot5) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot6) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot7) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot8) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot9) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot10) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot11) + "	"
+					+ "\r\n		" + std::to_string((unsigned short)hide_mask._slots.slot0) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot1) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot2) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot3) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot4) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot5) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot6) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot7) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot8) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot9) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot10) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot11) + "	"
 					+ "\r\nHide Slot	13	14	15	16	17	18	16	20	21	22	23	24"
-					+ "\r\n		"	+ std::to_string((unsigned short)hide_mask._slots.slot12) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot13) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot14) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot15) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot16) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot17) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot18) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot19) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot20) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot21) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot22) + "	"
-								+ std::to_string((unsigned short)hide_mask._slots.slot23) + "	"
+					+ "\r\n		" + std::to_string((unsigned short)hide_mask._slots.slot12) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot13) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot14) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot15) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot16) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot17) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot18) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot19) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot20) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot21) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot22) + "	"
+					+ std::to_string((unsigned short)hide_mask._slots.slot23) + "	"
 					+ "\r\nC:	" + std::to_string(c[0]) + "	" + std::to_string(c[1]) + "	"
-							+ std::to_string(c[2]) + "	" + std::to_string(c[3]) + "	" + std::to_string(c[4])
+					+ std::to_string(c[2]) + "	" + std::to_string(c[3]) + "	" + std::to_string(c[4])
 					+ "\r\nSlot:	" + std::to_string(slot[0]) + "	" + std::to_string(slot[1]) + "	"
-							+ std::to_string(slot[2]) + "	" + std::to_string(slot[3]) + "	" + std::to_string(slot[4]) 
+					+ std::to_string(slot[2]) + "	" + std::to_string(slot[3]) + "	" + std::to_string(slot[4])
 					+ "\r\nSell Shop: " + std::to_string(shop.sell_price)
 					+ "\r\nFlag Shop	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16"
 					+ "\r\n			" + std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.is_cash) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.can_send_mail_and_personal_shop) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.can_dup) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.unknown) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.block_mail_and_personal_shop) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.is_saleable) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.is_giftable) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.only_display) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.is_new) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.is_hot) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit2) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit3) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit4) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit5) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit6) + "	"
-										+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit7)
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.can_send_mail_and_personal_shop) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.can_dup) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.unknown) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.block_mail_and_personal_shop) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.is_saleable) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.is_giftable) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stFlagShop.only_display) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.is_new) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.is_hot) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit2) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit3) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit4) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit5) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit6) + "	"
+					+ std::to_string((unsigned short)shop.flag_shop.uFlagShop.stIconShop.unknown_bit7)
 					+ "\r\n";
 #else
 				return "Typeid: " + std::to_string(_typeid) + "(0x" + hex_util::ltoaToHex(_typeid) + ")\r\n";
@@ -560,13 +560,13 @@ namespace stdA {
 				unsigned short exp_rate;
 				unsigned short unknown;		// Pode ser o efeito de item slot
 				std::string toString() {
-					return "Efeito [\n\tPOWER_DRIVE: " + std::to_string(power_drive) 
+					return "Efeito [\n\tPOWER_DRIVE: " + std::to_string(power_drive)
 						+ ";\n\tDROP_RATE: " + std::to_string(drop_rate)
 						+ ";\n\tPOWER_GAUGE: " + std::to_string(power_gauge)
 						+ ";\n\tPANG_RATE: " + std::to_string(pang_rate)
 						+ ";\n\tEXP_RATE: " + std::to_string(exp_rate)
 						+ ";\n\tUNKNOWN: " + std::to_string(unknown)
-						+".\n\t]";
+						+ ".\n\t]";
 				};
 			};
 			stEfeito efeito;
@@ -576,12 +576,12 @@ namespace stdA {
 #ifdef _DEBUG
 				return "Typeid: " + std::to_string(_typeid)
 					+ "(0x" + hex_util::ltoaToHex(_typeid) + ")"
-					+ "\r\nCC[]: [CC0=" + std::to_string(cc[0]) + ", CC1=" + std::to_string(cc[1]) + ", CC2=" + std::to_string(cc[2]) 
-							+ ", CC3=" + std::to_string(cc[3]) + ", CC4=" + std::to_string(cc[4]) + "]"
-					+ "\r\nC[]: [C0=" + std::to_string((unsigned short)c[0]) + ", C1=" + std::to_string((unsigned short)c[1]) + ", C2=" 
-							+ std::to_string((unsigned short)c[2]) + ", C3=" + std::to_string((unsigned short)c[3]) + ", C4=" + std::to_string((unsigned short)c[4]) + "]"
+					+ "\r\nCC[]: [CC0=" + std::to_string(cc[0]) + ", CC1=" + std::to_string(cc[1]) + ", CC2=" + std::to_string(cc[2])
+					+ ", CC3=" + std::to_string(cc[3]) + ", CC4=" + std::to_string(cc[4]) + "]"
+					+ "\r\nC[]: [C0=" + std::to_string((unsigned short)c[0]) + ", C1=" + std::to_string((unsigned short)c[1]) + ", C2="
+					+ std::to_string((unsigned short)c[2]) + ", C3=" + std::to_string((unsigned short)c[3]) + ", C4=" + std::to_string((unsigned short)c[4]) + "]"
 					+ "\r\nSlot[]: [Slot0=" + std::to_string((unsigned short)slot[0]) + ", Slot1=" + std::to_string((unsigned short)slot[1]) + ", Slot2="
-							+ std::to_string((unsigned short)slot[2]) + ", Slot3=" + std::to_string((unsigned short)slot[3]) + ", Slot4=" + std::to_string((unsigned short)slot[4]) + "]"
+					+ std::to_string((unsigned short)slot[2]) + ", Slot3=" + std::to_string((unsigned short)slot[3]) + ", Slot4=" + std::to_string((unsigned short)slot[4]) + "]"
 					+ "\r\n" + efeito.toString()
 					+ "\r\nulUnknown2: " + std::to_string(ulUnknown2) + "\r\n";
 #else
@@ -607,8 +607,8 @@ namespace stdA {
 				return "Typeid: " + std::to_string(_typeid)
 					+ "(0x" + hex_util::ltoaToHex(_typeid) + ")"
 					+ "\r\nC[]: [C0=" + std::to_string((unsigned short)c[0]) + ", C1=" + std::to_string((unsigned short)c[1]) + ", C2="
-							+ std::to_string((unsigned short)c[2]) + ", C3=" + std::to_string((unsigned short)c[3]) + ", C4=" + std::to_string((unsigned short)c[4]) + "]"
-					+ "\r\nusUnknown: " + std::to_string(usUnknown) + "\r\n"; 
+					+ std::to_string((unsigned short)c[2]) + ", C3=" + std::to_string((unsigned short)c[3]) + ", C4=" + std::to_string((unsigned short)c[4]) + "]"
+					+ "\r\nusUnknown: " + std::to_string(usUnknown) + "\r\n";
 #else
 				return "Typeid: " + std::to_string(_typeid)
 					+ "(0x" + hex_util::ltoaToHex(_typeid) + ")";
@@ -914,8 +914,8 @@ namespace stdA {
 
 		// Ability IFF
 		struct Ability {
-			enum class eEFFECT_TYPE : unsigned int  {
-				NONE, 
+			enum class eEFFECT_TYPE : unsigned int {
+				NONE,
 				PIXEL,							// Pixel o valor em rate
 				PIXEL_BY_WIND_NO_ITEM,			// Pixel dependendo do vento o valor em rate, se usar item ou ps cancela o efeito
 				PIXEL_OVER_WIND_NO_ITEM,		// Pixel acima de um vento o valor em rate, se usar item ou ps cancela o efeito
@@ -1134,7 +1134,7 @@ namespace stdA {
 
 		// MemorialShopCoinItem IFF(.sff)
 		struct MemorialShopCoinItem {
-			enum TYPE_FILTER : unsigned int  {
+			enum TYPE_FILTER : unsigned int {
 				SPRING = 1,
 				SUMMER,
 				FALL,
@@ -1203,7 +1203,7 @@ namespace stdA {
 				for (auto i = 0u; i < (sizeof(filter) / sizeof(filter[0])); ++i)
 					if (filter[i] == _filter)
 						return true;
-				
+
 				return false;
 			};
 			bool emptyFilter() {
@@ -1265,15 +1265,15 @@ namespace stdA {
 					+ "\r\nRare Type: " + std::to_string(rare_type)
 					+ "\r\nProbability: " + std::to_string(probability)
 					+ "\r\nFilter(s): " + std::to_string(filter[0])
-						+ ", " + std::to_string(filter[1])
-						+ ", " + std::to_string(filter[2])
-						+ ", " + std::to_string(filter[3])
-						+ ", " + std::to_string(filter[4])
-						+ ", " + std::to_string(filter[5])
-						+ ", " + std::to_string(filter[6])
-						+ ", " + std::to_string(filter[7])
-						+ ", " + std::to_string(filter[8])
-						+ ", " + std::to_string(filter[9])
+					+ ", " + std::to_string(filter[1])
+					+ ", " + std::to_string(filter[2])
+					+ ", " + std::to_string(filter[3])
+					+ ", " + std::to_string(filter[4])
+					+ ", " + std::to_string(filter[5])
+					+ ", " + std::to_string(filter[6])
+					+ ", " + std::to_string(filter[7])
+					+ ", " + std::to_string(filter[8])
+					+ ", " + std::to_string(filter[9])
 					+ "\r\nString S (Index): " + std::string(s_string) + "\r\n";
 #else
 				return "Typeid: " + std::to_string(_typeid);
@@ -1517,26 +1517,26 @@ namespace stdA {
 #ifdef _DEBUG
 				return "ID: " + std::to_string(id)
 					+ "\r\nType(s): " + std::to_string(effect.type[0])
-						+ ", " + std::to_string(effect.type[1])
-						+ ", " + std::to_string(effect.type[2])
+					+ ", " + std::to_string(effect.type[1])
+					+ ", " + std::to_string(effect.type[2])
 					+ "\r\nEffect(s): " + std::to_string(effect.effect[0])
-						+ ", " + std::to_string(effect.effect[1])
-						+ ", " + std::to_string(effect.effect[2])
+					+ ", " + std::to_string(effect.effect[1])
+					+ ", " + std::to_string(effect.effect[2])
 					+ "\r\nItem(ns) Typeid: " + std::to_string(item._typeid[0])
-						+ ", " + std::to_string(item._typeid[1])
-						+ ", " + std::to_string(item._typeid[2])
-						+ ", " + std::to_string(item._typeid[3])
-						+ ", " + std::to_string(item._typeid[4])
+					+ ", " + std::to_string(item._typeid[1])
+					+ ", " + std::to_string(item._typeid[2])
+					+ ", " + std::to_string(item._typeid[3])
+					+ ", " + std::to_string(item._typeid[4])
 					+ "\r\nItem(ns) active: " + std::to_string(item.active[0])
-						+ ", " + std::to_string(item.active[1])
-						+ ", " + std::to_string(item.active[2])
-						+ ", " + std::to_string(item.active[3])
-						+ ", " + std::to_string(item.active[4])
+					+ ", " + std::to_string(item.active[1])
+					+ ", " + std::to_string(item.active[2])
+					+ ", " + std::to_string(item.active[3])
+					+ ", " + std::to_string(item.active[4])
 					+ "\r\nSlot(s): " + std::to_string(slot[0])
-						+ ", " + std::to_string(slot[1])
-						+ ", " + std::to_string(slot[2])
-						+ ", " + std::to_string(slot[3])
-						+ ", " + std::to_string(slot[4])
+					+ ", " + std::to_string(slot[1])
+					+ ", " + std::to_string(slot[2])
+					+ ", " + std::to_string(slot[3])
+					+ ", " + std::to_string(slot[4])
 					+ "\r\nEffect Add Power: " + std::to_string(effect_add_power)
 					+ "\r\nucUnknown\r\n" + hex_util::BufferToHexString(ucUnknown, sizeof(ucUnknown));
 #else
@@ -1640,7 +1640,7 @@ namespace stdA {
 			unsigned int  _typeid[5];
 		};
 
-    }
+	}
 }
 
 

@@ -761,20 +761,15 @@ void packet::addString(const std::wstring string) {
 
 void packet::addFixedString(const std::string string, uint32_t size) {
 	addInt16((unsigned short)size);
-
 	if (string.size() >= size)
 		add_plain(string.c_str(), size);
 	else {
-
 		add_plain(string.c_str(), string.size());
-
 		auto diff = size - string.size();
-
 		if ((int32_t)diff > 0)
 			addZeroByte(diff);
 	}
 };
-
 void packet::addFixedString(const std::wstring string, uint32_t size) {
 	addFixedString(WcToMb(string), size);
 };

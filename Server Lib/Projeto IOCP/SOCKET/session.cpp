@@ -33,12 +33,12 @@ session::session(threadpool_base& _threadpool) : m_threadpool(_threadpool), m_us
 #if defined(_WIN32)
 	m_sock = INVALID_SOCKET;
 #elif defined(__linux__)
-    m_sock.fd = INVALID_SOCKET;
+	m_sock.fd = INVALID_SOCKET;
 	m_sock.connect_time.tv_sec = 0;
 	m_sock.connect_time.tv_nsec = 0;
 #endif
 
-    m_key = 0;
+	m_key = 0;
 	m_addr = { 0 };
 
 	m_time_start = 0l;
@@ -86,11 +86,11 @@ session::session(threadpool_base& _threadpool) : m_threadpool(_threadpool), m_us
 #endif
 };
 
-session::session(threadpool_base& _threadpool, SOCKET _sock, SOCKADDR_IN _addr, unsigned char _key) 
-		: m_threadpool(_threadpool), m_sock(_sock), m_addr(_addr), m_key(_key), m_use_ctx() {
+session::session(threadpool_base& _threadpool, SOCKET _sock, SOCKADDR_IN _addr, unsigned char _key)
+	: m_threadpool(_threadpool), m_sock(_sock), m_addr(_addr), m_key(_key), m_use_ctx() {
 
 	m_ip_maked = false;
-	
+
 	m_oid = ~0;
 
 	m_is_authorized = 0u;
@@ -102,7 +102,7 @@ session::session(threadpool_base& _threadpool, SOCKET _sock, SOCKADDR_IN _addr, 
 	m_check_packet.clear();
 
 	memset(m_ip, 0, sizeof(m_ip));
-	
+
 	make_ip();
 
 	m_buff_r.buff.init(0);
@@ -139,7 +139,7 @@ session::session(threadpool_base& _threadpool, SOCKET _sock, SOCKADDR_IN _addr, 
 };
 
 session::~session() {
-	
+
 	clear();
 
 	// Virou uma classe o buff_ctx, agora chame essa função no destrutor da classe
@@ -159,16 +159,16 @@ bool session::clear() {
 
 	if (!m_use_ctx.checkCanQuit()) {
 
-		_smp::message_pool::getInstance().push(new message("[session::clear][WARNING] [Session OID=" + std::to_string(m_oid) 
-				+ "] o buffer esta sendo usada, espera, o proximo thread que esta usando tem que limpar a session.", CL_ONLY_FILE_LOG));
+		_smp::message_pool::getInstance().push(new message("[session::clear][WARNING] [Session OID=" + std::to_string(m_oid)
+			+ "] o buffer esta sendo usada, espera, o proximo thread que esta usando tem que limpar a session.", CL_ONLY_FILE_LOG));
 
-// !@ Teste
+		// !@ Teste
 #if defined(__linux__)
 		// Libera o send buffer para deletar a session
 		// !@ deu dead lock no login server isso aqui
 		//releaseSend();
 #endif
-		
+
 		return false;
 	}
 
@@ -193,14 +193,14 @@ bool session::clear() {
 	m_sock.connect_time.tv_sec = 0;
 	m_sock.connect_time.tv_nsec = 0;
 #endif
-	
+
 	m_key = 0;
 	m_addr = { 0 };
-	
+
 	m_time_start = 0l;
 	m_tick = 0l;
 	m_tick_bot = 0l;
-	
+
 	m_oid = ~0;
 
 	m_is_authorized = 0u;
@@ -213,7 +213,7 @@ bool session::clear() {
 
 	memset(m_ip, 0, sizeof(m_ip));
 	m_ip_maked = false;
-	
+
 	//m_pi.clear();
 
 	m_buff_s.clear();
@@ -258,7 +258,7 @@ void session::make_ip() {
 };
 
 bool session::isConnectedToSend() {
-	
+
 	bool ret = false;
 
 	try {
@@ -269,8 +269,9 @@ bool session::isConnectedToSend() {
 		ret = m_connected_to_send && (getConnectTime() >= 0);
 
 		unlock();
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[session::isConnectedToSend][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -319,28 +320,29 @@ void session::requestSendBuffer(void* _buff, size_t _size, bool _raw) {
 
 	if (_size <= 0)
 		throw exception("Error _size is less or equal the zero. session::requestSendBuffer()", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SESSION, 4, 0));
-	
+
 	m_buff_s.lock();
 
-	if (isConnectedToSend() && m_buff_s.isWritable() && isConnectedToSend()) 
+	if (isConnectedToSend() && m_buff_s.isWritable() && isConnectedToSend())
 	{
-			
+
 		m_buff_s.setWrite();
 
 		size_t sz_write = 0u;
-		
+
 		do {
-			
+
 			if (isConnectedToSend() && m_buff_s.readyToWrite() && isConnectedToSend()) {
 
-				if (_raw && m_buff_s.buff.getUsed() > 0 
+				if (_raw && m_buff_s.buff.getUsed() > 0
 					&& m_buff_s.buff.getOperation() != STDA_OT_SEND_RAW_REQUEST && m_buff_s.buff.getOperation() != STDA_OT_SEND_RAW_COMPLETED) {
 
 					m_buff_s.setPartialSend();
 
 					m_threadpool.postIoOperation(this, &m_buff_s.buff, 0, STDA_OT_SEND_REQUEST);
 
-				}else {
+				}
+				else {
 
 					sz_write += m_buff_s.buff.write((void*)((unsigned char*)_buff + sz_write), _size - sz_write);
 
@@ -351,19 +353,20 @@ void session::requestSendBuffer(void* _buff, size_t _size, bool _raw) {
 					m_threadpool.postIoOperation(this, &m_buff_s.buff, 0, (_raw ? STDA_OT_SEND_RAW_REQUEST : STDA_OT_SEND_REQUEST));
 				}
 
-			}else { // Não conseguiu entrar para escrever ou a session não está mais conectada, libera o state write
-				
+			}
+			else { // Não conseguiu entrar para escrever ou a session não está mais conectada, libera o state write
+
 				m_buff_s.releaseWrite();
 
 				m_buff_s.unlock();
 
 				return;
 			}
-		
+
 		} while (sz_write < _size);
 
 		// Libera o State Write
-		m_buff_s.releaseWrite();	
+		m_buff_s.releaseWrite();
 	}
 
 	m_buff_s.unlock();
@@ -386,8 +389,9 @@ void session::setRecv() {
 		m_request_recv = 1ll;
 
 		m_threadpool.postIoOperation(this, &m_buff_r.buff, 0, STDA_OT_RECV_REQUEST);
-		
-	}else
+
+	}
+	else
 		m_request_recv++;
 
 	m_buff_r.unlock();
@@ -413,29 +417,31 @@ void session::setSend() {
 	if (isConnectedToSend() && m_buff_s.isSendable() && isConnectedToSend()) {
 
 		if (m_buff_s.buff.getUsed() <= 0) {
-			
+
 			m_buff_s.unlock();
 
 			throw exception("[session::setSend][Error] nao tem nada no buffer para ser enviado[SIZE_BUFF=" + std::to_string(m_buff_s.buff.getUsed()) + "].", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SESSION, 5, 0));
 		}
 
 		if (isConnectedToSend() && m_buff_s.readyToSend() && isConnectedToSend()) {
-			
+
 			m_buff_s.setSend();
 
 			m_buff_s.increseRequestSendCount();
-		
-		}else {
+
+		}
+		else {
 
 			m_buff_s.releaseSendAndPartialSend();
 
 			m_buff_s.unlock();
-			
+
 			// Lança o erro para ser exibido e não chamar o WSASend para não da error, pois a session já não é mais valida para enviar dados
 			throw exception("[session::setSend][Error] nao conseguiu set o Send por que a session nao esta mais conectada.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SESSION, 2, 0));
 		}
-	
-	}else {
+
+	}
+	else {
 
 		m_buff_s.unlock();
 
@@ -452,9 +458,9 @@ void session::setSendPartial() {
 
 	// Verifica antes e depois se a session ainda está conectada
 	if (m_buff_s.isSetedToSend() && m_buff_s.buff.getUsed() > 0) {
-		
+
 		m_buff_s.setPartialSend();
-	
+
 		// Post new request to send buff, to send rest of buff
 		m_threadpool.postIoOperation(this, &m_buff_s.buff, 0, m_buff_s.buff.getOperation());
 	}
@@ -485,8 +491,9 @@ bool session::isConnected() {
 		ret = m_connected && (getConnectTime() >= 0);
 
 		unlock();
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[session::isConnected][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -532,8 +539,8 @@ int session::getConnectTime() {
 			return (errno == EAGAIN | errno == EBADF | errno == EACCES) ? -1 : -2; // -1 socket is not connected, -2 Erro ao pegar status flag do socket
 
 		int error = 0;
-		socklen_t len = sizeof (error);
-		int retval = getsockopt (m_sock.fd, SOL_SOCKET, SO_ERROR, &error, &len);
+		socklen_t len = sizeof(error);
+		int retval = getsockopt(m_sock.fd, SOL_SOCKET, SO_ERROR, &error, &len);
 
 		if (retval != 0) {
 			/* there was a problem getting the error code */
@@ -552,7 +559,7 @@ int session::getConnectTime() {
 		return (int)(((uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec) - (uint64_t)(m_sock.connect_time.tv_sec * 1000000000 + m_sock.connect_time.tv_nsec)) / 1000000000);
 	}
 #endif
-		
+
 	return -1;
 };
 
@@ -568,7 +575,7 @@ packet* session::getPacketS() {
 #endif
 };
 
-void session::setPacketS(packet *_packet) {
+void session::setPacketS(packet* _packet) {
 #if defined(_WIN32)
 	InterlockedExchangePointer((PVOID*)&m_packet_s, _packet);
 #elif defined(__linux__)
@@ -584,7 +591,7 @@ packet* session::getPacketR() {
 #endif
 };
 
-void session::setPacketR(packet *_packet) {
+void session::setPacketR(packet* _packet) {
 #if defined(_WIN32)
 	InterlockedExchangePointer((PVOID*)&m_packet_r, _packet);
 #elif defined(__linux__)
@@ -617,9 +624,9 @@ void session::setState(bool _state) {
 };
 
 void session::setConnected(bool _connected) {
-	
+
 	m_connected = _connected;
-	
+
 	// Espelho de connected exceto quando o setConnectedToSend é chamando que vão ter outros valores,
 	// esse aqui é para quando o socket WSASend retorna WSAECONNREST, que o getTimeConnect não vai detectar no mesmo estante que o socket foi resetado,
 	// essa flag é para bloquea os requestSend no socket, para não gerar deadlock no buffer_send do socket
@@ -717,7 +724,7 @@ void session::buff_ctx::unlock() {
 }
 
 bool session::buff_ctx::isWritable() {
-	
+
 	while (state_write) {
 
 #if defined(_WIN32)
@@ -733,10 +740,11 @@ bool session::buff_ctx::isWritable() {
 				// Não está preparado para escrever
 				return false;
 
-			}else {	// outro tipo de erro
+			}
+			else {	// outro tipo de erro
 
 				_smp::message_pool::getInstance().push(new message("[session::buff_ctx::isWritable][Error] problema para pegar o sinal do SleepConditionVariableCS. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 				// Não está preparado para escrever
 				return false;
@@ -748,7 +756,7 @@ bool session::buff_ctx::isWritable() {
 		if ((error = pthread_cond_wait(&cv_write, &cs)) != 0) {
 
 			_smp::message_pool::getInstance().push(new message("[session::buff_ctx::isWritable][Error] problema para pegar o sinal do pthread_cond_wait. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 			// Não está preparado para escrever
 			return false;
@@ -760,7 +768,7 @@ bool session::buff_ctx::isWritable() {
 }
 
 bool session::buff_ctx::readyToWrite() {
-			
+
 	while (state_send || state_wr_send) {
 
 #if defined(_WIN32)
@@ -776,10 +784,11 @@ bool session::buff_ctx::readyToWrite() {
 				// Não está preparado para escrever
 				return false;
 
-			}else {	// outro tipo de erro
+			}
+			else {	// outro tipo de erro
 
 				_smp::message_pool::getInstance().push(new message("[session::buff_ctx::readyToWrite][Error] problema para pegar o sinal do SleepConditionVariableCS. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 				// Não está preparado para escrever
 				return false;
@@ -788,14 +797,14 @@ bool session::buff_ctx::readyToWrite() {
 #elif defined(__linux__)
 
 		int32_t error = 0;
-		
+
 		if ((error = pthread_cond_wait(&cv_send, &cs)) != 0) {
 
 			_smp::message_pool::getInstance().push(new message("[session::buff_ctx::readyToWrite][Error] problema para pegar o sinal do pthread_cond_wait. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 			// Não está preparado para escrever
-			return false;	
+			return false;
 		}
 #endif
 	}
@@ -804,7 +813,7 @@ bool session::buff_ctx::readyToWrite() {
 }
 
 bool session::buff_ctx::isSendable() {
-	
+
 	while (state_send) {
 
 #if defined(_WIN32)
@@ -820,10 +829,11 @@ bool session::buff_ctx::isSendable() {
 				// Não está preparado para escrever
 				return false;
 
-			}else {	// outro tipo de erro
+			}
+			else {	// outro tipo de erro
 
 				_smp::message_pool::getInstance().push(new message("[session::buff_ctx::isSendable][Error] problema para pegar o sinal do SleepConditionVariableCS. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 				// Não está preparado para escrever
 				return false;
@@ -836,7 +846,7 @@ bool session::buff_ctx::isSendable() {
 		if ((error = pthread_cond_wait(&cv_send, &cs)) != 0) {
 
 			_smp::message_pool::getInstance().push(new message("[session::buff_ctx::isSendable][Error] problema para pegar o sinal do pthread_cond_wait. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 			// Não está preparado para escrever
 			return false;
@@ -848,7 +858,7 @@ bool session::buff_ctx::isSendable() {
 }
 
 bool session::buff_ctx::readyToSend() {
-	
+
 	while (!state_wr_send && state_write) {
 
 #if defined(_WIN32)
@@ -864,10 +874,11 @@ bool session::buff_ctx::readyToSend() {
 				// Não está preparado para escrever
 				return false;
 
-			}else {	// outro tipo de erro
+			}
+			else {	// outro tipo de erro
 
 				_smp::message_pool::getInstance().push(new message("[session::buff_ctx::readyToSend][Error] problema para pegar o sinal do SleepConditionVariableCS. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 				// Não está preparado para escrever
 				return false;
@@ -880,7 +891,7 @@ bool session::buff_ctx::readyToSend() {
 		if ((error = pthread_cond_wait(&cv_write, &cs)) != 0) {
 
 			_smp::message_pool::getInstance().push(new message("[session::buff_ctx::readyToSend][Error] problema para pegar o sinal do pthread_cond_wait. Error code: "
-						+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(error), CL_FILE_LOG_AND_CONSOLE));
 
 			// Não está preparado para escrever
 			return false;
@@ -953,7 +964,7 @@ void session::buff_ctx::releasePartial() {
 }
 
 void session::buff_ctx::releaseSendAndPartialSend() {
-	
+
 	if (state_wr_send && buff.getUsed() <= 0)
 		state_wr_send = 0u;
 
@@ -973,5 +984,3 @@ int64_t session::buff_ctx::increseRequestSendCount() {
 int64_t session::buff_ctx::decreaseRequestSendCount() {
 	return --request_send_count;
 }
-
-

@@ -51,8 +51,8 @@
 
 using namespace stdA;
 
-auth_server::auth_server() : unit(m_player_manager, 4/*DB Instance Num*/, 4/*Job Thread Num*/), 
-	m_player_manager(*this, m_si.max_user), m_guild_ranking_time{0} {
+auth_server::auth_server() : unit(m_player_manager, 4/*DB Instance Num*/, 4/*Job Thread Num*/),
+m_player_manager(*this, m_si.max_user), m_guild_ranking_time{ 0 } {
 
 	if (m_state == FAILURE) {
 		_smp::message_pool::getInstance().push(new message("[auth_server::auth_server][Error] Ao iniciar o auth server.\n", CL_FILE_LOG_AND_CONSOLE));
@@ -87,7 +87,8 @@ auth_server::auth_server() : unit(m_player_manager, 4/*DB Instance Num*/, 4/*Job
 		packet_func::funcs_sv.addPacketCall(0x0D, packet_func::packet_svFazNada, this);
 		packet_func::funcs_sv.addPacketCall(0x0E, packet_func::packet_svFazNada, this);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::auth_server][Error] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -103,7 +104,7 @@ auth_server::~auth_server() {
 	waitAllThreadFinish(INFINITE);
 }
 
-void auth_server::requestDisconnectPlayer(player& _session, packet *_packet) {
+void auth_server::requestDisconnectPlayer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("DisconnectPlayer");
 
 	packet p;
@@ -126,7 +127,7 @@ void auth_server::requestDisconnectPlayer(player& _session, packet *_packet) {
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestDisconnectPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para o outro Server[UID="
-					+ std::to_string(server_uid) + "] desconectar o Player[UID=" + std::to_string(player_uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(server_uid) + "] desconectar o Player[UID=" + std::to_string(player_uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// Envia para o outro server o comando para desconectar o player
 			p.init_plain((unsigned short)0x6);
@@ -137,15 +138,16 @@ void auth_server::requestDisconnectPlayer(player& _session, packet *_packet) {
 
 			packet_func::session_send(p, s, 1);
 
-		}else {
+		}
+		else {
 
 			// n�o encontrou o Server para enviar o comando para deconectar o player
 #ifdef _DEBUG
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestDisconnectPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para o outro Server[UID="
-					+ std::to_string(server_uid) + "] desconectar o Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(server_uid) + "] desconectar o Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_FILE_LOG_AND_CONSOLE));
 #else
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestDisconnectPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para o outro Server[UID="
-					+ std::to_string(server_uid) + "] desconectar o Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_ONLY_FILE_LOG));
+				+ std::to_string(server_uid) + "] desconectar o Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_ONLY_FILE_LOG));
 #endif // _DEBUG
 
 			// Ent�o retorn para o Cliente que pediu para desconectar o player,
@@ -158,7 +160,8 @@ void auth_server::requestDisconnectPlayer(player& _session, packet *_packet) {
 
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		// Ent�o retorn para o Cliente que pediu para desconectar o player,
 		// para ele continuar sua execu��o e deixar que o server deconecte o player quando ele logar
@@ -172,7 +175,7 @@ void auth_server::requestDisconnectPlayer(player& _session, packet *_packet) {
 	}
 }
 
-void auth_server::requestConfirmDisconnectPlayer(player& _session, packet *_packet) {
+void auth_server::requestConfirmDisconnectPlayer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("ConfirmDisconnectPlayer");
 
 	try {
@@ -185,7 +188,7 @@ void auth_server::requestConfirmDisconnectPlayer(player& _session, packet *_pack
 		CHECK_SESSION_IS_AUTHORIZED("ConfirmDisconnectPlayer");
 
 		if (server_uid != m_si.uid) {
-			
+
 			// N�o foi o Auth Server que pediu para disconectar esse usu�rio, procura o cliente e manda a resposta para ele
 			auto s = m_player_manager.findPlayer(server_uid);
 
@@ -193,29 +196,32 @@ void auth_server::requestConfirmDisconnectPlayer(player& _session, packet *_pack
 
 				// Log
 				_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmDisconnectPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para enviar a confirmacao para o Server[UID="
-						+ std::to_string(server_uid) + "] que o Player[UID=" + std::to_string(player_uid) + "] foi deconectado.", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(server_uid) + "] que o Player[UID=" + std::to_string(player_uid) + "] foi deconectado.", CL_FILE_LOG_AND_CONSOLE));
 
 				packet p((unsigned short)0x7);
 
 				p.addUint32(player_uid);
 
 				packet_func::session_send(p, s, 1);
-			
-			}else
+
+			}
+			else
 				_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmDisconnectPlayer][WARNING] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para enviar a confirmacao para o Server[UID="
-						+ std::to_string(server_uid) + "] que o Player[UID=" + std::to_string(player_uid) + "] foi desconectado, mas o server nao esta conectado.", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(server_uid) + "] que o Player[UID=" + std::to_string(player_uid) + "] foi desconectado, mas o server nao esta conectado.", CL_FILE_LOG_AND_CONSOLE));
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmDisconnectPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para enviar a confirmacao para o Server[UID="
-					+ std::to_string(server_uid) + "](Auth Server) que o Player[UID=" + std::to_string(player_uid) + "] foi desconectado.", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(server_uid) + "](Auth Server) que o Player[UID=" + std::to_string(player_uid) + "] foi desconectado.", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmDisconnectPlayer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
 
-void auth_server::requestInfoPlayer(player& _session, packet *_packet) {
+void auth_server::requestInfoPlayer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("InfoPlayer");
 
 	packet p;
@@ -238,7 +244,7 @@ void auth_server::requestInfoPlayer(player& _session, packet *_packet) {
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestInfoPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para o outro Server[UID="
-					+ std::to_string(server_uid) + "] o Info do Player[UID=" + std::to_string(player_uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(server_uid) + "] o Info do Player[UID=" + std::to_string(player_uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// Envia para o outro server o comando para desconectar o player
 			p.init_plain((unsigned short)0xB);
@@ -248,15 +254,16 @@ void auth_server::requestInfoPlayer(player& _session, packet *_packet) {
 
 			packet_func::session_send(p, s, 1);
 
-		}else {
+		}
+		else {
 
 			// n�o encontrou o Server para enviar o comando pedinfo o info do player
 #ifdef _DEBUG
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestInfoPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para o outro Server[UID="
-					+ std::to_string(server_uid) + "] o info do Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(server_uid) + "] o info do Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_FILE_LOG_AND_CONSOLE));
 #else
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestInfoPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para o outro Server[UID="
-					+ std::to_string(server_uid) + "] o info do Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_ONLY_FILE_LOG));
+				+ std::to_string(server_uid) + "] o info do Player[UID=" + std::to_string(player_uid) + "], mas nao encontrou o Server.", CL_ONLY_FILE_LOG));
 #endif // _DEBUG
 
 			// Ent�o retorna para o Cliente que pediu o info do player, 
@@ -272,7 +279,8 @@ void auth_server::requestInfoPlayer(player& _session, packet *_packet) {
 
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		// Ent�o retorna para o Cliente que pediu o info do player, 
 		// dizendo que o player n�o foi encontrado online por que o teve algum Exception no Auth Server
@@ -289,7 +297,7 @@ void auth_server::requestInfoPlayer(player& _session, packet *_packet) {
 	}
 }
 
-void auth_server::requestConfirmSendInfoPlayer(player& _session, packet *_packet) {
+void auth_server::requestConfirmSendInfoPlayer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("ConfirmSendInfoPlayer");
 
 	try {
@@ -297,7 +305,7 @@ void auth_server::requestConfirmSendInfoPlayer(player& _session, packet *_packet
 		AuthServerPlayerInfo aspi{ 0 };
 
 		uint32_t req_server_uid = _packet->readUint32();
-		
+
 		aspi.option = _packet->readInt32();
 		aspi.uid = _packet->readUint32();
 
@@ -313,7 +321,7 @@ void auth_server::requestConfirmSendInfoPlayer(player& _session, packet *_packet
 		CHECK_SESSION_IS_AUTHORIZED("ConfirmSendInfoPlayer");
 
 		if (req_server_uid != m_si.uid) {
-			
+
 			// N�o foi o Auth Server que pediu para disconectar esse usu�rio, procura o cliente e manda a resposta para ele
 			auto s = m_player_manager.findPlayer(req_server_uid);
 
@@ -321,7 +329,7 @@ void auth_server::requestConfirmSendInfoPlayer(player& _session, packet *_packet
 
 				// Log
 				_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmSendInfoPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para enviar a confirmacao para o Server[UID="
-						+ std::to_string(req_server_uid) + "] do info do Player[UID=" + std::to_string(aspi.uid) + "].", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(req_server_uid) + "] do info do Player[UID=" + std::to_string(aspi.uid) + "].", CL_FILE_LOG_AND_CONSOLE));
 
 				// Resposta
 				packet p((unsigned short)0xC);
@@ -338,22 +346,25 @@ void auth_server::requestConfirmSendInfoPlayer(player& _session, packet *_packet
 				}
 
 				packet_func::session_send(p, s, 1);
-			
-			}else
+
+			}
+			else
 				_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmSendInfoPlayer][WARNING] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para enviar a confirmacao para o Server[UID="
-						+ std::to_string(req_server_uid) + "] do info do Player[UID=" + std::to_string(req_server_uid) + "], mas o server nao esta conectado.", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(req_server_uid) + "] do info do Player[UID=" + std::to_string(req_server_uid) + "], mas o server nao esta conectado.", CL_FILE_LOG_AND_CONSOLE));
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmSendInfoPlayer][Log] o Server[UID=" + std::to_string(_session.m_pi.uid) + "] pediu para enviar a confirmacao para o Server[UID="
-					+ std::to_string(req_server_uid) + "](Auth Server) do info do Player[UID=" + std::to_string(req_server_uid) + "].", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(req_server_uid) + "](Auth Server) do info do Player[UID=" + std::to_string(req_server_uid) + "].", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestConfirmSendInfoPlayer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
 
-void auth_server::requestSendCommandToOtherServer(player& _session, packet *_packet) {
+void auth_server::requestSendCommandToOtherServer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("SendCommandToOtherServer");
 
 	packet p;
@@ -388,9 +399,9 @@ void auth_server::requestSendCommandToOtherServer(player& _session, packet *_pac
 
 					if (!cosh.command.is_good())
 						throw exception("[auth_server::requestSendCommandToOtherServer][Error] Server[UID=" + std::to_string(_session.m_pi.uid)
-								+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
-								+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type)
-								+ "], mas nao conseguiu alocar memoria para o comando buff[size=" + std::to_string(command_buff_size) + "]. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3501, 0));
+							+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
+							+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type)
+							+ "], mas nao conseguiu alocar memoria para o comando buff[size=" + std::to_string(command_buff_size) + "]. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3501, 0));
 
 					// Ler o comando buffer do _packet, para enviar para o outro Server
 					_packet->readBuffer(cosh.command.buff, cosh.command.size);
@@ -399,8 +410,8 @@ void auth_server::requestSendCommandToOtherServer(player& _session, packet *_pac
 
 				// Log
 				_smp::message_pool::getInstance().push(new message("[auth_server::requestSendCommandToOtherServer][Log] Server[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
-						+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type) + "]", CL_FILE_LOG_AND_CONSOLE));
+					+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
+					+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 				// Envia para todos o Server do mesmo tipo excluindo quem pediu para enviar o comando
 				p.init_plain((unsigned short)0x0D);
@@ -416,29 +427,32 @@ void auth_server::requestSendCommandToOtherServer(player& _session, packet *_pac
 					// Comando buffer
 					p.addBuffer(cosh.command.buff, cosh.command.size);
 
-				}else
+				}
+				else
 					p.addUint16(0u);	// Comando buffer � vazio
 
 				packet_func::vector_send(p, v_s, 1);
 
-			}else
-				throw exception("[auth_server::requestSendCommandToOtherServer][WARNING] Server[UID=" + std::to_string(_session.m_pi.uid) 
-						+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id) 
-						+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type) 
-						+ "], mas nao encontrou ele.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3500, 0));
-		
-		}else {
+			}
+			else
+				throw exception("[auth_server::requestSendCommandToOtherServer][WARNING] Server[UID=" + std::to_string(_session.m_pi.uid)
+					+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
+					+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type)
+					+ "], mas nao encontrou ele.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3500, 0));
+
+		}
+		else {
 
 			// Inicializa o Buffer do comando
 			if (command_buff_size > 0) {
-				
+
 				cosh.command.init(command_buff_size);
 
 				if (!cosh.command.is_good())
 					throw exception("[auth_server::requestSendCommandToOtherServer][Error] Server[UID=" + std::to_string(_session.m_pi.uid)
-							+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
-							+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type)
-							+ "], mas nao conseguiu alocar memoria para o comando buff[size=" + std::to_string(command_buff_size) + "]. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3501, 0));
+						+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
+						+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type)
+						+ "], mas nao conseguiu alocar memoria para o comando buff[size=" + std::to_string(command_buff_size) + "]. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3501, 0));
 
 				// Ler o comando buffer do _packet, para enviar para o outro Server
 				_packet->readBuffer(cosh.command.buff, cosh.command.size);
@@ -447,8 +461,8 @@ void auth_server::requestSendCommandToOtherServer(player& _session, packet *_pac
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[auth_server::requestSendCommandToOtherServer][Log] Server[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
-					+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ "] pediu para enviar o command[ID=" + std::to_string(cosh.command_id)
+				+ "] para o outro Server[UID/TYPE=" + std::to_string(cosh.send_server_uid_or_type) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// Envia para o Server
 			p.init_plain((unsigned short)0x0D);
@@ -464,20 +478,22 @@ void auth_server::requestSendCommandToOtherServer(player& _session, packet *_pac
 				// Comando buffer
 				p.addBuffer(cosh.command.buff, cosh.command.size);
 
-			}else
+			}
+			else
 				p.addUint16(0u);	// Comando buffer � vazio
 
 			packet_func::session_send(p, s, 1);
 		}
-		
 
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestSendCommandToOtherServer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
 
-void auth_server::requestSendReplyToOtherServer(player& _session, packet *_packet) {
+void auth_server::requestSendReplyToOtherServer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("SendReplyToOtherServer");
 
 	packet p;
@@ -501,20 +517,20 @@ void auth_server::requestSendReplyToOtherServer(player& _session, packet *_packe
 
 		if (s == nullptr)
 			throw exception("[auth_server::requestSendReplyToOtherServer][WARNING] Server[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] pediu para enviar a resposta[ID=" + std::to_string(cosh.command_id)
-					+ "] para o outro Server[UID=" + std::to_string(cosh.send_server_uid_or_type)
-					+ "], mas nao encontrou ele.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3502, 0));
+				+ "] pediu para enviar a resposta[ID=" + std::to_string(cosh.command_id)
+				+ "] para o outro Server[UID=" + std::to_string(cosh.send_server_uid_or_type)
+				+ "], mas nao encontrou ele.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3502, 0));
 
 		// Inicializa o Buffer do comando
 		if (command_buff_size > 0) {
-				
+
 			cosh.command.init(command_buff_size);
 
 			if (!cosh.command.is_good())
 				throw exception("[auth_server::requestSendReplyToOtherServer][Error] Server[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] pediu para enviar a resposta[ID=" + std::to_string(cosh.command_id)
-						+ "] para o outro Server[UID=" + std::to_string(cosh.send_server_uid_or_type)
-						+ "], mas nao conseguiu alocar memoria para o comando buff[size=" + std::to_string(command_buff_size) + "]. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3503, 0));
+					+ "] pediu para enviar a resposta[ID=" + std::to_string(cosh.command_id)
+					+ "] para o outro Server[UID=" + std::to_string(cosh.send_server_uid_or_type)
+					+ "], mas nao conseguiu alocar memoria para o comando buff[size=" + std::to_string(command_buff_size) + "]. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::AUTH_SERVER, 3503, 0));
 
 			// Ler o comando buffer do _packet, para enviar para o outro Server
 			_packet->readBuffer(cosh.command.buff, cosh.command.size);
@@ -523,8 +539,8 @@ void auth_server::requestSendReplyToOtherServer(player& _session, packet *_packe
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestSendReplyToOtherServer][Log] Server[UID=" + std::to_string(_session.m_pi.uid)
-				+ "] pediu para enviar a resposta[ID=" + std::to_string(cosh.command_id)
-				+ "] para o outro Server[UID=" + std::to_string(cosh.send_server_uid_or_type) + "]", CL_FILE_LOG_AND_CONSOLE));
+			+ "] pediu para enviar a resposta[ID=" + std::to_string(cosh.command_id)
+			+ "] para o outro Server[UID=" + std::to_string(cosh.send_server_uid_or_type) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 		// Envia para o Server
 		p.init_plain((unsigned short)0x0E);
@@ -540,19 +556,21 @@ void auth_server::requestSendReplyToOtherServer(player& _session, packet *_packe
 			// Comando buffer
 			p.addBuffer(cosh.command.buff, cosh.command.size);
 
-		}else
+		}
+		else
 			p.addUint16(0u);	// Comando buffer � vazio
 
 		packet_func::session_send(p, s, 1);
 
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestSendReplyToOtherServer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
 
-void auth_server::requestAuthenticPlayer(player& _session, packet *_packet) {
+void auth_server::requestAuthenticPlayer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("AuthenticPlayer");
 
 	try {
@@ -576,7 +594,7 @@ void auth_server::requestAuthenticPlayer(player& _session, packet *_packet) {
 #endif
 
 		CmdAuthServerKey cmd_ask(_session.m_pi.uid, true);	// Waiter
-		
+
 		snmdb::NormalManagerDB::getInstance().add(0, &cmd_ask, nullptr, nullptr);
 
 		cmd_ask.waitEvent();
@@ -588,8 +606,8 @@ void auth_server::requestAuthenticPlayer(player& _session, packet *_packet) {
 
 		if (!ask.checkKey(key))
 			throw exception("[auth_server::requestAuthenticPlayer][Error] SERVER[UID=" + std::to_string(_session.m_pi.uid) + "] key[KEY=" + key + "] is not valid. Key[KEY="
-					+ std::string(ask.key) + ", VALID=" + std::to_string((unsigned short)ask.valid)
-					+ "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PACKET_FUNC_AS, 350, 0));
+				+ std::string(ask.key) + ", VALID=" + std::to_string((unsigned short)ask.valid)
+				+ "]. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::PACKET_FUNC_AS, 350, 0));
 
 		ask.valid = 0;	// J� usou a chave atualiza no banco de dados
 
@@ -601,8 +619,8 @@ void auth_server::requestAuthenticPlayer(player& _session, packet *_packet) {
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestAuthenticPlayer][Log] Server[TIPO=" + std::to_string(_session.m_pi.tipo) + ", NAME="
-				+ std::string(_session.m_pi.nickname) + ", UID=" + std::to_string(_session.m_pi.uid) + ", ONLINE_ID=" + std::to_string(_session.m_oid)
-				+ ", IP=" + std::string(_session.m_ip) + "] WITH KEY[" + key + "] conectou-se com sucesso.", CL_FILE_LOG_AND_CONSOLE));
+			+ std::string(_session.m_pi.nickname) + ", UID=" + std::to_string(_session.m_pi.uid) + ", ONLINE_ID=" + std::to_string(_session.m_oid)
+			+ ", IP=" + std::string(_session.m_ip) + "] WITH KEY[" + key + "] conectou-se com sucesso.", CL_FILE_LOG_AND_CONSOLE));
 
 		// UPDATE TO CLIENTE
 		packet p((unsigned short)0x1);
@@ -611,14 +629,15 @@ void auth_server::requestAuthenticPlayer(player& _session, packet *_packet) {
 
 		packet_func::session_send(p, &_session, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestAuthenticPlayer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[auth_server::requestAuthenticPlayer][Error] desconectando session[OID=" + std::to_string(_session.m_oid)
-				+ "], por que mandou alguns dados errado no packet de login. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
-		
+			+ "], por que mandou alguns dados errado no packet de login. Hacker ou Bug", CL_FILE_LOG_AND_CONSOLE));
+
 		DisconnectSession(&_session);
 	}
 }
@@ -647,7 +666,8 @@ void auth_server::onAcceptCompleted(session* _session) {
 	try {
 		_session->requestRecvBuffer();
 		_session->requestSendBuffer(mb.buf, mb.len);
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		if (STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::SESSION, 1))
 			throw;
 	}
@@ -655,7 +675,7 @@ void auth_server::onAcceptCompleted(session* _session) {
 
 void auth_server::onDisconnected(session* _session) {
 
-	player *_player = reinterpret_cast< player* >(_session);
+	player* _player = reinterpret_cast<player*>(_session);
 
 	_smp::message_pool::getInstance().push(new message("[auth_server::onDisconnected][Log] Player Desconectou. ID: " + std::string(_player->m_pi.id) + "  UID: " + std::to_string(_player->m_pi.uid), CL_FILE_LOG_AND_CONSOLE));
 
@@ -667,7 +687,7 @@ void auth_server::onHeartBeat() {
 	SYSTEMTIME local{ 0 };
 
 	try {
-		
+
 		// Check Commands
 		CmdCommandInfo cmd_ci(true);	// Waiter
 
@@ -697,8 +717,8 @@ void auth_server::onHeartBeat() {
 			m_guild_ranking_time = cmd_grut.getTime();
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[auth_server::onHeartBeat][Log] Inicializou o Update Time do Guild Ranking[" 
-					+ _formatDate(m_guild_ranking_time) + "] com sucesso.", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[auth_server::onHeartBeat][Log] Inicializou o Update Time do Guild Ranking["
+				+ _formatDate(m_guild_ranking_time) + "] com sucesso.", CL_FILE_LOG_AND_CONSOLE));
 		}
 
 		// Local Time para verificar
@@ -706,7 +726,7 @@ void auth_server::onHeartBeat() {
 
 		// Verifica se é um novo dia e atualiza o Guild Ranking
 		if (m_guild_ranking_time.wYear < local.wYear || m_guild_ranking_time.wMonth < local.wMonth || m_guild_ranking_time.wDay < local.wDay) {
-				
+
 			_smp::message_pool::getInstance().push(new message("[auth_server::onHearBeat][Log] Atualizando o Guild Ranking...", CL_FILE_LOG_AND_CONSOLE));
 
 			snmdb::NormalManagerDB::getInstance().add(3, new CmdUpdateGuildRanking(), auth_server::SQLDBResponse, this);
@@ -715,8 +735,9 @@ void auth_server::onHeartBeat() {
 			GetLocalTime(&m_guild_ranking_time);
 		}
 
-	}catch (exception& e) {
-		
+	}
+	catch (exception& e) {
+
 		_smp::message_pool::getInstance().push(new message("[auth_server::onHeartBeat][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
@@ -727,7 +748,8 @@ void auth_server::onStart() {
 
 		// N�o faz nada por enquanto
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::onStart][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -826,7 +848,7 @@ void auth_server::translateCmd(std::vector< CommandInfo >& _v_ci) {
 
 				if (!ti.isValid()) {
 					_smp::message_pool::getInstance().push(new message("[auth_server::translateCmd][Error] Ticker Info is invalid [MSG="
-							+ ti.msg + ", NICK=" + ti.nick + "]. Comando[" + el.toString() + "]", CL_FILE_LOG_AND_CONSOLE));
+						+ ti.msg + ", NICK=" + ti.nick + "]. Comando[" + el.toString() + "]", CL_FILE_LOG_AND_CONSOLE));
 
 					// Trata os outros comandos
 					continue;
@@ -842,22 +864,24 @@ void auth_server::translateCmd(std::vector< CommandInfo >& _v_ci) {
 				auto s = (player*)m_player_manager.findSessionByUID(el.target);
 
 				if (s == nullptr) {
-				
+
 					// Exclui do vector de server para enviar, o server que gerou o ticker, ele nao precisa que envie de novo para ele
 					auto v_s = m_player_manager.findPlayerByTypeExcludeUID(el.target, el.arg[1]/*SERVER UID*/);
-					
+
 					if (!v_s.empty()) {
-						
+
 						// Log
 						_smp::message_pool::getInstance().push(new message("[auth_server::translateCmd][Log] Send Ticker[MESSAGE=" + ti.msg + ", NICK=" + ti.nick + "] For Server[UID=" + std::to_string(el.target) + "]", CL_FILE_LOG_AND_CONSOLE));
-						
+
 						packet_func::vector_send(p, v_s, 1);
-					
-					}else
+
+					}
+					else
 						_smp::message_pool::getInstance().push(new message("[auth_server::translateCmd][Error] Nao encontrou o SERVER[UID/TIPO=" + std::to_string(el.target)
-								+ "], para enviar o comando de Ticker[MESSAGE=" + ti.msg + ", NICK=" + ti.nick + "] para ele.", CL_FILE_LOG_AND_CONSOLE));
-				
-				}else {
+							+ "], para enviar o comando de Ticker[MESSAGE=" + ti.msg + ", NICK=" + ti.nick + "] para ele.", CL_FILE_LOG_AND_CONSOLE));
+
+				}
+				else {
 
 					// Log 
 					_smp::message_pool::getInstance().push(new message("[auth_server::translateCmd][Log] Send Ticker[MESSAGE=" + ti.msg + ", NICK=" + ti.nick + "] For Server[UID=" + std::to_string(el.target) + "]", CL_FILE_LOG_AND_CONSOLE));
@@ -917,8 +941,8 @@ void auth_server::translateCmd(std::vector< CommandInfo >& _v_ci) {
 				p.addUint32(el.arg[0]);	// Player UID
 				p.addUint32(el.arg[1]);	// Msg Id
 
-				FIND_TARGET_AND_SEND(el.target, p, "New Mail Arrived In MailBox[PLAYER=" + std::to_string(el.arg[0]) 
-						+ ", MSG_ID=" + std::to_string(el.arg[1]) + "]");
+				FIND_TARGET_AND_SEND(el.target, p, "New Mail Arrived In MailBox[PLAYER=" + std::to_string(el.arg[0])
+					+ ", MSG_ID=" + std::to_string(el.arg[1]) + "]");
 
 				break;
 			}
@@ -985,7 +1009,7 @@ void auth_server::translateCmd(std::vector< CommandInfo >& _v_ci) {
 					packet_func::vector_send(p, m_player_manager.getAllPlayer(), 1);
 
 					_smp::message_pool::getInstance().push(new message("[auth_server::translateCmd][Log] Comando de Desligar o Auth Server. Desligando o Server em "
-							+ std::to_string(time_sec) + " segundos", CL_FILE_LOG_AND_CONSOLE));
+						+ std::to_string(time_sec) + " segundos", CL_FILE_LOG_AND_CONSOLE));
 
 					if (time_sec <= 0)
 #if defined(_WIN32)
@@ -997,7 +1021,8 @@ void auth_server::translateCmd(std::vector< CommandInfo >& _v_ci) {
 					// Shutdown With Time
 					shutdown_time(time_sec);
 
-				}else
+				}
+				else
 					FIND_TARGET_AND_SEND(el.target, p, "Shutdown[TIME=" + std::to_string(time_sec) + "]");
 
 				break;
@@ -1028,14 +1053,15 @@ void auth_server::translateCmd(std::vector< CommandInfo >& _v_ci) {
 			} // END SWITCH
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::translateCmd][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
 
 bool auth_server::checkCommand(std::stringstream& _command) {
-	
+
 	std::string s = "";
 
 	_command >> s;
@@ -1045,7 +1071,8 @@ bool auth_server::checkCommand(std::stringstream& _command) {
 	else if (!s.empty() && s.compare("reload_files") == 0) {
 		reload_files();
 		_smp::message_pool::getInstance().push(new message("Auth Server files has been reloaded.", CL_FILE_LOG_AND_CONSOLE));
-	}else if (!s.empty() && s.compare("reload_socket_config") == 0) {
+	}
+	else if (!s.empty() && s.compare("reload_socket_config") == 0) {
 
 		// Ler novamento o arquivo de configura��o do socket
 		if (m_accept_sock != nullptr)
@@ -1053,7 +1080,8 @@ bool auth_server::checkCommand(std::stringstream& _command) {
 		else
 			_smp::message_pool::getInstance().push(new message("[auth_server::checkCommand][WARNING] m_accept_sock(socket que gerencia os socket que pode aceitar etc) is invalid.", CL_FILE_LOG_AND_CONSOLE));
 
-	}else if (!s.empty() && s.compare("shutdown") == 0) {
+	}
+	else if (!s.empty() && s.compare("shutdown") == 0) {
 
 		uint32_t time_sec = 0u;
 
@@ -1068,7 +1096,7 @@ bool auth_server::checkCommand(std::stringstream& _command) {
 			time_sec = 0u;
 
 		// Manda Shutdown para todos os server conectados depois sai
-		
+
 		// Send Time Shutdown
 		packet p((unsigned short)0x2);
 
@@ -1077,31 +1105,34 @@ bool auth_server::checkCommand(std::stringstream& _command) {
 		packet_func::vector_send(p, m_player_manager.getAllPlayer(), 1);
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::checkCmmand][Log] Comando de Desligar o Auth Server. Desligando o Server em "
-				+ std::to_string(time_sec) + " segundos", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(time_sec) + " segundos", CL_FILE_LOG_AND_CONSOLE));
 
 		// Shutdown With Time
 		shutdown_time((time_sec > 0 ? time_sec : 5)); // Espera 5 segundos para da tempo de enviar para todos os server conectados;
 
-	}else if (!s.empty() && s.compare("snapshot") == 0) {
+	}
+	else if (!s.empty() && s.compare("snapshot") == 0) {
 
 		try {
-			int *bad_ptr_snapshot = nullptr;
+			int* bad_ptr_snapshot = nullptr;
 			*bad_ptr_snapshot = 2;
-		}catch (exception& e) {
+		}
+		catch (exception& e) {
 			UNREFERENCED_PARAMETER(e);
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[auth_server::checkCommand][Log] Snapshot comando executado.", CL_FILE_LOG_AND_CONSOLE));
 		}
 
-	}else
+	}
+	else
 		_smp::message_pool::getInstance().push(new message("Unknown Command: " + s, CL_ONLY_CONSOLE));
 
 	return false;
 }
 
-bool auth_server::checkPacket(session& _session, packet *_packet) {
-	
+bool auth_server::checkPacket(session& _session, packet* _packet) {
+
 	///--------------- INICIO CHECK PACKET SESSION
 	if (/*(std::clock() - _session.m_check_packet.tick) <= CHK_PCKT_INTERVAL_LIMIT /* Dentro do Interval */
 		/*&& _session.m_check_packet.packet_id == _packet->getTipo() /* Mesmo pacote */
@@ -1169,12 +1200,12 @@ void auth_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 		return;
 	}
 
-	auto *_server = reinterpret_cast< auth_server* >(_arg);
+	auto* _server = reinterpret_cast<auth_server*>(_arg);
 
 	switch (_msg_id) {
 	case 1:	// Update Command
 	{
-		auto cmd_uc = reinterpret_cast< CmdUpdateCommand* >(&_pangya_db);
+		auto cmd_uc = reinterpret_cast<CmdUpdateCommand*>(&_pangya_db);
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::SQLDBResponse][Log] Atualizou o Command[" + cmd_uc->getInfo().toString() + "] com sucesso!", CL_FILE_LOG_AND_CONSOLE));
 
@@ -1182,11 +1213,11 @@ void auth_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 	}
 	case 2:	// Update Auth Server Key
 	{
-		auto cmd_uask = reinterpret_cast< CmdUpdateAuthServerKey* >(&_pangya_db);
+		auto cmd_uask = reinterpret_cast<CmdUpdateAuthServerKey*>(&_pangya_db);
 
 		_smp::message_pool::getInstance().push(new message("[auth_server::SQLDBResponse][Log] Atualizou Auth Server Key[SERVER_UID="
-				+ std::to_string(cmd_uask->getInfo().server_uid) + ", KEY=" + std::string(cmd_uask->getInfo().key) + ", VALID=" 
-				+ std::to_string((unsigned short)cmd_uask->getInfo().valid) + "]", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(cmd_uask->getInfo().server_uid) + ", KEY=" + std::string(cmd_uask->getInfo().key) + ", VALID="
+			+ std::to_string((unsigned short)cmd_uask->getInfo().valid) + "]", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	}
 	case 3: // Update Guild Ranking

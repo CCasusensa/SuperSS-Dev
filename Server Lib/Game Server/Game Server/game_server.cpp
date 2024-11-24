@@ -123,8 +123,8 @@
 
 using namespace stdA;
 
-game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manager(*this, m_si.max_user), m_dqi{0}, m_login_manager(), m_timer_manager(),
-		m_notice(60/*60 segundos 1 minuto para o notice*/), m_ticker(30/*30 segundos para o ticker*/), m_GameGuardAuth(false), m_game_guard(nullptr) {
+game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manager(*this, m_si.max_user), m_dqi{ 0 }, m_login_manager(), m_timer_manager(),
+m_notice(60/*60 segundos 1 minuto para o notice*/), m_ticker(30/*30 segundos para o ticker*/), m_GameGuardAuth(false), m_game_guard(nullptr) {
 
 	if (m_state == FAILURE) {
 		_smp::message_pool::getInstance().push(new message("[game_server::game_server][Error] na inicializacao do game server", CL_FILE_LOG_AND_CONSOLE));
@@ -161,7 +161,7 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 		cmd_dqi.waitEvent();
 
 		if (cmd_dqi.getException().getCodeError() != 0)
-			throw exception("[game_server::game_server][Error] nao conseguiu pegar o Daily Quest Info[Exption: " 
+			throw exception("[game_server::game_server][Error] nao conseguiu pegar o Daily Quest Info[Exption: "
 				+ cmd_dqi.getException().getFullMessageError() + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 277, 0));
 
 		// Initialize Daily Quest of Server
@@ -181,7 +181,7 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 			auto type = sIff::getInstance().getItemGroupIdentify(i->second._typeid);
 
 			if (type == iff::PART || type == iff::ITEM) {
-				
+
 				s = "Info Item\r\n";
 
 				s += i->second.toString();
@@ -216,11 +216,11 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 			s += i->second.toString();
 
 			std::for_each(i->second.item._typeid, LAST_ELEMENT_IN_ARRAY(i->second.item._typeid), [&](auto& _el) {
-				
+
 				if (_el != 0u) {
 
 					s += "\r\n";
-					
+
 					if ((commom = sIff::getInstance().findCommomItem(_el)) != nullptr)
 						s += "Name: " + std::string(commom->name) + "\r\n";
 
@@ -238,23 +238,23 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 			_smp::message_pool::getInstance().push(new message(s, CL_ONLY_FILE_LOG_TEST));
 		}
 */
-		//for (auto ii = mapCommom.begin(); ii != mapCommom.end(); ++ii) {
-		//	s = "Info Item\r\n";
+//for (auto ii = mapCommom.begin(); ii != mapCommom.end(); ++ii) {
+//	s = "Info Item\r\n";
 
-		//	//if ((commom = sIff::getInstance().findCommomItem(ii->second._typeid)) != nullptr)
-		//		//s += "Name: " + std::string(commom->name) + "\r\n";
+//	//if ((commom = sIff::getInstance().findCommomItem(ii->second._typeid)) != nullptr)
+//		//s += "Name: " + std::string(commom->name) + "\r\n";
 
-		//	s += ii->second.toString();
-		//	
-		//	/*if ((desc = sIff::getInstance().findDesc(ii->second._typeid)) != nullptr) {
-		//		s += "\r\nItem Description.\r\n";
-		//		s += std::string(desc->description);
-		//	}*/
+//	s += ii->second.toString();
+//	
+//	/*if ((desc = sIff::getInstance().findDesc(ii->second._typeid)) != nullptr) {
+//		s += "\r\nItem Description.\r\n";
+//		s += std::string(desc->description);
+//	}*/
 
-		//	s += "\r\n---------------------------END------------------------";
+//	s += "\r\n---------------------------END------------------------";
 
-		//	_smp::message_pool::getInstance().push(new message(s, CL_ONLY_FILE_LOG_TEST));
-		//}
+//	_smp::message_pool::getInstance().push(new message(s, CL_ONLY_FILE_LOG_TEST));
+//}
 #endif // _DEBUG
 
 		ChannelInfo ci{ 0 };
@@ -276,7 +276,8 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 
 			try {
 				ci.min_level_allow = m_reader_ini.readInt("CHANNEL" + std::to_string(i + 1), "LOWLEVEL");
-			}catch (exception& e) {
+			}
+			catch (exception& e) {
 
 				if (!STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::READER_INI, 6))
 					_smp::message_pool::getInstance().push(new message("[game_server::game_server][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
@@ -284,7 +285,8 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 
 			try {
 				ci.flag.ulFlag = m_reader_ini.readInt("CHANNEL" + std::to_string(i + 1), "FLAG");
-			}catch (exception& e) {
+			}
+			catch (exception& e) {
 
 				if (!STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::READER_INI, 6))
 					_smp::message_pool::getInstance().push(new message("[game_server::game_server][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
@@ -781,7 +783,8 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 		// Initialized complete
 		m_state = INITIALIZED;
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		_smp::message_pool::getInstance().push(new message(e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
 		m_state = FAILURE;
@@ -789,7 +792,7 @@ game_server::game_server() : server(m_player_manager, 2, 26, 8), m_player_manage
 }
 
 game_server::~game_server() {
-	
+
 	clear();
 
 	// Clear Game Guard Auth
@@ -797,7 +800,7 @@ game_server::~game_server() {
 		delete m_game_guard;
 
 	m_game_guard = nullptr;
-	
+
 	/*while (!v_channel.empty()) {
 		v_channel.erase(v_channel.begin());
 		v_channel.shrink_to_fit();
@@ -827,7 +830,7 @@ void game_server::clear() {
 channel* game_server::enterChannel(player& _session, unsigned char _channel) {
 	CHECK_SESSION_BEGIN("enterChannel");
 
-	channel *enter = nullptr, *last = nullptr;
+	channel* enter = nullptr, * last = nullptr;
 
 	try {
 
@@ -835,24 +838,25 @@ channel* game_server::enterChannel(player& _session, unsigned char _channel) {
 			throw exception("[game_server::enterChannel][Error] id channel nao exite.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0));
 
 		if (enter->getId() == _session.m_pi.channel) {
-		
+
 			packet p;
 			packet_func::pacote04E(p, &_session, 1);
 			packet_func::session_send(p, &_session, 0);
-		
+
 			return enter;	// Ele já está nesse canal
 		}
 
 		if (enter->isFull()) {
-		
+
 			// Não conseguiu entrar no canal por que ele está cheio, deixa o enter como nullptr
 			enter = nullptr;
 
 			packet p;
 			packet_func::pacote04E(p, &_session, 2/*Channel Full*/);
 			packet_func::session_send(p, &_session, 0);
-	
-		}else {
+
+		}
+		else {
 
 			// Verifica se pode entrar no canal
 			enter->checkEnterChannel(_session);
@@ -860,13 +864,14 @@ channel* game_server::enterChannel(player& _session, unsigned char _channel) {
 			// Sai do canal antigo se ele estiver em outro canal
 			if (_session.m_pi.channel != INVALID_CHANNEL && (last = findChannel(_session.m_pi.channel)) != nullptr)
 				last->leaveChannel(_session);
-	
+
 			// Entra no canal
 			enter->enterChannel(_session);
-		
+
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		// Não conseguiu entrar no canal por um alguma flag ou erro do sistema deixa o enter como nullptr
 		enter = nullptr;
@@ -896,8 +901,9 @@ void game_server::sendChannelListToSession(player& _session) {
 
 		packet_func::pacote04D(p, &_session, v_channel);
 		packet_func::session_send(p, &_session, 0);
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendChannelListToSession][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -917,7 +923,8 @@ void game_server::sendServerListAndChannelListToSession(player& _session) {
 		packet_func::pacote09F(p, &_session, m_server_list, v_channel);
 		packet_func::session_send(p, &_session, 0);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendServerListAndChannelListToSession][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -942,7 +949,8 @@ void game_server::sendDateTimeToSession(player& _session) {
 
 		packet_func::session_send(p, &_session, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendDateTimeToSession][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -960,8 +968,8 @@ void game_server::sendRankServer(player& _session) {
 		CHECK_SESSION_IS_AUTHORIZED("sendRankServer");
 
 		if (_session.m_pi.block_flag.m_flag.stBit.rank_server)
-			throw exception("[game_server::sendRankServer][Error] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] esta bloqueado o Rank Server, ele nao pode acessar o rank server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7010, 0));
+			throw exception("[game_server::sendRankServer][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] esta bloqueado o Rank Server, ele nao pode acessar o rank server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7010, 0));
 
 		CmdServerList cmd_sl(CmdServerList::TYPE_SERVER::RANK, true);	// Waiter
 
@@ -975,8 +983,8 @@ void game_server::sendRankServer(player& _session) {
 		auto sl = cmd_sl.getServerList();
 
 		if (sl.empty())
-			throw exception("[game_server::sendRankServer][WARNING] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] requisitou o Rank Server, mas nao tem nenhum Rank Server online no DB.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7011, 0));
+			throw exception("[game_server::sendRankServer][WARNING] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] requisitou o Rank Server, mas nao tem nenhum Rank Server online no DB.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7011, 0));
 
 		p.init_plain((unsigned short)0xA2);
 
@@ -985,7 +993,8 @@ void game_server::sendRankServer(player& _session) {
 
 		packet_func::session_send(p, &_session, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendRankServer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -999,8 +1008,8 @@ void game_server::sendRankServer(player& _session) {
 	}
 };
 
-channel *game_server::findChannel(uint32_t _channel) {
-	
+channel* game_server::findChannel(uint32_t _channel) {
+
 	if (_channel == INVALID_CHANNEL)
 		return nullptr;
 
@@ -1040,7 +1049,7 @@ void game_server::sendSmartCalculatorReplyToPlayer(const uint32_t _uid, std::str
 		if (player == nullptr) {
 
 			_smp::message_pool::getInstance().push(new message("[game_server::sendSmartCalculatorReplyToPlayer][WARNING] Player[UID="
-					+ std::to_string(_uid) + "] nao esta mais online.", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_uid) + "] nao esta mais online.", CL_FILE_LOG_AND_CONSOLE));
 
 			return;
 		}
@@ -1071,7 +1080,8 @@ void game_server::sendSmartCalculatorReplyToPlayer(const uint32_t _uid, std::str
 			packet_func::session_send(p, player, 1);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendSmartCalculatorReplyToPlayer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -1099,13 +1109,14 @@ void game_server::sendNoticeGMFromDiscordCmd(std::string& _notice) {
 		for (auto& el : v_channel)
 			packet_func::channel_broadcast(*el, p, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendNoticeGMFromDiscordCmd][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-void game_server::requestLogin(player& _session, packet *_packet) {
+void game_server::requestLogin(player& _session, packet* _packet) {
 	REQUEST_BEGIN("Login");
 
 	packet p;
@@ -1113,26 +1124,26 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 	try {
 
 		size_t ii = 0, packet_version = 0;
-		
+
 		KeysOfLogin kol = { 0 };
-		
+
 		AuthKeyLoginInfo akli{ 0 };
 		AuthKeyGameInfo akgi{};
-		
+
 		std::string client_version;
-		
+
 		// Temp que vai guarda os dados que o cliente enviou para fazer o login com o server
 		player_info _pi;
 
 		// Player info da session e vai guardar os valores recuperados do banco de dados
-		PlayerInfo *pi = &(_session.m_pi);
+		PlayerInfo* pi = &(_session.m_pi);
 		pi->clear();
 
 		//////////// ----------------------- Começa a ler o packet que o cliente enviou ------------------------- \\\\\\\\\\\/
 
 #ifdef _DEBUG
 		_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][Log] Hex:\n\r" + hex_util::BufferToHexString(_packet->getBuffer(), _packet->getSize()), CL_FILE_LOG_AND_CONSOLE));
-		
+
 		// Read Packet of Client request
 #if defined(_WIN32)
 		memcpy_s(_pi.id, sizeof(_pi.id), _packet->readString().c_str(), sizeof(_pi.id));
@@ -1141,39 +1152,39 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 #endif
 
 		_smp::message_pool::getInstance().push(new message("id: " + std::string(_pi.id), CL_FILE_LOG_AND_CONSOLE));
-		
+
 		_pi.uid = _packet->readInt32();
 
 		_smp::message_pool::getInstance().push(new message("uid: " + std::to_string(_pi.uid), CL_FILE_LOG_AND_CONSOLE));
 		_smp::message_pool::getInstance().push(new message("ntKey: " + std::to_string(_packet->readInt32()), CL_FILE_LOG_AND_CONSOLE));
 		_smp::message_pool::getInstance().push(new message("command: " + hex_util::ltoaToHex(_packet->readUint16()), CL_FILE_LOG_AND_CONSOLE)); // -f
-		
+
 #if defined(_WIN32)
 		memcpy_s(kol.keys[0], sizeof(kol.keys[0]), _packet->readString().c_str(), sizeof(kol.keys[0]));
 #elif defined(__linux__)
 		memcpy(kol.keys[0], _packet->readString().c_str(), sizeof(kol.keys[0]));
 #endif
-		
+
 		_smp::message_pool::getInstance().push(new message("authKey: " + std::string(kol.keys[0])/*pw->p->readString()*/, CL_FILE_LOG_AND_CONSOLE));
-		
+
 		client_version = _packet->readString();
-		
+
 		_smp::message_pool::getInstance().push(new message("Version: " + client_version/*pw->p->readString()*/, CL_FILE_LOG_AND_CONSOLE));
-		
+
 		packet_version = _packet->readInt32();
-		
+
 		_smp::message_pool::getInstance().push(new message("Packet Version: " + std::to_string(packet_version), CL_FILE_LOG_AND_CONSOLE));
 
 		std::string mac_address = _packet->readString();
 
 		_smp::message_pool::getInstance().push(new message("Mac Address: " + mac_address, CL_FILE_LOG_AND_CONSOLE));
-		
+
 #if defined(_WIN32)
 		memcpy_s(kol.keys[1], sizeof(kol.keys[1]), _packet->readString().c_str(), sizeof(kol.keys[1]));
 #elif defined(__linux__)
 		memcpy(kol.keys[1], _packet->readString().c_str(), sizeof(kol.keys[1]));
 #endif
-		
+
 		_smp::message_pool::getInstance().push(new message("AuthKey2: " + std::string(kol.keys[1])/*pw->p->readString()*/, CL_FILE_LOG_AND_CONSOLE));
 #else
 		// Read Packet Client request
@@ -1225,13 +1236,13 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 
 		// Verifica aqui se o IP/MAC ADDRESS do player está bloqueado
 		if (haveBanList(_session.m_ip, mac_address))
-			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(_pi.uid) + ", IP=" 
-					+ _session.m_ip +", MAC=" + mac_address + "] esta bloqueado por regiao IP/MAC Addrress.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1058, 0));
-		
+			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(_pi.uid) + ", IP="
+				+ _session.m_ip + ", MAC=" + mac_address + "] esta bloqueado por regiao IP/MAC Addrress.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1058, 0));
+
 		// Aqui verifica se recebeu os dados corretos
 		if (_pi.id[0] == '\0')
-			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(_pi.uid) 
-					+ ", IP=" + _session.m_ip + "] id que o player enviou eh invalido. id: " + std::string(_pi.id), STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1050, 0));
+			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(_pi.uid)
+				+ ", IP=" + _session.m_ip + "] id que o player enviou eh invalido. id: " + std::string(_pi.id), STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1050, 0));
 
 		// Verifica se o server está mantle, se tiver verifica se o player tem capacidade para entrar
 		CmdPlayerInfo cmd_pi(_pi.uid, true); // Waiter
@@ -1250,26 +1261,28 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 
 		// UID de outro player ou enviou o ID errado mesmo (essa parte é anti-hack ou bot)
 		if (strcmp(pi->id, _pi.id) != 0)
-			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(pi->uid) + ", REQ_UID=" 
-					+ std::to_string(_pi.uid) + "] Player ID nao bate : client send ID : " + std::string(_pi.id) + "\t player DB ID : " 
-					+ std::string(pi->id), STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1052, 0));
-		
+			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(pi->uid) + ", REQ_UID="
+				+ std::to_string(_pi.uid) + "] Player ID nao bate : client send ID : " + std::string(_pi.id) + "\t player DB ID : "
+				+ std::string(pi->id), STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1052, 0));
+
 		// Verifica aqui se a conta do player está bloqueada
 		if (pi->block_flag.m_id_state.id_state.ull_IDState != 0) {
 
 			if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_TEMPORARY && (pi->block_flag.m_id_state.block_time == -1 || pi->block_flag.m_id_state.block_time > 0)) {
 
 				throw exception("[game_server::requestLogin][Log] Bloqueado por tempo[Time="
-						+ (pi->block_flag.m_id_state.block_time == -1 ? std::string("indeterminado") : (std::to_string(pi->block_flag.m_id_state.block_time / 60)
+					+ (pi->block_flag.m_id_state.block_time == -1 ? std::string("indeterminado") : (std::to_string(pi->block_flag.m_id_state.block_time / 60)
 						+ "min " + std::to_string(pi->block_flag.m_id_state.block_time % 60) + "sec"))
-						+ "]. player [UID=" + std::to_string(pi->uid) + ", ID=" + std::string(pi->id) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1029, 0));
+					+ "]. player [UID=" + std::to_string(pi->uid) + ", ID=" + std::string(pi->id) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1029, 0));
 
-			}else if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_FOREVER) {
+			}
+			else if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_FOREVER) {
 
 				throw exception("[game_server::requestLogin][Log] Bloqueado permanente. player [UID=" + std::to_string(pi->uid)
-						+ ", ID=" + std::string(pi->id) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1030, 0));
+					+ ", ID=" + std::string(pi->id) + "]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1030, 0));
 
-			}else if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_ALL_IP) {
+			}
+			else if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_ALL_IP) {
 
 				// Bloquea todos os IP que o player logar e da error de que a area dele foi bloqueada
 
@@ -1277,10 +1290,11 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 				snmdb::NormalManagerDB::getInstance().add(9, new CmdInsertBlockIP(_session.m_ip, "255.255.255.255"), game_server::SQLDBResponse, this);
 
 				// Resposta
-				throw exception("[game_server::requestLogin][Log] Player[UID=" + std::to_string(pi->uid) + ", IP=" + std::string(_session.m_ip) 
-						+ "] Block ALL IP que o player fizer login.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1031, 0));
+				throw exception("[game_server::requestLogin][Log] Player[UID=" + std::to_string(pi->uid) + ", IP=" + std::string(_session.m_ip)
+					+ "] Block ALL IP que o player fizer login.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1031, 0));
 
-			}else if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_MAC_ADDRESS) {
+			}
+			else if (pi->block_flag.m_id_state.id_state.st_IDState.L_BLOCK_MAC_ADDRESS) {
 
 				// Bloquea o MAC Address que o player logar e da error de que a area dele foi bloqueada
 
@@ -1289,8 +1303,8 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 
 				// Resposta
 				throw exception("[game_server::requestLogin][Log] Player[UID=" + std::to_string(pi->uid)
-						+ ", IP=" + std::string(_session.m_ip) + ", MAC=" + mac_address + "] Block MAC Address que o player fizer login.",  
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1032, 0));
+					+ ", IP=" + std::string(_session.m_ip) + ", MAC=" + mac_address + "] Block MAC Address que o player fizer login.",
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1032, 0));
 
 			}
 		}
@@ -1300,8 +1314,8 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 
 		// Se a flag do canSameIDLogin estiver ativo, não verifica packet
 		if (!m_login_manager.canSameIDLogin() && packet_version != PACKET_VERSION_SERVER)
-			throw exception("[game_server::requestLogin][Error] Player UID: " + std::to_string(_pi.uid) + ".\tPacket Version of client not match. Server: " 
-					+ std::to_string(PACKET_VERSION_SERVER) + " == Client: " + std::to_string(packet_version), STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1055, 0));
+			throw exception("[game_server::requestLogin][Error] Player UID: " + std::to_string(_pi.uid) + ".\tPacket Version of client not match. Server: "
+				+ std::to_string(PACKET_VERSION_SERVER) + " == Client: " + std::to_string(packet_version), STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1055, 0));
 
 		// Verifica o Auth Key do player
 		CmdAuthKeyLoginInfo cmd_akli(pi->uid, true); // Waiter
@@ -1318,33 +1332,34 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(pi->uid) + "].\tAuthKey ja foi utilizada antes.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1056, 0));
 
 		// ### Isso aqui é uma falha de segurança faltal, muito grande nunca posso deixar isso ligado depois que colocar ele online
-		if (!m_login_manager.canSameIDLogin() && 
+		if (!m_login_manager.canSameIDLogin() &&
 #if defined(_WIN32)
 			_stricmp(kol.keys[0], cmd_akli.getInfo().key) != 0
 #elif defined(__linux__)
 			strcasecmp(kol.keys[0], cmd_akli.getInfo().key) != 0
 #endif
-		)
+			)
 			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(pi->uid) + "].\tAuthKey no bate(no match).", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1057, 0));
 
 		ClientVersion cv_side_sv = ClientVersion::make_version(const_cast<std::string&>(m_login_manager.getClientVersionSideServer()));
 		auto cv_side_c = ClientVersion::make_version(client_version);
-		
+
 		if (cv_side_c.flag == ClientVersion::COMPLETE_VERSION && strcmp(cv_side_c.region, cv_side_sv.region) == 0
-				&& strcmp(cv_side_c.season, cv_side_sv.season) == 0) {
-			
+			&& strcmp(cv_side_c.season, cv_side_sv.season) == 0) {
+
 			if (cv_side_c.high != cv_side_sv.high || cv_side_c.low < cv_side_sv.low) {
-				_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][WARNING] Player[UID=" + std::to_string(pi->uid) + "].\tClient Version not match. Server: " 
-						+ std::string(m_login_manager.getClientVersionSideServer()) + " == Client: " + cv_side_c.toString(), CL_ONLY_FILE_LOG));
-				
+				_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][WARNING] Player[UID=" + std::to_string(pi->uid) + "].\tClient Version not match. Server: "
+					+ std::string(m_login_manager.getClientVersionSideServer()) + " == Client: " + cv_side_c.toString(), CL_ONLY_FILE_LOG));
+
 				pi->block_flag.m_flag.stBit.all_game = 1u;// |= BLOCK_PLAY_ALL;
 			}
 
-		}else if (cv_side_c.high != cv_side_sv.high || cv_side_c.low < cv_side_sv.low) {
-			
-			_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][WARNING] Player[UID=" + std::to_string(pi->uid) + "].\tClient Version not match. Server: " 
-					+ std::string(m_login_manager.getClientVersionSideServer()) + " == Client: " + cv_side_c.toString(), CL_ONLY_FILE_LOG));
-			
+		}
+		else if (cv_side_c.high != cv_side_sv.high || cv_side_c.low < cv_side_sv.low) {
+
+			_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][WARNING] Player[UID=" + std::to_string(pi->uid) + "].\tClient Version not match. Server: "
+				+ std::string(m_login_manager.getClientVersionSideServer()) + " == Client: " + cv_side_c.toString(), CL_ONLY_FILE_LOG));
+
 			pi->block_flag.m_flag.stBit.all_game = 1u;// |= BLOCK_PLAY_ALL;
 		}
 
@@ -1374,19 +1389,19 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 			pi->mi.state_flag.stFlagBit.whisper = _session.m_gi.whisper;
 			pi->mi.state_flag.stFlagBit.channel = _session.m_gi.channel;
 
-			_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][Log] [GM][ID=" + std::string(pi->id) + "][UID=" 
-					+ std::to_string(pi->uid) + "][OID=" + std::to_string(_session.m_oid) + "] Logou.", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][Log] [GM][ID=" + std::string(pi->id) + "][UID="
+				+ std::to_string(pi->uid) + "][OID=" + std::to_string(_session.m_oid) + "] Logou.", CL_FILE_LOG_AND_CONSOLE));
 		}
 
 		// Verifica se o player tem a capacidade e level para entrar no server
 		if (m_si.propriedade.stBit.only_rookie && pi->level >= 6/*Beginner E maior*/)
 			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(pi->uid) + ", LEVEL="
-					+ std::to_string((unsigned short)pi->level) + "] nao pode entrar no server por que o server eh so para rookie.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1052, 0));
+				+ std::to_string((unsigned short)pi->level) + "] nao pode entrar no server por que o server eh so para rookie.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1052, 0));
 
 		/*Nega ele não pode ser nenhum para lançar o erro*/
 		if (m_si.propriedade.stBit.mantle && !(pi->m_cap.stBit.mantle || pi->m_cap.stBit.game_master))
 			throw exception("[game_server::requestLogin][Error] Player[UID=" + std::to_string(pi->uid) + ", CAP=" + std::to_string(pi->m_cap.ulCapability)
-					+ "] nao tem a capacidade para entrar no server mantle.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1053, 0));
+				+ "] nao tem a capacidade para entrar no server mantle.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1053, 0));
 
 		// Verifica se o Player já está logado
 		auto player_logado = HasLoggedWithOuterSocket(_session);
@@ -1394,13 +1409,13 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 		if (!m_login_manager.canSameIDLogin() && player_logado != nullptr) {
 
 			_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][Log] Player[UID=" + std::to_string(_pi.uid) + ", OID="
-					+ std::to_string(_session.m_oid) + ", IP=" + _session.getIP() + "] que esta logando agora, ja tem uma outra session com o mesmo UID logado, desloga o outro Player[UID="
-					+ std::to_string(player_logado->getUID()) + ", OID=" + std::to_string(player_logado->m_oid) + ", IP=" + player_logado->getIP() + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_session.m_oid) + ", IP=" + _session.getIP() + "] que esta logando agora, ja tem uma outra session com o mesmo UID logado, desloga o outro Player[UID="
+				+ std::to_string(player_logado->getUID()) + ", OID=" + std::to_string(player_logado->m_oid) + ", IP=" + player_logado->getIP() + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			if (!DisconnectSession(player_logado))
 				throw exception("[game_server::requestLogin][Error] Nao conseguiu disconnectar o player[UID=" + std::to_string(player_logado->getUID())
-						+ ", OID=" + std::to_string(player_logado->m_oid) + ", IP=" + player_logado->getIP() + "], ele pode esta com o bug do oid bloqueado, ou Session::UsaCtx bloqueado.",
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1054, 0));
+					+ ", OID=" + std::to_string(player_logado->m_oid) + ", IP=" + player_logado->getIP() + "], ele pode esta com o bug do oid bloqueado, ou Session::UsaCtx bloqueado.",
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1054, 0));
 		}
 
 		// Junta Flag de block do server, ao do player
@@ -1415,8 +1430,8 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 		// Resgistra o Login do Player no server
 		snmdb::NormalManagerDB::getInstance().add(7, new CmdRegisterLogonServer(pi->uid, std::to_string(m_si.uid)), game_server::SQLDBResponse, this);
 
-		_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][Log] Player[OID=" + std::to_string(_session.m_oid) + ", UID=" + std::to_string(pi->uid) + ", NICKNAME=" 
-				+ std::string(pi->nickname) + "] Autenticou com sucesso.", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::requestLogin][Log] Player[OID=" + std::to_string(_session.m_oid) + ", UID=" + std::to_string(pi->uid) + ", NICKNAME="
+			+ std::string(pi->nickname) + "] Autenticou com sucesso.", CL_FILE_LOG_AND_CONSOLE));
 
 		// Verifica se o papel tem limite por dia, se não anula o papel shop do player
 		sPapelShopSystem::getInstance().init_player_papel_shop_info(_session);
@@ -1439,7 +1454,8 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 		// Entra com sucesso
 		packet_func::session_send(p, &_session, 0);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		// Error no login, set falso o autoriza o player a continuar conectado com o Game Server
 		_session.m_is_authorized = 0u;
@@ -1464,7 +1480,7 @@ void game_server::requestLogin(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestEnterChannel(player& _session, packet *_packet) {
+void game_server::requestEnterChannel(player& _session, packet* _packet) {
 	REQUEST_BEGIN("EnterChannel");
 
 	try {
@@ -1478,7 +1494,8 @@ void game_server::requestEnterChannel(player& _session, packet *_packet) {
 		// Enter Channel
 		enterChannel(_session, channel);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		// Tem que ter a resposta
 		packet p;
@@ -1490,7 +1507,7 @@ void game_server::requestEnterChannel(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestEnterOtherChannelAndLobby(player& _session, packet *_packet) {
+void game_server::requestEnterOtherChannelAndLobby(player& _session, packet* _packet) {
 	REQUEST_BEGIN("EnterOtherChannelAndLobby");
 
 	try {
@@ -1507,17 +1524,18 @@ void game_server::requestEnterOtherChannelAndLobby(player& _session, packet *_pa
 		if (c != nullptr)
 			c->enterLobby(_session, lobby);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestEnterOtherChannelAndLobby][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
-		
+
 		// Relança
 		if (STDA_SOURCE_ERROR_DECODE(e.getCodeError()) != STDA_ERROR_TYPE::CHANNEL)
 			throw;
 	}
 };
 
-void game_server::requestChangeServer(player& _session, packet *_packet) {
+void game_server::requestChangeServer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("ChangeServer");
 
 	packet p;
@@ -1532,18 +1550,18 @@ void game_server::requestChangeServer(player& _session, packet *_packet) {
 
 		auto it = std::find_if(m_server_list.begin(), m_server_list.end(), [&](auto& _el) {
 			return _el.uid == server_uid;
-		});
+			});
 
 		if (it == m_server_list.end())
-			throw exception("[game_server::requestChangeServer][Error] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] tentou trocar de server para o Server[UID=" + std::to_string(server_uid) 
-					+ "], mas ele nao esta no server list mais.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0x7500001, 1));
+			throw exception("[game_server::requestChangeServer][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] tentou trocar de server para o Server[UID=" + std::to_string(server_uid)
+				+ "], mas ele nao esta no server list mais.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0x7500001, 1));
 
 		if (_session.m_pi.lobby != (unsigned char)~0 && _session.m_pi.lobby == 176u/*Grand Prix*/
 			&& !it->propriedade.stBit.grand_prix/*Não é Grand Prix o Server*/)
-			throw exception("[game_server::requestChangeServer][Error] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] tentou trocar de server para o Server[UID=" + std::to_string(server_uid) 
-					+ "], mas o player esta na lobby grand prix e o server que ele quer entrar nao e' grand prix.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0x7500002, 2));
+			throw exception("[game_server::requestChangeServer][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] tentou trocar de server para o Server[UID=" + std::to_string(server_uid)
+				+ "], mas o player esta na lobby grand prix e o server que ele quer entrar nao e' grand prix.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0x7500002, 2));
 
 		CmdAuthKeyGame cmd_akg(_session.m_pi.uid, server_uid, true);	// waitable
 
@@ -1568,7 +1586,8 @@ void game_server::requestChangeServer(player& _session, packet *_packet) {
 		packet_func::pacote1D4(p, &_session, auth_key_game);
 		packet_func::session_send(p, &_session, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[requestChangeServer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -1583,7 +1602,7 @@ void game_server::requestChangeServer(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestUCCWebKey(player& _session, packet *_packet) {
+void game_server::requestUCCWebKey(player& _session, packet* _packet) {
 	REQUEST_BEGIN("UCCWebKey");
 
 	packet p;
@@ -1615,27 +1634,27 @@ void game_server::requestUCCWebKey(player& _session, packet *_packet) {
 		CHECK_SESSION_IS_AUTHORIZED("UCCWebKey");
 
 		if (ctx_uwk.uid == 0)
-			throw exception("[game_server::requestUCCWebKey][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou gerar chave web de UCC[ITEM_ID=" 
-					+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o uid do player eh invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5100101));
+			throw exception("[game_server::requestUCCWebKey][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou gerar chave web de UCC[ITEM_ID="
+				+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o uid do player eh invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5100101));
 
 		if (ctx_uwk.item_id <= 0)
 			throw exception("[game_server::requestUCCWebKey][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou gerar chave web de UCC[ITEM_ID="
-					+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o item_id is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0x5100102));
+				+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o item_id is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0x5100102));
 
-		player *s = (player*)m_session_manager.findSessionByUID(ctx_uwk.uid);
+		player* s = (player*)m_session_manager.findSessionByUID(ctx_uwk.uid);
 
 		// ----------- PRECISA TERMINAR ELE AINDA, SÓ FUNCIONA PARA O DONO DA UCC ---------------------------
 		// Player não está nesse server, se nao tiver, procura no banco de dados
 		// [Já fiz] Por Hora envio error, por que não sei se os player que vão ver ucc de outro player envia esse pacote
 		if (s == nullptr)
 			throw exception("[game_server::requestUCCWebKey][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou gerar chave web de UCC[ITEM_ID="
-					+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o player nao esta nesse server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5100103));
+				+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o player nao esta nesse server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5100103));
 
 		auto pWi = s->m_pi.findWarehouseItemById(ctx_uwk.item_id);
 
 		if (pWi == nullptr)
 			throw exception("[game_server::requestUCCWebKey][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou gerar chave web de UCC[ITEM_ID="
-					+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o ele nao tem a UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5100104));
+				+ std::to_string(ctx_uwk.item_id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "], mas o ele nao tem a UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5100104));
 
 		// Gera Web Key UCC
 		CmdGeraUCCWebKey cmd_guwk(_session.m_pi.uid, pWi->id, true);	// Waiter
@@ -1650,8 +1669,8 @@ void game_server::requestUCCWebKey(player& _session, packet *_packet) {
 		std::string key = cmd_guwk.getKey();
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[UCC::SelfDesignSystem::GeraWebKey][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] gerou Web Key[KEY=" + key + "] da UCC[TYPEID=" 
-				+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[UCC::SelfDesignSystem::GeraWebKey][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] gerou Web Key[KEY=" + key + "] da UCC[TYPEID="
+			+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "] do player[UID=" + std::to_string(ctx_uwk.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 		// Resposta para Gera UCC Web Key
 		p.init_plain((unsigned short)0x153);
@@ -1664,8 +1683,9 @@ void game_server::requestUCCWebKey(player& _session, packet *_packet) {
 		p.addUint8(ctx_uwk.seq);
 
 		packet_func::session_send(p, &_session, 1);
-		
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestUCCWebKey][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -1679,7 +1699,7 @@ void game_server::requestUCCWebKey(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestUCCSystem(player& _session, packet *_packet) {
+void game_server::requestUCCSystem(player& _session, packet* _packet) {
 	REQUEST_BEGIN("UCCSystem");
 
 	packet p;
@@ -1725,14 +1745,14 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 
 			if (ucc_name.empty())
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou salvar definitivo a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas o name eh invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7, 0x5200107));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas o name eh invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7, 0x5200107));
 
 			// Save definitivo UCC
 
 			// UPDATE ON SERVER
 			auto it = std::find_if(_session.m_pi.mp_wi.begin(), _session.m_pi.mp_wi.end(), [&](auto& el) {
 				return (el.second._typeid == ucc_typeid && (el.second.ucc.name[0] == '\0' || strcmp(el.second.ucc.name, "0") == 0) && ucc_idx.compare(el.second.ucc.idx) == 0);
-			});
+				});
 
 			if (it == _session.m_pi.mp_wi.end())
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou salvar definitivo a UCC[TYPEID="
@@ -1792,8 +1812,8 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 			WarehouseItemEx wi{ 0 };
 
 			if (ucc_id <= 0)
-				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou ver info da UCC[ID=" 
-						+ std::to_string(ucc_id) + "], mas o id da ucc eh invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0x5200102));
+				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou ver info da UCC[ID="
+					+ std::to_string(ucc_id) + "], mas o id da ucc eh invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0x5200102));
 
 			auto pWi = _session.m_pi.findWarehouseItemById(ucc_id);
 
@@ -1812,7 +1832,7 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 
 				if (cmd_fu.getInfo().id == -1)
 					throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou ver info da UCC[ID="
-							+ std::to_string(ucc_id) + "], mas nao encontrou essa UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5200103));
+						+ std::to_string(ucc_id) + "], mas nao encontrou essa UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5200103));
 
 				wi = cmd_fu.getInfo();
 
@@ -1822,18 +1842,18 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 
 			// Log
 #ifdef _DEBUG
-			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] pediu info da ucc[TYPEID=" 
-					+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] pediu info da ucc[TYPEID="
+				+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "]", CL_FILE_LOG_AND_CONSOLE));
 #else
 			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] pediu info da ucc[TYPEID="
-					+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "]", CL_ONLY_FILE_LOG));
+				+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "]", CL_ONLY_FILE_LOG));
 #endif
 
 			// UPDATE ON GAME
 			p.init_plain((unsigned short)0x12E);
 
 			p.addInt8(opt);
-					
+
 			p.addInt32(pWi->_typeid);
 			p.addString(pWi->ucc.idx);
 			p.addInt8(owner);
@@ -1841,7 +1861,7 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 			p.addBuffer(pWi, sizeof(WarehouseItem));
 
 			packet_func::session_send(p, &_session, 0);
-			
+
 			break;
 		}
 		case 2:	// C�piar
@@ -1851,7 +1871,7 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 			unsigned short seq = _packet->readUint16();
 			int32_t cpy_id = _packet->readInt32();
 
-			IFF::Part *part = nullptr;
+			IFF::Part* part = nullptr;
 
 			// INICIO CHECK UCC VALID FOR SERVER
 			if (sIff::getInstance().getItemGroupIdentify(ucc_typeid) != iff::PART)
@@ -1879,32 +1899,32 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 
 			if (seq == 0)
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas seq[value=" + std::to_string(seq) + "] is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5200108));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas seq[value=" + std::to_string(seq) + "] is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5200108));
 
 			if (cpy_id <= 0)
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas o copy_id is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 9, 0x5200109));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas o copy_id is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 9, 0x5200109));
 
 			auto pWi = _session.m_pi.findWarehouseItemById(cpy_id);
 
 			if (pWi == nullptr)
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas o ele nao tem a UCC_CPY, Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10, 0x5200110));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas o ele nao tem a UCC_CPY, Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10, 0x5200110));
 
 			// INICIO CHECK UCC VALID FOR SERVER
 			if (sIff::getInstance().getItemGroupIdentify(pWi->_typeid) != iff::PART)
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas o UCC nao eh um part valido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 13, 0x5200113));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas o UCC nao eh um part valido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 13, 0x5200113));
 
 			part = sIff::getInstance().findPart(pWi->_typeid);
 
 			if (part == nullptr)
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas nao tem a UCC no IFF_STRUCT do Server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 11, 0x5200111));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas nao tem a UCC no IFF_STRUCT do Server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 11, 0x5200111));
 
 			if (part->type_item != IFF::Part::UCC_BLANK && part->type_item != IFF::Part::UCC_COPY)
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas nao eh uma UCC valida. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 12, 0x5200112));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "] para UCC_CPY[ID=" + std::to_string(cpy_id) + "], mas nao eh uma UCC valida. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 12, 0x5200112));
 			// FIM CHECK UCC VALID FOR SERVER
 
 			// Copiar UCC
@@ -1912,11 +1932,11 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 			// UPDATE ON SERVER
 			auto it = std::find_if(_session.m_pi.mp_wi.begin(), _session.m_pi.mp_wi.end(), [&](auto& el) {
 				return (el.second._typeid == ucc_typeid && (el.second.ucc.name[0] != '\0' && strcmp(el.second.ucc.name, "0") != 0) && ucc_idx.compare(el.second.ucc.idx) == 0);
-			});
+				});
 
 			if (it == _session.m_pi.mp_wi.end())
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou copiar a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas ele nao tem essa UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5200105));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas ele nao tem essa UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5200105));
 
 			// Copia permanente
 			pWi->ucc.status = 1;
@@ -1949,9 +1969,9 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 			(*pWi) = cmd_uu.getInfo();
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] fez um copia da UCC[TYPEID=" 
-					+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + ", IDX=" + std::string(it->second.ucc.idx) + "] na UCC_CPY[TYPEID="
-					+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] fez um copia da UCC[TYPEID="
+				+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + ", IDX=" + std::string(it->second.ucc.idx) + "] na UCC_CPY[TYPEID="
+				+ std::to_string(pWi->_typeid) + ", ID=" + std::to_string(pWi->id) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// UPDATE ON GAME
 			p.init_plain((unsigned short)0x12E);
@@ -1996,23 +2016,23 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 			// FIM CHECK UCC VALID FOR SERVER
 
 			if (ucc_typeid == 0)
-				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou salvar temporario a UCC[TYPEID=" 
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas o typeid is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5200104));
+				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou salvar temporario a UCC[TYPEID="
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas o typeid is invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5200104));
 
 			if (ucc_idx.empty())
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou salvar temporario a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas o idx eh invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 6, 0x5200106));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas o idx eh invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 6, 0x5200106));
 
 			// Save tempor�rio UCC
-			
+
 			// UPDATE ON SERVER
 			auto it = std::find_if(_session.m_pi.mp_wi.begin(), _session.m_pi.mp_wi.end(), [&](auto& el) {
 				return (el.second._typeid == ucc_typeid && (el.second.ucc.name[0] == '\0' || strcmp(el.second.ucc.name, "0") == 0) && ucc_idx.compare(el.second.ucc.idx) == 0);
-			});
+				});
 
 			if (it == _session.m_pi.mp_wi.end())
 				throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou salvar temporario a UCC[TYPEID="
-						+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas ele nao tem essa UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5200105));
+					+ std::to_string(ucc_typeid) + ", IDX=" + ucc_idx + "], mas ele nao tem essa UCC. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5200105));
 
 			// TEMPORARY 2, FOREVER 1
 			it->second.ucc.status = 2;		// Tempor�rio
@@ -2034,8 +2054,8 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 				throw cmd_uu.getException();
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] salvo temporario a UCC[TYPEID=" 
-					+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + ", IDX=" + std::string(it->second.ucc.idx) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[UCC::Self Design System][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] salvo temporario a UCC[TYPEID="
+				+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + ", IDX=" + std::string(it->second.ucc.idx) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// UPDATE ON GAME
 			p.init_plain((unsigned short)0x12E);
@@ -2053,7 +2073,8 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 		default:
 			throw exception("[game_server::requestUCCSystem][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou usar UCC System, mas forneceu uma option desconhecida. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5200101));
 		}
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestUCCSystem][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -2065,7 +2086,7 @@ void game_server::requestUCCSystem(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestChat(player& _session, packet *_packet) {
+void game_server::requestChat(player& _session, packet* _packet) {
 	REQUEST_BEGIN("Chat");
 
 	packet p;
@@ -2078,10 +2099,10 @@ void game_server::requestChat(player& _session, packet *_packet) {
 		msg = _packet->readString();
 
 		// Verifica a mensagem com palavras proibida e manda para o log e bloquea o chat dele
-	#ifdef _DEBUG
+#ifdef _DEBUG
 		_smp::message_pool::getInstance().push(new message("Player UID: " + std::to_string(_session.m_pi.uid) + ".\tNickname: " + nickname, CL_ONLY_FILE_LOG));
 		_smp::message_pool::getInstance().push(new message("Player UID: " + std::to_string(_session.m_pi.uid) + ".\tmessage: " + msg, CL_ONLY_FILE_LOG));
-	#endif
+#endif
 
 		// Verifica se session está autorizada para executar esse ação, 
 		// se ele não fez o login com o Server ele não pode fazer nada até que ele faça o login
@@ -2138,7 +2159,7 @@ void game_server::requestChat(player& _session, packet *_packet) {
 		//}
 		// Fim do Teste
 
-		channel *c = findChannel(_session.m_pi.channel);
+		channel* c = findChannel(_session.m_pi.channel);
 
 		if (c != nullptr) {
 
@@ -2158,9 +2179,9 @@ void game_server::requestChat(player& _session, packet *_packet) {
 
 				// Normal rotina notify gm global chat
 				for (auto& el : gm) {
-					if (((el->m_gi.channel &&  el->m_pi.channel == c->getInfo()->id) || el->m_gi.whisper || el->m_gi.isOpenPlayerWhisper(_session.m_pi.uid))
+					if (((el->m_gi.channel && el->m_pi.channel == c->getInfo()->id) || el->m_gi.whisper || el->m_gi.isOpenPlayerWhisper(_session.m_pi.uid))
 						&& /* Check SAME Channel and Room*/(el->m_pi.channel != _session.m_pi.channel || el->m_pi.mi.sala_numero != _session.m_pi.mi.sala_numero)) {
-							
+
 						// Responde no chat do player
 						p.init_plain((unsigned short)0x40);
 
@@ -2194,7 +2215,8 @@ void game_server::requestChat(player& _session, packet *_packet) {
 				);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestChat][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -2208,7 +2230,7 @@ void game_server::requestChat(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestChangeChatMacroUser(player& _session, packet *_packet) {
+void game_server::requestChangeChatMacroUser(player& _session, packet* _packet) {
 	REQUEST_BEGIN("ChangeChatMacroUser");
 
 	try {
@@ -2237,13 +2259,14 @@ void game_server::requestChangeChatMacroUser(player& _session, packet *_packet) 
 		// UPDATE ON DB
 		snmdb::NormalManagerDB::getInstance().add(3, new CmdUpdateChatMacroUser(_session.m_pi.uid, _session.m_pi.cmu), game_server::SQLDBResponse, this);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestChangeChatMacroUser][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-void game_server::requestPlayerInfo(player& _session, packet *_packet) {
+void game_server::requestPlayerInfo(player& _session, packet* _packet) {
 	REQUEST_BEGIN("PlayerInfo");
 
 	packet p;
@@ -2262,20 +2285,22 @@ void game_server::requestPlayerInfo(player& _session, packet *_packet) {
 		// se ele não fez o login com o Server ele não pode fazer nada até que ele faça o login
 		CHECK_SESSION_IS_AUTHORIZED("PlayerInfo");
 
-		player *s = nullptr;
-		PlayerInfo *pi = nullptr;
+		player* s = nullptr;
+		PlayerInfo* pi = nullptr;
 		CharacterInfo ci;
 
 		if (uid == _session.m_pi.uid) {
-			
+
 			pi = &_session.m_pi;
-		
-		}else if ((s = findPlayer(uid)) != nullptr) {
-			
+
+		}
+		else if ((s = findPlayer(uid)) != nullptr) {
+
 			pi = &s->m_pi;
-		
-		}else {
-			
+
+		}
+		else {
+
 			CmdMemberInfo cmd_mi(uid, true);	// waitable
 
 			snmdb::NormalManagerDB::getInstance().add(0, &cmd_mi, nullptr, nullptr);
@@ -2290,12 +2315,13 @@ void game_server::requestPlayerInfo(player& _session, packet *_packet) {
 			// Verifica se não é o mesmo UID, pessoas diferentes
 			// Quem quer ver a info não é GM aí verifica se o player é GM
 			if (uid != _session.m_pi.uid && !_session.m_pi.m_cap.stBit.game_master && mi.capability.stBit.game_master/* & 4/*(GM)*/) {
-				
+
 				packet_func::pacote089(p, &_session, uid, season, 3);
 				packet_func::session_send(p, &_session, 1);
-			
-			}else {
-				
+
+			}
+			else {
+
 				std::vector< MapStatistics > v_ms_n, v_msa_n, v_ms_na, v_msa_na, v_ms_g, v_msa_g;
 
 				CmdCharacterInfo cmd_ci(uid, CmdCharacterInfo::ONE, -1, true);	// waitable
@@ -2478,12 +2504,13 @@ void game_server::requestPlayerInfo(player& _session, packet *_packet) {
 		// Verifica se não é o mesmo UID, pessoas diferentes
 		// Quem quer ver a info não é GM aí verifica se o player é GM
 		if (uid != _session.m_pi.uid && !_session.m_pi.m_cap.stBit.game_master && pi->m_cap.stBit.game_master/* & 4/*(GM)*/) {
-			
+
 			packet_func::pacote089(p, &_session, uid, season, 3);
 			packet_func::session_send(p, &_session, 1);
-		
-		}else {
-		
+
+		}
+		else {
+
 			auto pCi = pi->findCharacterById(pi->ue.character_id);
 
 			if (pCi != nullptr)
@@ -2544,24 +2571,25 @@ void game_server::requestPlayerInfo(player& _session, packet *_packet) {
 			packet_func::session_send(p, &_session, 1);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestPlayerInfo][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
 		p.init_plain((unsigned short)0x89);
 
 		p.addUint32((STDA_SOURCE_ERROR_DECODE(e.getCodeError()) == STDA_ERROR_TYPE::GAME_SERVER) ? STDA_SYSTEM_ERROR_DECODE(e.getCodeError()) : 0/*Error*/);	// 0x6500100
-		
+
 		packet_func::session_send(p, &_session, 1);
 	}
 
 };
 
-void game_server::requestPrivateMessage(player& _session, packet *_packet) {
+void game_server::requestPrivateMessage(player& _session, packet* _packet) {
 	REQUEST_BEGIN("PrivateMessage");
 
 	packet p;
-	player *s = nullptr;
+	player* s = nullptr;
 	std::string nickname;
 
 	try {
@@ -2574,8 +2602,8 @@ void game_server::requestPrivateMessage(player& _session, packet *_packet) {
 		std::string msg = _packet->readString();
 
 		if (nickname.empty())
-			throw exception("[game_server::requestPrivateMessage][Error] player[UID=" + std::to_string(_session.m_pi.uid) +"] tentou enviar message privada[msg=" + msg + "] para o player[NICKNAME=" 
-					+ nickname + "], mas o nick esta vazio. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 5));
+			throw exception("[game_server::requestPrivateMessage][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar message privada[msg=" + msg + "] para o player[NICKNAME="
+				+ nickname + "], mas o nick esta vazio. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 5));
 
 		if (msg.empty())
 			throw exception("[game_server::requestPrivateMessage][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar message privada[msg=" + msg + "] para o player[NICKNAME="
@@ -2589,20 +2617,20 @@ void game_server::requestPrivateMessage(player& _session, packet *_packet) {
 				return;
 		}
 
-		s = reinterpret_cast< player* >(m_session_manager.findSessionByNickname(nickname));
+		s = reinterpret_cast<player*>(m_session_manager.findSessionByNickname(nickname));
 
 		if (s == nullptr || !s->getState() || !s->isConnected())
 			throw exception("[game_server::requestPrivateMessage][WARNING] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar message privada[msg=" + msg + "] para o player[NICKNAME="
-					+ nickname + "], mas o player nao esta online nesse server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 5));
+				+ nickname + "], mas o player nao esta online nesse server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 5));
 
 		// Whisper Block
 		if (!s->m_pi.whisper)
 			throw exception("[game_server::requestPrivateMessage][WARNING] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar message privada[msg=" + msg + "] para o player[NICKNAME="
-					+ nickname + "], mas o whisper do player esta bloqueado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 4));
+				+ nickname + "], mas o whisper do player esta bloqueado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 4));
 
 		if ((s->m_pi.lobby == (unsigned char)~0/*não está na lobby*/ && s->m_pi.mi.sala_numero == -1/*e não está em nenhum sala*/) || s->m_pi.place == 2)
 			throw exception("[game_server::requestPrivateMessage][WARNING] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar message privada[msg=" + msg + "] para o player[NICKNAME="
-					+ nickname + "], mas o player nao pode receber message agora, por que nao pode ver o chat. pode estar no Papel Shop e Etc.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 4));
+				+ nickname + "], mas o player nao pode receber message agora, por que nao pode ver o chat. pode estar no Papel Shop e Etc.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 4));
 
 		// Arqui procura por palavras inapropriadas na message
 
@@ -2654,7 +2682,7 @@ void game_server::requestPrivateMessage(player& _session, packet *_packet) {
 		packet_func::session_send(p, s, 1);
 
 		// Envia a mensagem para o Chat History do discord se ele estiver ativo
-		
+
 		// Verifica se o m_chat_discod flag está ativo para enviar o chat para o discord
 		if (m_si.rate.smart_calculator && m_chat_discord)
 			sendMessageToDiscordChatHistory(
@@ -2662,7 +2690,8 @@ void game_server::requestPrivateMessage(player& _session, packet *_packet) {
 				std::string(_session.m_pi.nickname) + ">" + std::string(s->m_pi.nickname) + ": '" + msg + "'"						// Msg
 			);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestPrivateMessage][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -2670,13 +2699,13 @@ void game_server::requestPrivateMessage(player& _session, packet *_packet) {
 
 		p.addUint8((STDA_SOURCE_ERROR_DECODE(e.getCodeError()) == STDA_ERROR_TYPE::GAME_SERVER) ? (unsigned char)STDA_SYSTEM_ERROR_DECODE(e.getCodeError()) : 5u);
 
-		if (s != nullptr && 
+		if (s != nullptr &&
 #if defined(_WIN32)
 			s->m_sock != INVALID_SOCKET
 #elif defined(__linux__)
 			s->m_sock.fd != INVALID_SOCKET
 #endif
-		)
+			)
 			p.addString(s->m_pi.nickname);
 		else
 			p.addString(nickname);	// Player não está online usa o nickname que ele forneceu
@@ -2685,7 +2714,7 @@ void game_server::requestPrivateMessage(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestChangeWhisperState(player& _session, packet *_packet) {
+void game_server::requestChangeWhisperState(player& _session, packet* _packet) {
 	REQUEST_BEGIN("ChangeWisperState");
 
 	try {
@@ -2697,21 +2726,22 @@ void game_server::requestChangeWhisperState(player& _session, packet *_packet) {
 		CHECK_SESSION_IS_AUTHORIZED("ChangeWisperState");
 
 		if (whisper > 1)
-			throw exception("[game_server::requestChangeWhisperState][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou alterar o estado do Whisper[state=" 
-					+ std::to_string((unsigned short)whisper) + "], mas ele mandou um valor invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5300101));
+			throw exception("[game_server::requestChangeWhisperState][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou alterar o estado do Whisper[state="
+				+ std::to_string((unsigned short)whisper) + "], mas ele mandou um valor invalido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5300101));
 
 		_session.m_pi.mi.state_flag.stFlagBit.whisper = _session.m_pi.whisper = whisper;
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[Whisper::ChangeState][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] trocou o Whisper State para : " + (whisper ? std::string("ON") : std::string("OFF")), CL_FILE_LOG_AND_CONSOLE));
 
-	}catch(exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestChangeWhisperState][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-void game_server::requestNotifyNotDisplayPrivateMessageNow(player& _session, packet *_packet) {
+void game_server::requestNotifyNotDisplayPrivateMessageNow(player& _session, packet* _packet) {
 	REQUEST_BEGIN("NotifyNotDisplayPrivateMessageNow");
 
 	try {
@@ -2723,24 +2753,24 @@ void game_server::requestNotifyNotDisplayPrivateMessageNow(player& _session, pac
 		std::string nickname = _packet->readString();
 
 		if (nickname.empty())
-			throw exception("[game_server::requestNotifyNotDisplayPrivateMessageNow][Error] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] nao pode ver mensagem agora, mas o nickname de quem enviou a mensagem para ele eh invalido(empty). Hacker ou Bug.", 
-					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0x750050, 0));
+			throw exception("[game_server::requestNotifyNotDisplayPrivateMessageNow][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] nao pode ver mensagem agora, mas o nickname de quem enviou a mensagem para ele eh invalido(empty). Hacker ou Bug.",
+				STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0x750050, 0));
 
 		// Procura o player pelo nickname, para ver se ele está online
-		auto s = reinterpret_cast< player* >(m_player_manager.findSessionByNickname(nickname));
+		auto s = reinterpret_cast<player*>(m_player_manager.findSessionByNickname(nickname));
 
-		if (s != nullptr && 
+		if (s != nullptr &&
 #if defined(_WIN32)
 			s->m_sock != INVALID_SOCKET
 #elif defined(__linux__)
 			s->m_sock.fd != INVALID_SOCKET
 #endif
-		) {
+			) {
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::requestNotifyNotDisplayPrivateMessageNow][Log] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] recebeu mensagem do Player[UID=" + std::to_string(s->m_pi.uid) + ", NICKNAME=" + nickname + "], mas ele nao pode ver a mensagem agora.", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestNotifyNotDisplayPrivateMessageNow][Log] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] recebeu mensagem do Player[UID=" + std::to_string(s->m_pi.uid) + ", NICKNAME=" + nickname + "], mas ele nao pode ver a mensagem agora.", CL_FILE_LOG_AND_CONSOLE));
 
 			// Envia para o player que o player não pode receber mensagem agora
 			packet p((unsigned short)0x40);
@@ -2752,13 +2782,14 @@ void game_server::requestNotifyNotDisplayPrivateMessageNow(player& _session, pac
 			packet_func::session_send(p, s, 1);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestNotifyNotDisplayPrivateMessageNow][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
+void game_server::requestCommonCmdGM(player& _session, packet* _packet) {
 	REQUEST_BEGIN("CommonCmdGM");
 
 	enum COMMON_CMD_GM {
@@ -2776,7 +2807,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 		CCG_GIVE_ITEM = 18,
 		CCG_GOLDENBELL,
 	};
-	
+
 	packet p;
 
 	try {
@@ -2798,7 +2829,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (c == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][VISIBLE][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] tentou executar o comando /visible mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+					+ "] tentou executar o comando /visible mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 			c->requestExecCCGVisible(_session, _packet);
 
@@ -2818,7 +2849,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][WHISPER][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] trocou WHISPER STATUS[STATE="
-					+ (whisper & 2 ? std::string("ON") : std::string("OFF")) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ (whisper & 2 ? std::string("ON") : std::string("OFF")) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			break;
 		}
@@ -2836,7 +2867,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][CHANNEL][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] trocou CHANNEL STATUS[STATE="
-					+ (channel & 4 ? std::string("ON") : std::string("OFF")) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ (channel & 4 ? std::string("ON") : std::string("OFF")) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			break;
 		}
@@ -2845,8 +2876,8 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 			std::string nickname = _packet->readString();
 
 			if (nickname.empty())
-				throw exception("[game_server::requestCommonCmdGM][OPEN_WHISPER_PLAYER_LIST][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um player a lista de Whisper, mas o nickname esta vazio. Hacker ou Bug", 
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700108));
+				throw exception("[game_server::requestCommonCmdGM][OPEN_WHISPER_PLAYER_LIST][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um player a lista de Whisper, mas o nickname esta vazio. Hacker ou Bug",
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700108));
 
 			if (!(_session.m_pi.m_cap.stBit.game_master/* & 4*/))
 				throw exception("[game_server::requestCommonCmdGM][OPEN_WHISPER_PLAYER_LIST][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] nao eh GM mas tentou executar comando GM. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5700100));
@@ -2854,8 +2885,8 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 			auto s = (player*)m_player_manager.findSessionByNickname(nickname);
 
 			if (s == nullptr)
-				throw exception("[game_server::requestCommonCmdGM][OPEN_WHISPER_PLAYER_LIST][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um player a lista de Whisper, mas nao encontrou o nickname no Server.", 
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 9, 0x5700109));
+				throw exception("[game_server::requestCommonCmdGM][OPEN_WHISPER_PLAYER_LIST][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou add um player a lista de Whisper, mas nao encontrou o nickname no Server.",
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 9, 0x5700109));
 
 			_session.m_gi.openPlayerWhisper(s->m_pi.uid);
 
@@ -2879,7 +2910,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (s == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][CLOSE_WHISPER_PLAYER_LIST][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou deletar um player da lista de Whisper, mas nao encontrou o nickname no Server.",
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 9, 0x5700109));
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 9, 0x5700109));
 
 			_session.m_gi.closePlayerWhisper(s->m_pi.uid);
 
@@ -2897,7 +2928,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (c == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][KICK][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] tentou executar o comando /kick mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+					+ "] tentou executar o comando /kick mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 			c->requestExecCCGKick(_session, _packet);
 
@@ -2914,11 +2945,11 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (s == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][DISCONNECT][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou executar o comando /disconnect or /discon_uid mas nao encontrou o player[OID="
-						+ std::to_string(oid) + "] do oid fornecido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0));
+					+ std::to_string(oid) + "] do oid fornecido. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0));
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][DISCONNECT][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] desconecta o player[UID="
-					+ std::to_string(s->m_pi.uid) + ", NICKNAME=" + std::string(s->m_pi.nickname) + "]", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(s->m_pi.uid) + ", NICKNAME=" + std::string(s->m_pi.nickname) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// Disconnect Player
 			DisconnectSession(s);
@@ -2928,8 +2959,8 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 		case CCG_DESTROY:
 		{
 
-			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][DESTROY][Log] player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] destroy a sala, mas aqui o cliente nao passa mais o numero dela, mas passa no packet060, e eu destruo a sala por la.", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][DESTROY][Log] player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] destroy a sala, mas aqui o cliente nao passa mais o numero dela, mas passa no packet060, e eu destruo a sala por la.", CL_FILE_LOG_AND_CONSOLE));
 
 			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][DESTROY][Log] [Command=" + std::to_string(cmd) + "]. Hex: " + hex_util::BufferToHexString(_packet->getBuffer(), _packet->getSize()), CL_ONLY_FILE_LOG));
 
@@ -2944,11 +2975,11 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 			auto c = findChannel(_session.m_pi.channel);
 
 			if (c == nullptr)
-				throw exception("[game_server::requestCommonCmdGM][CHANGE_WIND_VERSUS][Error] player[UID=" + std::to_string(_session.m_pi.uid) 
-						+ "] tentou executar o comando /wind mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+				throw exception("[game_server::requestCommonCmdGM][CHANGE_WIND_VERSUS][Error] player[UID=" + std::to_string(_session.m_pi.uid)
+					+ "] tentou executar o comando /wind mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 			c->requestExecCCGChangeWindVersus(_session, _packet);
-			
+
 			break;
 		}
 		case CCG_CHANGE_WEATHER:
@@ -2961,7 +2992,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (c == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][CHANGE_WEATHER][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] tentou executar o comando /weather mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+					+ "] tentou executar o comando /weather mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 			c->requestExecCCGChangeWeather(_session, _packet);
 
@@ -2983,22 +3014,22 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 			auto s = (player*)m_player_manager.findSessionByOID(oid_send);
 
 			if (s == nullptr || !s->getState() || !s->isConnected())
-				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[OID=" 
-						+ std::to_string(oid_send) + "] mas ele nao esta nesse server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::CHANNEL, 2, 0x5700100));
+				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[OID="
+					+ std::to_string(oid_send) + "] mas ele nao esta nesse server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::CHANNEL, 2, 0x5700100));
 
 			if (item_typeid == 0)
-				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[UID=" 
-						+ std::to_string(s->m_pi.uid) + "] mas o Item[TYPEID=" + std::to_string(item_typeid) + "QNTD = " + std::to_string(item_qntd) + "] eh invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5700100));
+				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[UID="
+					+ std::to_string(s->m_pi.uid) + "] mas o Item[TYPEID=" + std::to_string(item_typeid) + "QNTD = " + std::to_string(item_qntd) + "] eh invalid. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5700100));
 
 			if (item_qntd > 20000u)
 				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[UID="
-						+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas a quantidade passa de 20mil. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5700100));
+					+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas a quantidade passa de 20mil. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5700100));
 
 			auto base = sIff::getInstance().findCommomItem(item_typeid);
 
 			if (base == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[UID="
-						+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas o item nao existe no IFF_STRUCT do Server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 6, 0));
+					+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas o item nao existe no IFF_STRUCT do Server. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 6, 0));
 
 			stItem item{ 0 };
 			BuyItem bi{ 0 };
@@ -3006,22 +3037,22 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 			bi.id = -1;
 			bi._typeid = item_typeid;
 			bi.qntd = item_qntd;
-			
+
 			item_manager::initItemFromBuyItem(s->m_pi, item, bi, false, 0, 0, 1/*~nao Check Level*/);
 
 			if (item._typeid == 0)
 				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][ErrorSystem] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[UID="
-						+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas nao conseguiu inicializar o item. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0));
+					+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas nao conseguiu inicializar o item. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0));
 
 			auto msg = std::string("GM enviou um item para voce: item[ " + std::string(base->name) + " ]");
 
 			if (MailBoxManager::sendMessageWithItem(0, s->m_pi.uid, msg, item) <= 0)
 				throw exception("[game_server::requestCommonCmdGM][GIVE_ITEM][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar presente para o player[UID="
-						+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas nao conseguiu colocar o item no mail box dele. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7, 0));
+					+ std::to_string(s->m_pi.uid) + "] o Item[TYPEID=" + std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "], mas nao conseguiu colocar o item no mail box dele. Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 7, 0));
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][GIVE_ITEM][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] enviou um Item[TYPEID=" 
-					+ std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "] para o player[UID=" + std::to_string(s->m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][GIVE_ITEM][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] enviou um Item[TYPEID="
+				+ std::to_string(item_typeid) + ", QNTD=" + std::to_string(item_qntd) + "] para o player[UID=" + std::to_string(s->m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			break;
 		}
@@ -3038,7 +3069,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (c == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][GOLDENBELL][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] tentou executar o comando /goldenbell mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+					+ "] tentou executar o comando /goldenbell mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 			c->requestExecCCGGoldenBell(_session, _packet);
 
@@ -3054,7 +3085,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 
 			if (c == nullptr)
 				throw exception("[game_server::requestCommonCmdGM][IDENTITY][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] tentou executar o comando /identity mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+					+ "] tentou executar o comando /identity mas ele nao esta em nenhum canal. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 			c->requestExecCCGIdentity(_session, _packet);
 
@@ -3067,12 +3098,13 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 			throw exception("[game_server::requestCommonCmdGM][Error] Comando do GM Comum[value=" + std::to_string(cmd) + "] nao implementado ou nao existe. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 0, 0x5700100));
 		}	// End Switch
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestCommonCmdGM][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
 		p.init_plain((unsigned short)0x40);	// Msg to Chat of player
-	
+
 		p.addUint8(7);	// Notice
 
 		p.addString(_session.m_pi.nickname);
@@ -3086,7 +3118,7 @@ void game_server::requestCommonCmdGM(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestCommandNoticeGM(player& _session, packet *_packet) {
+void game_server::requestCommandNoticeGM(player& _session, packet* _packet) {
 	REQUEST_BEGIN("CommandNoticeGM");
 
 	packet p;
@@ -3098,18 +3130,18 @@ void game_server::requestCommandNoticeGM(player& _session, packet *_packet) {
 		CHECK_SESSION_IS_AUTHORIZED("CommandNoticeGM");
 
 		if (!(_session.m_pi.m_cap.stBit.game_master/* & 4*/))
-			throw exception("[game_server::requestCommandNoticeGM][Error] player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] nao eh GM mas tentou executar comando GM. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5700100));
+			throw exception("[game_server::requestCommandNoticeGM][Error] player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] nao eh GM mas tentou executar comando GM. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5700100));
 
 		std::string notice = _packet->readString();
 
 		if (notice.empty())
-			throw exception("[game_server::requestCommandNoticeGM][Error] player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] tentou executar o comando de notice, mas a notice is empty. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
+			throw exception("[game_server::requestCommandNoticeGM][Error] player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] tentou executar o comando de notice, mas a notice is empty. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 8, 0x5700100));
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[game_server::requestCommandNoticeGM][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] enviou notice[NOTICE=" 
-				+ notice + "] para todos do game server.", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::requestCommandNoticeGM][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] enviou notice[NOTICE="
+			+ notice + "] para todos do game server.", CL_FILE_LOG_AND_CONSOLE));
 
 		p.init_plain((unsigned short)0x40);	// Msg to Chat of player
 
@@ -3122,7 +3154,8 @@ void game_server::requestCommandNoticeGM(player& _session, packet *_packet) {
 		for (auto& el : v_channel)
 			packet_func::channel_broadcast(*el, p, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestCommandNoticeGM][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -3137,7 +3170,7 @@ void game_server::requestCommandNoticeGM(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestTranslateSubPacket(player& _session, packet *_packet) {
+void game_server::requestTranslateSubPacket(player& _session, packet* _packet) {
 	REQUEST_BEGIN("TranslateSubPacket");
 
 	packet p;
@@ -3159,26 +3192,26 @@ void game_server::requestTranslateSubPacket(player& _session, packet *_packet) {
 			unsigned char opt = _packet->readUint8();
 
 			if (uid == 0)
-				throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou mandar Message Off[" 
-						+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas m_uid is invalid(zero). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5700101));
+				throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou mandar Message Off["
+					+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas m_uid is invalid(zero). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 0x5700101));
 
 			if (msg.empty())
 				throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou mandar Message Off["
-						+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas msg is empty. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0x5700102));
+					+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas msg is empty. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 2, 0x5700102));
 
 			if (msg.size() > 256)
 				throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou mandar Message Off["
-						+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas o tamanho[SIZE=" + std::to_string(msg.size()) + "] da message eh maior que o limite suportado. Hacker ou Bug", 
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5700103));
+					+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas o tamanho[SIZE=" + std::to_string(msg.size()) + "] da message eh maior que o limite suportado. Hacker ou Bug",
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 3, 0x5700103));
 
 			if (opt != 0)
 				throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou mandar Message Off["
-						+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas opt[VALUE=" + std::to_string((unsigned short)opt) + " eh diferente de 0. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5700104));
+					+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas opt[VALUE=" + std::to_string((unsigned short)opt) + " eh diferente de 0. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 4, 0x5700104));
 
 			if (_session.m_pi.ui.pang < 10)
 				throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou mandar Message Off["
-						+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas ele nao tem pang(s) suficiente[have=" + std::to_string(_session.m_pi.ui.pang) + ", request=10]. Hacker ou Bug", 
-						STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5700105));
+					+ msg + "] para o player[UID=" + std::to_string(uid) + "], mas ele nao tem pang(s) suficiente[have=" + std::to_string(_session.m_pi.ui.pang) + ", request=10]. Hacker ou Bug",
+					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5700105));
 
 			// UPDATE ON SERVER
 			_session.m_pi.consomePang(10);
@@ -3193,8 +3226,8 @@ void game_server::requestTranslateSubPacket(player& _session, packet *_packet) {
 			snmdb::NormalManagerDB::getInstance().add(4, new CmdInsertMsgOff(_session.m_pi.uid, uid, msg), game_server::SQLDBResponse, this);
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::requestTranslateSubPacket::MessageOff][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] mandou Message Off[" 
-					+ msg + "] para o player[UID=" + std::to_string(uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestTranslateSubPacket::MessageOff][Log] player[UID=" + std::to_string(_session.m_pi.uid) + "] mandou Message Off["
+				+ msg + "] para o player[UID=" + std::to_string(uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// UPDATE ON GAME
 
@@ -3213,13 +3246,14 @@ void game_server::requestTranslateSubPacket(player& _session, packet *_packet) {
 		}
 		case 0x11F:	// List Friend
 		{
-			throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID=" 
-					+ std::to_string(_session.m_pi.uid) + "] pediu a lista de amigos, mas ainda nao foi implementado essa funcionalidade.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5700105));
+			throw exception("[game_server::requestTranslateSubPacket][ID=" + std::to_string(sub_packet_id) + "][Error] player[UID="
+				+ std::to_string(_session.m_pi.uid) + "] pediu a lista de amigos, mas ainda nao foi implementado essa funcionalidade.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 5, 0x5700105));
 			break;
 		}	// End Case 0x11F
 		}	// End Switch
 
-	}catch(exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestTranslateSubPacket][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -3234,7 +3268,7 @@ void game_server::requestTranslateSubPacket(player& _session, packet *_packet) {
 
 };
 
-void game_server::requestSendTicker(player& _session, packet *_packet) {
+void game_server::requestSendTicker(player& _session, packet* _packet) {
 	REQUEST_BEGIN("SendTicker");
 
 	packet p;
@@ -3247,16 +3281,16 @@ void game_server::requestSendTicker(player& _session, packet *_packet) {
 
 		if (_session.m_pi.block_flag.m_flag.stBit.ticker)
 			throw exception("[game_server::requestSendTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] tentou abrir a fila do Ticker, mas o ticker esta bloqueado. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10, 1/*UNKNOWN ERROR*/));
+				+ "] tentou abrir a fila do Ticker, mas o ticker esta bloqueado. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10, 1/*UNKNOWN ERROR*/));
 
 		std::string msg = _packet->readString();
 
 		if (msg.empty())
-			throw exception("[game_server::requestSendTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar ticker[MESSAGE=" 
-					+ msg + "], mas msg is empty(vazia). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 1/*UNKNOWN ERROR*/));
+			throw exception("[game_server::requestSendTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar ticker[MESSAGE="
+				+ msg + "], mas msg is empty(vazia). Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 1/*UNKNOWN ERROR*/));
 
 		try {
-			
+
 			// Log de Gastos de CP(Cookie Point)
 			CPLog cp_log;
 
@@ -3283,29 +3317,32 @@ void game_server::requestSendTicker(player& _session, packet *_packet) {
 			_session.saveCPLog(cp_log);
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::requestSendTicker][Log] player[UID=" + std::to_string(_session.m_pi.uid) + ", NICKNAME=" 
-					+ std::string(_session.m_pi.nickname) + "] enviou Ticker[MESSAGE=" + msg + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestSendTicker][Log] player[UID=" + std::to_string(_session.m_pi.uid) + ", NICKNAME="
+				+ std::string(_session.m_pi.nickname) + "] enviou Ticker[MESSAGE=" + msg + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// UPDATE ON GAME
 			p.init_plain((unsigned short)0x96);
 
 			p.addUint64(_session.m_pi.cookie);
-			
+
 			packet_func::session_send(p, &_session, 1);
 
-		}catch (exception& e) {
+		}
+		catch (exception& e) {
 
 			if (STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::PLAYER_INFO, 20)) {
-				
+
 				throw exception("[game_server::requestSendTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar ticker[MESSAGE="
-						+ msg + "], mas ele nao tem cookies suficiente[HAVE=" + std::to_string(_session.m_pi.cookie) + ", REQ=1]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 4/*NÃO TEM COOKIES SUFICIENTE*/));
-			
-			}else if (STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::PLAYER_INFO, 200/*Tem alterações no Cookie do player no DB*/)) {
-				
-				throw exception("[game_server::requestSendTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar ticker[MESSAGE=" 
-						+ msg + ", mas tem alteracoes no Cookie dele no Banco de dados.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 4/*Tem alterações no Cookie do player no DB*/));
-			
-			}else {
+					+ msg + "], mas ele nao tem cookies suficiente[HAVE=" + std::to_string(_session.m_pi.cookie) + ", REQ=1]", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 4/*NÃO TEM COOKIES SUFICIENTE*/));
+
+			}
+			else if (STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::PLAYER_INFO, 200/*Tem alterações no Cookie do player no DB*/)) {
+
+				throw exception("[game_server::requestSendTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid) + "] tentou enviar ticker[MESSAGE="
+					+ msg + ", mas tem alteracoes no Cookie dele no Banco de dados.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1, 4/*Tem alterações no Cookie do player no DB*/));
+
+			}
+			else {
 
 				// Devolve os Cookies gasto do player, por que não conseguiu enviar o ticker dele
 				_session.m_pi.addCookie(1);
@@ -3315,7 +3352,8 @@ void game_server::requestSendTicker(player& _session, packet *_packet) {
 			}
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestSendTicker][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -3328,7 +3366,7 @@ void game_server::requestSendTicker(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestQueueTicker(player& _session, packet *_packet) {
+void game_server::requestQueueTicker(player& _session, packet* _packet) {
 	REQUEST_BEGIN("QueueTicker");
 
 	packet p;
@@ -3340,8 +3378,8 @@ void game_server::requestQueueTicker(player& _session, packet *_packet) {
 		CHECK_SESSION_IS_AUTHORIZED("QueueTicker");
 
 		if (_session.m_pi.block_flag.m_flag.stBit.ticker)
-			throw exception("[game_server::requestQueueTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] tentou abrir a fila do Ticker, mas o ticker esta bloqueado. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10, 1/*UNKNOWN ERROR*/));
+			throw exception("[game_server::requestQueueTicker][Error] player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] tentou abrir a fila do Ticker, mas o ticker esta bloqueado. Hacker ou Bug", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10, 1/*UNKNOWN ERROR*/));
 
 		auto count = m_ticker.getSize();
 
@@ -3355,7 +3393,8 @@ void game_server::requestQueueTicker(player& _session, packet *_packet) {
 
 		packet_func::session_send(p, &_session, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestQueueTicker][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -3368,7 +3407,7 @@ void game_server::requestQueueTicker(player& _session, packet *_packet) {
 	}
 };
 
-void game_server::requestExceptionClientMessage(player& _session, packet *_packet) {
+void game_server::requestExceptionClientMessage(player& _session, packet* _packet) {
 	REQUEST_BEGIN("ExceptionClientMessage");
 
 	try {
@@ -3381,16 +3420,17 @@ void game_server::requestExceptionClientMessage(player& _session, packet *_packe
 
 		std::string exception_msg = _packet->readString();
 
-		_smp::message_pool::getInstance().push(new message("[game_server::requestExceptionClientMessage][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "], EXCEPTION[TIPO=" 
-				+ std::to_string((unsigned short)tipo) + ", MESSAGE=" + exception_msg + "]", CL_ONLY_FILE_LOG));
+		_smp::message_pool::getInstance().push(new message("[game_server::requestExceptionClientMessage][Log] Player[UID=" + std::to_string(_session.m_pi.uid) + "], EXCEPTION[TIPO="
+			+ std::to_string((unsigned short)tipo) + ", MESSAGE=" + exception_msg + "]", CL_ONLY_FILE_LOG));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestExceptionClientMessage][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-void game_server::requestCheckGameGuardAuthAnswer(player& _session, packet *_packet) {
+void game_server::requestCheckGameGuardAuthAnswer(player& _session, packet* _packet) {
 	REQUEST_BEGIN("CheckGameGuardAuthAnswer");
 
 	try {
@@ -3403,7 +3443,7 @@ void game_server::requestCheckGameGuardAuthAnswer(player& _session, packet *_pac
 
 #ifdef _DEBUG
 			_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Log] Player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] GG Auth Hash: " + hex_util::BufferToHexString(_packet->getBuffer(), _packet->getSize()), CL_FILE_LOG_AND_CONSOLE));
+				+ "] GG Auth Hash: " + hex_util::BufferToHexString(_packet->getBuffer(), _packet->getSize()), CL_FILE_LOG_AND_CONSOLE));
 #endif // _DEBUG
 
 			// Read reply
@@ -3432,7 +3472,7 @@ void game_server::requestCheckGameGuardAuthAnswer(player& _session, packet *_pac
 
 				// Log
 				_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Log] Player[UID=" + std::to_string(_session.m_pi.uid)
-						+ "] GG Auth Check answer: false", CL_FILE_LOG_AND_CONSOLE));
+					+ "] GG Auth Check answer: false", CL_FILE_LOG_AND_CONSOLE));
 			}
 #elif INTPTR_MAX == INT32_MAX || MY_GG_SRV_LIB == 1
 			DWORD err_success = _session.m_gg.m_csa.CheckAuthAnswer();
@@ -3445,47 +3485,49 @@ void game_server::requestCheckGameGuardAuthAnswer(player& _session, packet *_pac
 				char sd[1024];
 
 #if defined(_WIN32)
-				sprintf_s(sd, 1024, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", err_success, _session.m_gg.m_csa.m_AuthAnswer.dwIndex, 
-						_session.m_gg.m_csa.m_AuthAnswer.dwValue1, _session.m_gg.m_csa.m_AuthAnswer.dwValue2, _session.m_gg.m_csa.m_AuthAnswer.dwValue3);
+				sprintf_s(sd, 1024, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", err_success, _session.m_gg.m_csa.m_AuthAnswer.dwIndex,
+					_session.m_gg.m_csa.m_AuthAnswer.dwValue1, _session.m_gg.m_csa.m_AuthAnswer.dwValue2, _session.m_gg.m_csa.m_AuthAnswer.dwValue3);
 #elif defined(__linux__)
-				sprintf(sd, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", err_success, _session.m_gg.m_csa.m_AuthAnswer.dwIndex, 
-						_session.m_gg.m_csa.m_AuthAnswer.dwValue1, _session.m_gg.m_csa.m_AuthAnswer.dwValue2, _session.m_gg.m_csa.m_AuthAnswer.dwValue3);
+				sprintf(sd, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", err_success, _session.m_gg.m_csa.m_AuthAnswer.dwIndex,
+					_session.m_gg.m_csa.m_AuthAnswer.dwValue1, _session.m_gg.m_csa.m_AuthAnswer.dwValue2, _session.m_gg.m_csa.m_AuthAnswer.dwValue3);
 #endif
 
 				_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Error] Player[UID=" + std::to_string(_session.m_pi.uid) + "] CSAuth Fail. " + sd, CL_FILE_LOG_AND_CONSOLE));
-				
+
 				// Disconnect o player
 				DisconnectSession(&_session);
 			}
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Log] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] GG Auth Check answer: " + (err_success == ERROR_SUCCESS ? "true" : "false"), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Log] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] GG Auth Check answer: " + (err_success == ERROR_SUCCESS ? "true" : "false"), CL_FILE_LOG_AND_CONSOLE));
 #else
 #error Unknown pointer size or missing size macros!
 #endif
-		
-		}else {
 
-			_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Error][WARNING] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] enviou GameGuardAuth Answer, mas o GameGuard Auth no server esta desabilitado.", CL_FILE_LOG_AND_CONSOLE));
+		}
+		else {
+
+			_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][Error][WARNING] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] enviou GameGuardAuth Answer, mas o GameGuard Auth no server esta desabilitado.", CL_FILE_LOG_AND_CONSOLE));
 
 			// desconecta ele
 			DisconnectSession(&_session);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::requestCheckGameGuardAuthAnswer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
 timer* game_server::makeTime(DWORD _milleseconds, job& _job) {
-	
+
 	if (!_job.isValid())
 		throw exception("[game_server::makeTime][Error] job is invalid", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 50, 0));
 
-	timer *t = nullptr;
+	timer* t = nullptr;
 
 	if ((t = m_timer_manager.createTimer(_milleseconds, new (timer::timer_param){ _job, m_job_pool })) == nullptr)
 		throw exception("[game_server::makeTime][Error] nao conseguiu criar o timer", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 51, 0));
@@ -3494,11 +3536,11 @@ timer* game_server::makeTime(DWORD _milleseconds, job& _job) {
 };
 
 timer* game_server::makeTime(DWORD _milleseconds, job& _job, std::vector< DWORD > _table_interval) {
-	
+
 	if (!_job.isValid())
 		throw exception("[game_server::makeTime][Error] job is invalid", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 50, 0));
 
-	timer *t = nullptr;
+	timer* t = nullptr;
 
 	if ((t = m_timer_manager.createTimer(_milleseconds, new (timer::timer_param){ _job, m_job_pool }, _table_interval)) == nullptr)
 		throw exception("[game_server::makeTime][Error] nao conseguiu criar o timer", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 51, 0));
@@ -3562,7 +3604,7 @@ void game_server::updateDailyQuest(DailyQuestInfo& _dqi) {
 	m_dqi = _dqi;
 };
 
-void game_server::sendUpdateRoomInfo(room *_r, int _option) {
+void game_server::sendUpdateRoomInfo(room* _r, int _option) {
 
 	try {
 
@@ -3571,10 +3613,11 @@ void game_server::sendUpdateRoomInfo(room *_r, int _option) {
 			auto c = findChannel(_r->getChannelOwenerId());
 
 			if (c != nullptr)
-				c->sendUpdateRoomInfo(*const_cast< RoomInfoEx* >(_r->getInfo()), _option);
+				c->sendUpdateRoomInfo(*const_cast<RoomInfoEx*>(_r->getInfo()), _option);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::sendUpdateRoomInfo][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3586,18 +3629,20 @@ void game_server::authCmdShutdown(int32_t _time_sec) {
 
 		// Shut down com tempo
 		if (m_shutdown == nullptr) {
-			
+
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::authCmdShutdown][Log] Auth Server requisitou desligar o Server em "
-					+ std::to_string(_time_sec) + " segundos.", CL_FILE_LOG_AND_CONSOLE));
-			
+				+ std::to_string(_time_sec) + " segundos.", CL_FILE_LOG_AND_CONSOLE));
+
 			shutdown_time(_time_sec);
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::authCmdShutdown][WARNING] Auth Server requisitou para o server ser delisgado em "
-					+ std::to_string(_time_sec) + " segundos, mas o server ja esta com o timer de shutdown", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_time_sec) + " segundos, mas o server ja esta com o timer de shutdown", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdShutdown][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3617,7 +3662,8 @@ void game_server::authCmdBroadcastNotice(std::string _notice) {
 
 		m_notice.push_back(0, notice, BroadcastList::TYPE::GM_NOTICE);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastNotice][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3627,8 +3673,8 @@ void game_server::authCmdBroadcastTicker(std::string _nickname, std::string _msg
 
 	try {
 
-		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastTicker][Log] Auth Server Comando Ticker[NICKNAME=" 
-				+ _nickname + ", MESSAGE=" + _msg + "].", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastTicker][Log] Auth Server Comando Ticker[NICKNAME="
+			+ _nickname + ", MESSAGE=" + _msg + "].", CL_FILE_LOG_AND_CONSOLE));
 
 		auto msg = verifyAndTranslate(_msg, 2/*fixed size*/);
 
@@ -3638,7 +3684,8 @@ void game_server::authCmdBroadcastTicker(std::string _nickname, std::string _msg
 
 		m_ticker.push_back(0, _nickname, msg, BroadcastList::TYPE::TICKER);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastTicker][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3648,8 +3695,8 @@ void game_server::authCmdBroadcastCubeWinRare(std::string _msg, uint32_t _option
 
 	try {
 
-		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastCubeWinRare][Log] Auth Server Comando Cube Win Rare Notice[MESSAGE=" 
-				+ _msg + ", OPTION=" + std::to_string(_option) + "].", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastCubeWinRare][Log] Auth Server Comando Cube Win Rare Notice[MESSAGE="
+			+ _msg + ", OPTION=" + std::to_string(_option) + "].", CL_FILE_LOG_AND_CONSOLE));
 
 		auto msg = verifyAndTranslate(_msg, 2/*fixed size*/);
 
@@ -3659,7 +3706,8 @@ void game_server::authCmdBroadcastCubeWinRare(std::string _msg, uint32_t _option
 
 		m_notice.push_back(0, msg, _option, BroadcastList::TYPE::CUBE_WIN_RARE);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdBroadcastCubeWinRare][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3674,8 +3722,8 @@ void game_server::authCmdDisconnectPlayer(uint32_t _req_server_uid, uint32_t _pl
 		if (s != nullptr) {
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::authCmdDisconnectPlayer][log] Comando do Auth Server, Server[UID=" + std::to_string(_req_server_uid) 
-					+ "] pediu para desconectar o Player[UID=" + std::to_string(s->m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::authCmdDisconnectPlayer][log] Comando do Auth Server, Server[UID=" + std::to_string(_req_server_uid)
+				+ "] pediu para desconectar o Player[UID=" + std::to_string(s->m_pi.uid) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// Deconecta o Player
 			if (_force)	// Força o Disconect do player, sem verificar as regras do Game Server
@@ -3695,7 +3743,8 @@ void game_server::authCmdDisconnectPlayer(uint32_t _req_server_uid, uint32_t _pl
 
 				try {
 					same_id_login = ini.readInt("OPTION", "SAME_ID_LOGIN");
-				}catch (exception& e) {
+				}
+				catch (exception& e) {
 					// Não precisa mostrar o error
 					UNREFERENCED_PARAMETER(e);
 				}
@@ -3705,20 +3754,22 @@ void game_server::authCmdDisconnectPlayer(uint32_t _req_server_uid, uint32_t _pl
 					DisconnectSession(s);
 			}
 
-		}else {
+		}
+		else {
 
 			// Não encontrou o player no server, então desconecta no banco de dados
 			snmdb::NormalManagerDB::getInstance().add(5, new CmdRegisterLogon(_player_uid, 1/*Logout*/), game_server::SQLDBResponse, this);
-			
+
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::authCmdDisconnectPlayer][WARNING] Comando do Auth Server, Server[UID=" + std::to_string(_req_server_uid)
-					+ "] pediu para desconectar o Player[UID=" + std::to_string(_player_uid) + "], mas nao encontrou ele no server, entao desconecta ele no banco de dados.", CL_FILE_LOG_AND_CONSOLE));
+				+ "] pediu para desconectar o Player[UID=" + std::to_string(_player_uid) + "], mas nao encontrou ele no server, entao desconecta ele no banco de dados.", CL_FILE_LOG_AND_CONSOLE));
 		}
 
 		// UPDATE ON Auth Server
 		m_unit_connect->sendConfirmDisconnectPlayer(_req_server_uid, _player_uid);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdDisconnectPlayer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3736,8 +3787,8 @@ void game_server::authCmdNewMailArrivedMailBox(uint32_t _player_uid, uint32_t _m
 		auto s = m_player_manager.findPlayer(_player_uid);
 
 		if (s == nullptr)
-			throw exception("[game_server::authCmdNewMailArrivedMailBox][Warning] Auth Server Comando New Mail[ID=" + std::to_string(_mail_id) 
-					+ "] Arrived no Mailbox do player[UID=" + std::to_string(_player_uid) + "], mas o player nao esta conectado no server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 130, 0));
+			throw exception("[game_server::authCmdNewMailArrivedMailBox][Warning] Auth Server Comando New Mail[ID=" + std::to_string(_mail_id)
+				+ "] Arrived no Mailbox do player[UID=" + std::to_string(_player_uid) + "], mas o player nao esta conectado no server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 130, 0));
 
 		s->m_pi.m_mail_box.addNewEmailArrived(_mail_id);
 
@@ -3756,12 +3807,12 @@ void game_server::authCmdNewMailArrivedMailBox(uint32_t _player_uid, uint32_t _m
 
 		if (v_mi.empty())
 			throw exception("[game_server::authCmdNewMailArrivedMailBox][Error] Auth Server Comando New Mail[ID=" + std::to_string(_mail_id)
-					+ "] Arrived no Mailbox do player[UID=" + std::to_string(_player_uid) + "], mas nao tem nenhum email nao lido no Mailbox dele.", 
-					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 131, 0));
+				+ "] Arrived no Mailbox do player[UID=" + std::to_string(_player_uid) + "], mas nao tem nenhum email nao lido no Mailbox dele.",
+				STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 131, 0));
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[game_server::authCmdNewMailArrivedMailBox][Log] Auth Server Comando New Mail[ID=" + std::to_string(_mail_id) 
-				+ "] Arrived Mailbox do player[UID=" + std::to_string(_player_uid) + "].", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::authCmdNewMailArrivedMailBox][Log] Auth Server Comando New Mail[ID=" + std::to_string(_mail_id)
+			+ "] Arrived Mailbox do player[UID=" + std::to_string(_player_uid) + "].", CL_FILE_LOG_AND_CONSOLE));
 
 		// UPDATE ON GAME
 		packet p((unsigned short)0x210);
@@ -3775,7 +3826,8 @@ void game_server::authCmdNewMailArrivedMailBox(uint32_t _player_uid, uint32_t _m
 
 		packet_func::session_send(p, s, 1);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdNewMailArrivedMailBox][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3787,7 +3839,8 @@ void game_server::authCmdNewRate(uint32_t _tipo, uint32_t _qntd) {
 
 		updateRateAndEvent(_tipo, _qntd);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdNewRate][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3799,7 +3852,8 @@ void game_server::authCmdReloadGlobalSystem(uint32_t _tipo) {
 
 		reloadGlobalSystem(_tipo);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdReloadGlobalSystem][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3818,11 +3872,13 @@ void game_server::authCmdConfirmSendInfoPlayerOnline(uint32_t _req_server_uid, A
 
 			//confirmLoginOnOtherServer(*s, _req_server_uid, _aspi);
 
-		}else
-			_smp::message_pool::getInstance().push(new message("[game_server::authCmdConfirmSendInfoPlayerOnline][WARNING] Player[UID=" + std::to_string(_aspi.uid) 
-					+ "] retorno do confirma login com Auth Server do Server[UID=" + std::to_string(_req_server_uid) + "], mas o palyer nao esta mais conectado.", CL_FILE_LOG_AND_CONSOLE));
+		}
+		else
+			_smp::message_pool::getInstance().push(new message("[game_server::authCmdConfirmSendInfoPlayerOnline][WARNING] Player[UID=" + std::to_string(_aspi.uid)
+				+ "] retorno do confirma login com Auth Server do Server[UID=" + std::to_string(_req_server_uid) + "], mas o palyer nao esta mais conectado.", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdConfirmSendInfoPlayerOnline][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3854,8 +3910,8 @@ void game_server::ggAuthCmdGetQuery(uint32_t _error, uint32_t _socket_id, GG_AUT
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdGetQuery][Error] Player[UID=" + std::to_string(session->m_pi.uid) + "] CSAuth Fail Err: " + std::to_string(_error)
-					+ ", Index: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwIndex) + ", Value1: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue1)
-					+ ", Value2: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue2) + ", Value3: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue3), CL_FILE_LOG_AND_CONSOLE));
+				+ ", Index: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwIndex) + ", Value1: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue1)
+				+ ", Value2: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue2) + ", Value3: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue3), CL_FILE_LOG_AND_CONSOLE));
 
 			// Disconnect Player
 			DisconnectSession(session);
@@ -3871,9 +3927,9 @@ void game_server::ggAuthCmdGetQuery(uint32_t _error, uint32_t _socket_id, GG_AUT
 #endif
 
 #ifdef _DEBUG
-		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdGetQuery][Log] Player[UID=" + std::to_string(session->m_pi.uid) + "] send GameGuard Auth Query. Index: " 
-				+ std::to_string(session->m_gg.m_csa.m_AuthQuery.dwIndex) + ", Value1: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue1)
-				+ ", Value2: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue2) + ", Value3: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue3), CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdGetQuery][Log] Player[UID=" + std::to_string(session->m_pi.uid) + "] send GameGuard Auth Query. Index: "
+			+ std::to_string(session->m_gg.m_csa.m_AuthQuery.dwIndex) + ", Value1: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue1)
+			+ ", Value2: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue2) + ", Value3: " + std::to_string(session->m_gg.m_csa.m_AuthQuery.dwValue3), CL_FILE_LOG_AND_CONSOLE));
 #endif // _DEBUG
 
 		auto now = std::time(nullptr);
@@ -3886,8 +3942,9 @@ void game_server::ggAuthCmdGetQuery(uint32_t _error, uint32_t _socket_id, GG_AUT
 		p.addBuffer(&session->m_gg.m_csa.m_AuthQuery, sizeof(_GG_AUTH_DATA));
 
 		packet_func::session_send(p, session, 1);
-		
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdGetQuery][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -3922,38 +3979,39 @@ void game_server::ggAuthCmdCheckAnswer(uint32_t _error, uint32_t _socket_id) {
 			char sd[1024];
 
 #if defined(_WIN32)
-			sprintf_s(sd, 1024, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", _error, session->m_gg.m_csa.m_AuthAnswer.dwIndex, 
+			sprintf_s(sd, 1024, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", _error, session->m_gg.m_csa.m_AuthAnswer.dwIndex,
 				session->m_gg.m_csa.m_AuthAnswer.dwValue1, session->m_gg.m_csa.m_AuthAnswer.dwValue2, session->m_gg.m_csa.m_AuthAnswer.dwValue3);
 #elif defined(__linux__)
-			sprintf(sd, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", _error, session->m_gg.m_csa.m_AuthAnswer.dwIndex, 
+			sprintf(sd, "Err: %d, Index: %08X, Value1: %08X, Value2: %08X, Value3: %08X", _error, session->m_gg.m_csa.m_AuthAnswer.dwIndex,
 				session->m_gg.m_csa.m_AuthAnswer.dwValue1, session->m_gg.m_csa.m_AuthAnswer.dwValue2, session->m_gg.m_csa.m_AuthAnswer.dwValue3);
 #endif
 
 			_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdCheckAnswer][Error] Player[UID=" + std::to_string(session->m_pi.uid) + "] CSAuth Fail. " + sd, CL_FILE_LOG_AND_CONSOLE));
-				
+
 			// Disconnect o player
 			DisconnectSession(session);
 		}
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdCheckAnswer][Log] Player[UID=" + std::to_string(session->m_pi.uid)
-				+ "] GG Auth Check answer: " + (_error == ERROR_SUCCESS ? "true" : "false"), CL_FILE_LOG_AND_CONSOLE));
-		
-	}catch (exception& e) {
+			+ "] GG Auth Check answer: " + (_error == ERROR_SUCCESS ? "true" : "false"), CL_FILE_LOG_AND_CONSOLE));
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCmdCheckAnswer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
 uint32_t game_server::ggAuthCreateUser(uint32_t _socket_id) {
-	
+
 	uint32_t error = ERROR_SUCCESS;
-	
+
 	try {
 
 		if (!m_GameGuardAuth)
 			throw exception("[game_server::ggAuthCreateUser][Error] Player[SOCKET=" + std::to_string(_socket_id)
-					+ "] tentou criar User Game Guard Auth, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
+				+ "] tentou criar User Game Guard Auth, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
 
 		if (m_game_guard == nullptr)
 			throw exception("[game_server::ggAuthCreateUser][Error] Player[SOCKET=" + std::to_string(_socket_id)
@@ -3961,25 +4019,25 @@ uint32_t game_server::ggAuthCreateUser(uint32_t _socket_id) {
 
 		auto p = m_player_manager.findPlayerBySocketId(_socket_id);
 
-		if (p == nullptr || 
+		if (p == nullptr ||
 #if defined(_WIN32)
 			p->m_sock == INVALID_SOCKET
 #elif defined(__linux__)
 			p->m_sock.fd == INVALID_SOCKET
 #endif
-		)
+			)
 			throw exception("[game_server::ggAuthCreateUser][Error] Player[SOCKET=" + std::to_string(_socket_id)
 				+ "] tentou criar User Game Guard Auth, porem o player nao esta online no server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15502, 103));
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCreateUser][Log] Player[OID=" + std::to_string(p->m_oid) 
-				+ ", SOCKET=" + std::to_string(
+		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCreateUser][Log] Player[OID=" + std::to_string(p->m_oid)
+			+ ", SOCKET=" + std::to_string(
 #if defined(_WIN32)
-					p->m_sock
+				p->m_sock
 #elif defined(__linux__)
-					p->m_sock.fd
+				p->m_sock.fd
 #endif
-				) + "] envia o pedido para criar o User Game Guard Auth para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
+			) + "] envia o pedido para criar o User Game Guard Auth para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
 
 		// Request Create User para o player(SOCKET)
 		m_game_guard->sendCreateUser((uint32_t)
@@ -3990,7 +4048,8 @@ uint32_t game_server::ggAuthCreateUser(uint32_t _socket_id) {
 #endif
 		);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCreateUser][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -4004,25 +4063,26 @@ uint32_t game_server::ggAuthCreateUser(uint32_t _socket_id) {
 uint32_t game_server::ggAuthDeleteUser(uint32_t _socket_id) {
 
 	uint32_t error = ERROR_SUCCESS;
-	
+
 	try {
 
 		if (!m_GameGuardAuth)
 			throw exception("[game_server::ggAuthDeleteUser][Error] Player[SOCKET=" + std::to_string(_socket_id)
-					+ "] tentou deletar User Game Guard Auth, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
+				+ "] tentou deletar User Game Guard Auth, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
 
 		if (m_game_guard == nullptr)
 			throw exception("[game_server::ggAuthDeleteUser][Error] Player[SOCKET=" + std::to_string(_socket_id)
-					+ "] tentou deletar User Game Guard Auth, porem o Game Guard nao esta inicializado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15501, 102));
+				+ "] tentou deletar User Game Guard Auth, porem o Game Guard nao esta inicializado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15501, 102));
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthDeleteUser][Log] Player[SOCKET=" 
-				+ std::to_string(_socket_id) + "] envia o pedido para deletar o User Game Guard Auth para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthDeleteUser][Log] Player[SOCKET="
+			+ std::to_string(_socket_id) + "] envia o pedido para deletar o User Game Guard Auth para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
 
 		// Request Delete User para o player(SOCKET)
 		m_game_guard->sendDeleteUser(_socket_id);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthDeleteUser][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -4036,12 +4096,12 @@ uint32_t game_server::ggAuthDeleteUser(uint32_t _socket_id) {
 uint32_t game_server::ggAuthGetQuery(uint32_t _socket_id) {
 
 	uint32_t error = ERROR_SUCCESS;
-	
+
 	try {
 
 		if (!m_GameGuardAuth)
 			throw exception("[game_server::ggAuthGetQuery][Error] Player[SOCKET=" + std::to_string(_socket_id)
-					+ "] tentou pegar o Auth Query, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
+				+ "] tentou pegar o Auth Query, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
 
 		if (m_game_guard == nullptr)
 			throw exception("[game_server::ggAuthGetQuery][Error] Player[SOCKET=" + std::to_string(_socket_id)
@@ -4049,25 +4109,25 @@ uint32_t game_server::ggAuthGetQuery(uint32_t _socket_id) {
 
 		auto p = m_player_manager.findPlayerBySocketId(_socket_id);
 
-		if (p == nullptr || 
+		if (p == nullptr ||
 #if defined(_WIN32)
 			p->m_sock == INVALID_SOCKET
 #elif defined(__linux__)
 			p->m_sock.fd == INVALID_SOCKET
 #endif
-		)
+			)
 			throw exception("[game_server::ggAuthGetQuery][Error] Player[SOCKET=" + std::to_string(_socket_id)
 				+ "] tentou pegar o Auth Query, porem o player nao esta online no server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15502, 103));
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthGetQuery][Log] Player[UID=" + std::to_string(p->m_pi.uid) 
-				+ ", SOCKET=" + std::to_string(
+		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthGetQuery][Log] Player[UID=" + std::to_string(p->m_pi.uid)
+			+ ", SOCKET=" + std::to_string(
 #if defined(_WIN32)
-					p->m_sock
+				p->m_sock
 #elif defined(__linux__)
-					p->m_sock.fd
+				p->m_sock.fd
 #endif
-				) + "] envia o pedido de Auth Query para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
+			) + "] envia o pedido de Auth Query para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
 
 		// Request Auth Query para o player(SOCKET)
 		m_game_guard->sendGetQuery((uint32_t)
@@ -4078,7 +4138,8 @@ uint32_t game_server::ggAuthGetQuery(uint32_t _socket_id) {
 #endif
 		);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthGetQuery][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -4090,14 +4151,14 @@ uint32_t game_server::ggAuthGetQuery(uint32_t _socket_id) {
 };
 
 uint32_t game_server::ggAuthCheckAnswer(uint32_t _socket_id, GG_AUTH_DATA& _data) {
-	
+
 	uint32_t error = ERROR_SUCCESS;
-	
+
 	try {
 
 		if (!m_GameGuardAuth)
 			throw exception("[game_server::ggAuthCheckAnswer][Error] Player[SOCKET=" + std::to_string(_socket_id)
-					+ "] tentou enviar para o Game Guard Auth Server o Auth Answer para verificar, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
+				+ "] tentou enviar para o Game Guard Auth Server o Auth Answer para verificar, porem o Game Guard esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15500, 101));
 
 		if (m_game_guard == nullptr)
 			throw exception("[game_server::ggAuthCheckAnswer][Error] Player[SOCKET=" + std::to_string(_socket_id)
@@ -4105,13 +4166,13 @@ uint32_t game_server::ggAuthCheckAnswer(uint32_t _socket_id, GG_AUTH_DATA& _data
 
 		auto p = m_player_manager.findPlayerBySocketId(_socket_id);
 
-		if (p == nullptr || 
+		if (p == nullptr ||
 #if defined(_WIN32)
 			p->m_sock == INVALID_SOCKET
 #elif defined(__linux__)
 			p->m_sock.fd == INVALID_SOCKET
 #endif
-		)
+			)
 			throw exception("[game_server::ggAuthCheckAnswer][Error] Player[SOCKET=" + std::to_string(_socket_id)
 				+ "] tentou enviar para o Game Guard Auth Server o Auth Answer para verificar, porem o player nao esta online no server.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 15502, 103));
 
@@ -4125,15 +4186,15 @@ uint32_t game_server::ggAuthCheckAnswer(uint32_t _socket_id, GG_AUTH_DATA& _data
 #endif
 
 		// Log
-		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCheckAnswer][Log] Player[UID=" + std::to_string(p->m_pi.uid) 
-				+ ", SOCKET=" + std::to_string(
+		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCheckAnswer][Log] Player[UID=" + std::to_string(p->m_pi.uid)
+			+ ", SOCKET=" + std::to_string(
 #if defined(_WIN32)
-					p->m_sock
+				p->m_sock
 #elif defined(__linux__)
-					p->m_sock.fd
+				p->m_sock.fd
 #endif
-				) + "] DATA{" + sd 
-				+ "} envia o pedido de verificacao do Auth Answer para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
+			) + "] DATA{" + sd
+			+ "} envia o pedido de verificacao do Auth Answer para o Game Guard Auth Server.", CL_FILE_LOG_AND_CONSOLE));
 
 		// Request Check Auth Answer para o player(SOCKET)
 		m_game_guard->sendCheckAnswer((uint32_t)
@@ -4142,9 +4203,10 @@ uint32_t game_server::ggAuthCheckAnswer(uint32_t _socket_id, GG_AUTH_DATA& _data
 #elif defined(__linux__)
 			p->m_sock.fd
 #endif
-		, _data);
+			, _data);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::ggAuthCheckAnswer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -4156,7 +4218,7 @@ uint32_t game_server::ggAuthCheckAnswer(uint32_t _socket_id, GG_AUTH_DATA& _data
 };
 
 // Server Login Game Guard Auth Server
-void game_server::authCmdKeyLoginGGAuthServer(packet *_packet) {
+void game_server::authCmdKeyLoginGGAuthServer(packet* _packet) {
 
 	if (_packet == nullptr)
 		throw exception("[game_server::authCmdKeyLoginGGAuthServer][Error] _packet is nullptr", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 6, 0));
@@ -4175,7 +4237,8 @@ void game_server::authCmdKeyLoginGGAuthServer(packet *_packet) {
 
 				key = md5::getHash();
 
-			}catch (exception& e) {
+			}
+			catch (exception& e) {
 
 				_smp::message_pool::getInstance().push(new message("[game_server::authCmdKeyLoginGGAuthServer][Error] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -4185,14 +4248,15 @@ void game_server::authCmdKeyLoginGGAuthServer(packet *_packet) {
 			m_game_guard->sendHaskKeyLogin(key);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::authCmdKeyLoginGGAuthServer][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 #endif
 
-void game_server::onAcceptCompleted(session *_session) {
+void game_server::onAcceptCompleted(session* _session) {
 
 	if (_session == nullptr)
 		throw exception("[game_server::onAcceptCompleted][Error] session is nullptr.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SERVER, 60, 0));
@@ -4202,9 +4266,9 @@ void game_server::onAcceptCompleted(session *_session) {
 
 	if (!_session->isConnected())
 		throw exception("[game_server::onAcceptCompleted][Error] session is not connected.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SERVER, 62, 0));
-	
+
 	// Player
-	player *p = (player*)_session;
+	player* p = (player*)_session;
 
 	// Game Guard Auth
 	if (m_GameGuardAuth) {
@@ -4252,13 +4316,14 @@ void game_server::onAcceptCompleted(session *_session) {
 	try {
 		_session->requestRecvBuffer();
 		_session->requestSendBuffer(mb.buf, mb.len);
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		if (STDA_ERROR_CHECK_SOURCE_AND_ERROR(e.getCodeError(), STDA_ERROR_TYPE::SESSION, 1))
 			throw;
 	}
 };
 
-void game_server::onDisconnected(session *_session) {
+void game_server::onDisconnected(session* _session) {
 
 	if (_session == nullptr)
 		throw exception("[game_server::onDisconnected][Error] _session is nullptr", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SERVER, 60, 0));
@@ -4269,19 +4334,20 @@ void game_server::onDisconnected(session *_session) {
 	//if (!_session->isConnected())
 		//throw exception("[game_server::onDisconnected][Error] _session is not connected", STDA_MAKE_ERROR(STDA_ERROR_TYPE::SERVER, 62, 0));
 
-	player *_player = reinterpret_cast< player* >(_session);
+	player* _player = reinterpret_cast<player*>(_session);
 
 	_smp::message_pool::getInstance().push(new message("[game_server::onDisconnected][Log] Player Desconectou. ID: " + std::string(_player->m_pi.id) + "  UID: " + std::to_string(_player->m_pi.uid), CL_FILE_LOG_AND_CONSOLE));
 
 	/// Novo
-	channel *_channel = findChannel(_player->m_pi.channel);
+	channel* _channel = findChannel(_player->m_pi.channel);
 
 	try {
-		
+
 		if (_channel != nullptr)
 			_channel->leaveChannel(*_player);
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::onDisconnect][Error] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -4413,7 +4479,7 @@ void game_server::onHeartBeat() {
 				packet_func::channel_broadcast(*el, p, 1);
 		}
 		// End Check Treasure Hunter
-		
+
 		// Check Notice (GM or Cube Win Rare)
 		BroadcastList::RetNoticeCtx rt;
 
@@ -4429,15 +4495,16 @@ void game_server::onHeartBeat() {
 
 				p.addString(rt.nc.notice);
 
-			}else if (rt.nc.type == BroadcastList::TYPE::CUBE_WIN_RARE) {	// Cube Win Rare Notice
+			}
+			else if (rt.nc.type == BroadcastList::TYPE::CUBE_WIN_RARE) {	// Cube Win Rare Notice
 
 				p.init_plain((unsigned short)0x1D3);
 
 				p.addUint32(1);				// Count
-				
+
 				//for (auto i = 0u; i < 2u; ++i) {
-					p.addUint32(rt.nc.option);
-					p.addString(rt.nc.notice);
+				p.addUint32(rt.nc.option);
+				p.addString(rt.nc.notice);
 				//}
 
 			}
@@ -4462,7 +4529,8 @@ void game_server::onHeartBeat() {
 				packet_func::channel_broadcast(*el, p, 1);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::onHeartBeat][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -4479,7 +4547,8 @@ void game_server::onStart() {
 			m_game_guard->start();
 #endif
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::onStart][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -4503,7 +4572,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][WARNING] m_accept_sock(socket que gerencia os socket que pode aceitar etc) is invalid.", CL_FILE_LOG_AND_CONSOLE));
 
-	}else if (!s.empty() && s.compare("rate") == 0) {
+	}
+	else if (!s.empty() && s.compare("rate") == 0) {
 
 		std::string sTipo = "";
 
@@ -4515,25 +4585,34 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			if (sTipo.compare("pang") == 0) {
 				tipo = 0l;
-			}else if (sTipo.compare("exp") == 0) {
+			}
+			else if (sTipo.compare("exp") == 0) {
 				tipo = 1l;
-			}else if (sTipo.compare("club") == 0) {
+			}
+			else if (sTipo.compare("club") == 0) {
 				tipo = 2l;
-			}else if (sTipo.compare("chuva") == 0) {
+			}
+			else if (sTipo.compare("chuva") == 0) {
 				tipo = 3l;
-			}else  if (sTipo.compare("treasure") == 0) {
+			}
+			else  if (sTipo.compare("treasure") == 0) {
 				tipo = 4l;
-			}else if (sTipo.compare("scratchy") == 0) {
+			}
+			else if (sTipo.compare("scratchy") == 0) {
 				tipo = 5l;
-			}else if (sTipo.compare("pprareitem") == 0) {
+			}
+			else if (sTipo.compare("pprareitem") == 0) {
 				tipo = 6l;
-			}else if (sTipo.compare("ppcookieitem") == 0) {
+			}
+			else if (sTipo.compare("ppcookieitem") == 0) {
 				tipo = 7l;
-			}else if (sTipo.compare("memorial") == 0) {
+			}
+			else if (sTipo.compare("memorial") == 0) {
 				tipo = 8l;
 			}
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Command: \"rate " + sTipo + "\"", CL_ONLY_CONSOLE));
 
 		// Digitou um tipo conhecido
@@ -4547,11 +4626,13 @@ bool game_server::checkCommand(std::stringstream& _command) {
 				updateRateAndEvent((uint32_t)tipo, qntd);
 			else
 				_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown value, Command: \"rate " + sTipo + "\"" + std::to_string(qntd), CL_ONLY_CONSOLE));
-		
-		}else
+
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Command: \"rate " + sTipo + "\"", CL_ONLY_CONSOLE));
 
-	}else if (!s.empty() && s.compare("event") == 0) {
+	}
+	else if (!s.empty() && s.compare("event") == 0) {
 
 		s = "";
 
@@ -4565,7 +4646,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(9u/*Grand Zodiac Event Time*/, qntd);
 
-		}else if (!s.empty() && s.compare("angel_event") == 0) {
+		}
+		else if (!s.empty() && s.compare("angel_event") == 0) {
 
 			uint32_t qntd = 0u;	// Enable or Disable [1,0]
 
@@ -4573,7 +4655,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(10u/*Angel Event(Reduce Quit Rate)*/, qntd);
 
-		}else if (!s.empty() && s.compare("grand_prix") == 0) {
+		}
+		else if (!s.empty() && s.compare("grand_prix") == 0) {
 
 			uint32_t qntd = 0u;	// Enable != 0, Disable == 0
 
@@ -4581,7 +4664,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(11u/*Grand Prix Event*/, qntd);
 
-		}else if (!s.empty() && s.compare("golden_time") == 0) {
+		}
+		else if (!s.empty() && s.compare("golden_time") == 0) {
 
 			uint32_t qntd = 0u;	// Enable != 0, Disable == 0
 
@@ -4589,7 +4673,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(12u/*Golden Time Event*/, qntd);
 
-		}else if (!s.empty() && s.compare("login_reward") == 0) {
+		}
+		else if (!s.empty() && s.compare("login_reward") == 0) {
 
 			uint32_t qntd = 0u;	// Enable != 0, Disable == 0
 
@@ -4597,7 +4682,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(13u/*Login Reward Event*/, qntd);
 
-		}else if (!s.empty() && s.compare("bot_gm_event") == 0) {
+		}
+		else if (!s.empty() && s.compare("bot_gm_event") == 0) {
 
 			uint32_t qntd = 0u;	// Enable != 0, Disable == 0
 
@@ -4605,7 +4691,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(14u/*Bot GM Event*/, qntd);
 
-		}else if (!s.empty() && s.compare("smart_calc") == 0) {
+		}
+		else if (!s.empty() && s.compare("smart_calc") == 0) {
 
 			uint32_t qntd = 0u;	// Enable != 0, Disable == 0
 
@@ -4613,11 +4700,13 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			updateRateAndEvent(15u/*Smart Calculator*/, qntd);
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Comamnd: \"Event " + s + "\"", CL_ONLY_CONSOLE));
 
-	}else if (!s.empty() && s.compare("reload_system") == 0) {
-	
+	}
+	else if (!s.empty() && s.compare("reload_system") == 0) {
+
 		std::string sTipo = "";
 
 		_command >> sTipo;
@@ -4628,45 +4717,64 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 			if (sTipo.compare("all") == 0) {
 				tipo = 0l;
-			}else if (sTipo.compare("iff") == 0) {
+			}
+			else if (sTipo.compare("iff") == 0) {
 				tipo = 1l;
-			}else if (sTipo.compare("card") == 0) {
+			}
+			else if (sTipo.compare("card") == 0) {
 				tipo = 2l;
-			}else if (sTipo.compare("comet_refill") == 0) {
+			}
+			else if (sTipo.compare("comet_refill") == 0) {
 				tipo = 3l;
-			}else if (sTipo.compare("papel_shop") == 0) {
+			}
+			else if (sTipo.compare("papel_shop") == 0) {
 				tipo = 4l;
-			}else  if (sTipo.compare("box") == 0) {
+			}
+			else  if (sTipo.compare("box") == 0) {
 				tipo = 5l;
-			}else if (sTipo.compare("memorial_shop") == 0) {
+			}
+			else if (sTipo.compare("memorial_shop") == 0) {
 				tipo = 6l;
-			}else if (sTipo.compare("cube_coin") == 0) {
+			}
+			else if (sTipo.compare("cube_coin") == 0) {
 				tipo = 7l;
-			}else if (sTipo.compare("treasure_hunter") == 0) {
+			}
+			else if (sTipo.compare("treasure_hunter") == 0) {
 				tipo = 8l;
-			}else if (sTipo.compare("drop") == 0) {
+			}
+			else if (sTipo.compare("drop") == 0) {
 				tipo = 9l;
-			}else if (sTipo.compare("attendance_reward") == 0) {
+			}
+			else if (sTipo.compare("attendance_reward") == 0) {
 				tipo = 10l;
-			}else if (sTipo.compare("map_course") == 0) {
+			}
+			else if (sTipo.compare("map_course") == 0) {
 				tipo = 11l;
-			}else if (sTipo.compare("approach_mission") == 0) {
+			}
+			else if (sTipo.compare("approach_mission") == 0) {
 				tipo = 12l;
-			}else if (sTipo.compare("grand_zodiac_event") == 0) {
+			}
+			else if (sTipo.compare("grand_zodiac_event") == 0) {
 				tipo = 13l;
-			}else if (sTipo.compare("coin_cube_location") == 0) {
+			}
+			else if (sTipo.compare("coin_cube_location") == 0) {
 				tipo = 14l;
-			}else if (sTipo.compare("golden_time") == 0) {
+			}
+			else if (sTipo.compare("golden_time") == 0) {
 				tipo = 15l;
-			}else if (sTipo.compare("login_reward") == 0) {
+			}
+			else if (sTipo.compare("login_reward") == 0) {
 				tipo = 16l;
-			}else if (sTipo.compare("bot_gm_event") == 0) {
+			}
+			else if (sTipo.compare("bot_gm_event") == 0) {
 				tipo = 17l;
-			}else if (sTipo.compare("smart_calc") == 0) {
+			}
+			else if (sTipo.compare("smart_calc") == 0) {
 				tipo = 18l;
 			}
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Command: \"reload_system " + sTipo + "\"", CL_ONLY_CONSOLE));
 
 		// Digitou um tipo conhecido
@@ -4674,8 +4782,9 @@ bool game_server::checkCommand(std::stringstream& _command) {
 			reloadGlobalSystem((uint32_t)tipo);
 		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Command: \"reload_system " + sTipo + "\"", CL_ONLY_CONSOLE));
-	
-	}else if (!s.empty() && s.compare("smart_calc") == 0) {
+
+	}
+	else if (!s.empty() && s.compare("smart_calc") == 0) {
 
 		std::string sTipo = "";
 
@@ -4694,7 +4803,8 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 					sSmartCalculator::getInstance().close(); // Fecha
 
-				}else if (sTipo.compare("start") == 0)
+				}
+				else if (sTipo.compare("start") == 0)
 					sSmartCalculator::getInstance().load(); // Inicia(Load)
 				else if (sTipo.compare("chat_discord") == 0) {
 
@@ -4702,22 +4812,27 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 					// Log
 					_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Log] Chat Discord Flag agora esta " + std::string(m_chat_discord ? "Ativado" : "Desativado"), CL_ONLY_CONSOLE));
-				
-				}else
+
+				}
+				else
 					_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Command: \"smart_calc " + sTipo + "\"", CL_ONLY_CONSOLE));
-			
-			}else
+
+			}
+			else
 				_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Smart Calculator not active, exec Command Event smart_calc to active it.", CL_ONLY_CONSOLE));
 
-		}else
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Error] Unknown Command: \"smart_calc " + sTipo + "\"", CL_ONLY_CONSOLE));
 
-	}else if (!s.empty() && s.compare("snapshot") == 0) {
+	}
+	else if (!s.empty() && s.compare("snapshot") == 0) {
 
 		try {
-			int *bad_ptr_snapshot = nullptr;
+			int* bad_ptr_snapshot = nullptr;
 			*bad_ptr_snapshot = 2;
-		}catch (exception& e) {
+		}
+		catch (exception& e) {
 			UNREFERENCED_PARAMETER(e);
 
 			// Log
@@ -4727,7 +4842,7 @@ bool game_server::checkCommand(std::stringstream& _command) {
 	}
 #ifdef _DEBUG
 	else if (!s.empty() && s.compare("broadcast_tst") == 0) {
-		
+
 		// Lambda[getItemName]
 		auto getItemName = [](uint32_t _typeid) -> std::string {
 
@@ -4739,7 +4854,7 @@ bool game_server::checkCommand(std::stringstream& _command) {
 				ret = std::string(base->name);
 
 			return ret;
-		};
+			};
 
 		constexpr char MESSAGE_BOT_GM_EVENT_START_PART1[] = "Bot GM Event comecou, o jogo comeca em ";
 		constexpr char MESSAGE_BOT_GM_EVENT_START_PART2[] = " minutos. Os premios sao ";
@@ -4765,24 +4880,24 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Log] Bot GM Event Broadcast teste, criando a sala agora, o jogo comeca em "
-				+ std::to_string(duration_event_interval) + " minutos. Reward(" + std::to_string(reward.size()) + ")" + reward_str, CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(duration_event_interval) + " minutos. Reward(" + std::to_string(reward.size()) + ")" + reward_str, CL_FILE_LOG_AND_CONSOLE));
 
 		std::string msg = MESSAGE_BOT_GM_EVENT_START_PART1
 			+ std::to_string(duration_event_interval)
 			+ MESSAGE_BOT_GM_EVENT_START_PART2
 			+ [&getItemName](std::vector< stReward >& _el) {
 
-				std::string ret = "";
+			std::string ret = "";
 
-				for (auto it_r = _el.begin(); it_r != _el.end(); ++it_r) {
+			for (auto it_r = _el.begin(); it_r != _el.end(); ++it_r) {
 
-					if (it_r != _el.begin())
-						ret += ", ";
+				if (it_r != _el.begin())
+					ret += ", ";
 
-					ret += getItemName(it_r->_typeid) + "(" + (it_r->qntd_time > 0 ? std::to_string(it_r->qntd_time) + "day" : std::to_string(it_r->qntd)) + ")";
-				}
+				ret += getItemName(it_r->_typeid) + "(" + (it_r->qntd_time > 0 ? std::to_string(it_r->qntd_time) + "day" : std::to_string(it_r->qntd)) + ")";
+			}
 
-				return ret;
+			return ret;
 			}(reward);
 
 		packet p((unsigned short)0x1D3);
@@ -4796,7 +4911,7 @@ bool game_server::checkCommand(std::stringstream& _command) {
 			packet_func::channel_broadcast(*el, p, 1);
 	}
 	else if (!s.empty() && s.compare("scratch") == 0) {
-		
+
 		// !@ Teste
 		packet p((unsigned short)0x1EB);
 
@@ -4831,22 +4946,22 @@ bool game_server::checkCommand(std::stringstream& _command) {
 
 		//for (opt_broadcast = 0u; opt_broadcast < 0x16u; ++opt_broadcast) {
 
-			p.init_plain((unsigned short)0x1D3);
+		p.init_plain((unsigned short)0x1D3);
 
-			p.addUint32(count); // Count
+		p.addUint32(count); // Count
 
-			for (auto i = 0u; i < count; ++i) {
+		for (auto i = 0u; i < count; ++i) {
 
-				p.addUint32(opt_broadcast); // Option, 15 Running Time, ou exibir a msg
-				p.addString("<PARAMS><RunningTime>10</RunningTime><TYPEID>469762063</TYPEID><BOX_TYPEID>436207963</BOX_TYPEID><QTY>7</QTY><NICKNAME>Saitama(rock)</NICKNAME><NICKNAME>Genos(idea)</NICKNAME><EVENTSTARTTIME>2017-07-29 17:50:31.447</EVENTSTARTTIME><EVENTNEXTTIME>2017-07-29 19:50:31.447</EVENTNEXTTIME><WinnerEventNotice>Parabens</WinnerEventNotice><BroadCastReservedNoticesIdx>531</BroadCastReservedNoticesIdx></PARAMS>");
-			}
+			p.addUint32(opt_broadcast); // Option, 15 Running Time, ou exibir a msg
+			p.addString("<PARAMS><RunningTime>10</RunningTime><TYPEID>469762063</TYPEID><BOX_TYPEID>436207963</BOX_TYPEID><QTY>7</QTY><NICKNAME>Saitama(rock)</NICKNAME><NICKNAME>Genos(idea)</NICKNAME><EVENTSTARTTIME>2017-07-29 17:50:31.447</EVENTSTARTTIME><EVENTNEXTTIME>2017-07-29 19:50:31.447</EVENTNEXTTIME><WinnerEventNotice>Parabens</WinnerEventNotice><BroadCastReservedNoticesIdx>531</BroadCastReservedNoticesIdx></PARAMS>");
+		}
 
-			for (auto& el : v_channel)
-				packet_func::channel_broadcast(*el, p, 1);
+		for (auto& el : v_channel)
+			packet_func::channel_broadcast(*el, p, 1);
 
-			_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Log] Broadcast Msg ID=" + std::to_string(opt_broadcast), CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::checkCommand][Log] Broadcast Msg ID=" + std::to_string(opt_broadcast), CL_FILE_LOG_AND_CONSOLE));
 		//}
-		
+
 	}
 #endif // _DEBUG
 	else
@@ -4856,13 +4971,13 @@ bool game_server::checkCommand(std::stringstream& _command) {
 };
 
 bool game_server::checkPacket(session& _session, packet* _packet) {
-	
+
 	///--------------- INICIO CHECK PACKET SESSION
 	// a função Check Packet da estrutura já valida e atualiza os dados, dos pacotes salvo na memória rotativa 
 	if (/*(std::clock() - _session.m_check_packet.tick) <= CHK_PCKT_INTERVAL_LIMIT /* Dentro do Interval */
 		/*&& _session.m_check_packet.packet_id == _packet->getTipo() /* Mesmo pacote */
 		_session.m_check_packet.checkPacketId(_packet->getTipo())) {
-		
+
 		uint32_t limit_count = CHK_PCKT_COUNT_LIMIT;	// Padrão
 
 		// Game Server Vou deixar em 10x, por que é mais dificil atacar ele
@@ -4928,8 +5043,8 @@ bool game_server::checkPacket(session& _session, packet* _packet) {
 
 			_session.m_check_packet.clearLast();
 
-			_smp::message_pool::getInstance().push(new message("[WARNING] Player[UID=" + std::to_string(((player*)&_session)->m_pi.uid) + "] Tentativa de DDoS ataque com pacote ID: (0x" 
-					+ hex_util::lltoaToHex(_packet->getTipo()) + ") " + std::to_string(_packet->getTipo()) + ". IP=" + std::string(_session.m_ip), CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[WARNING] Player[UID=" + std::to_string(((player*)&_session)->m_pi.uid) + "] Tentativa de DDoS ataque com pacote ID: (0x"
+				+ hex_util::lltoaToHex(_packet->getTipo()) + ") " + std::to_string(_packet->getTipo()) + ". IP=" + std::string(_session.m_ip), CL_FILE_LOG_AND_CONSOLE));
 
 			DisconnectSession(&_session);
 
@@ -4938,13 +5053,13 @@ bool game_server::checkPacket(session& _session, packet* _packet) {
 	}/*else // Zera o contador, não entrou no intervalo ou não é o mesmo pacote
 		_session.m_check_packet.count = 0;*/
 
-	// Att packet ID
-	//_session.m_check_packet.packet_id = _packet->getTipo();
+		// Att packet ID
+		//_session.m_check_packet.packet_id = _packet->getTipo();
 
-	// Att tick
-	//_session.m_check_packet.tick = std::clock();
+		// Att tick
+		//_session.m_check_packet.tick = std::clock();
 
-	///--------------- FIM CHECK PACKET SESSION
+		///--------------- FIM CHECK PACKET SESSION
 
 	return true;
 };
@@ -4959,8 +5074,9 @@ void game_server::config_init() {
 	try {
 
 		m_si.flag.ullFlag = m_reader_ini.readBigInt("SERVERINFO", "FLAG");
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::config_init][ErrorSystem] SERVERINFO->FLAG" + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -4970,7 +5086,8 @@ void game_server::config_init() {
 
 		m_GameGuardAuth = (m_reader_ini.readInt("SERVERINFO", "GAMEGUARDAUTH") >= 1 ? true : false);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::config_init][ErrorSystem] SERVERINFO->GAMEGUARDAUTH. " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -4987,9 +5104,9 @@ void game_server::config_init() {
 		if (cmd_rci.getException().getCodeError() != 0)
 			_smp::message_pool::getInstance().push(new message("[game_server::config_init][ErrorSystem] " + cmd_rci.getException().getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
-		_smp::message_pool::getInstance().push(new message("[game_server::config_init][Error] nao conseguiu recuperar os valores de rate do server[UID=" 
-				+ std::to_string(m_si.uid) + "] no banco de dados. Utilizando valores padroes de rates.", CL_FILE_LOG_AND_CONSOLE));
-		
+		_smp::message_pool::getInstance().push(new message("[game_server::config_init][Error] nao conseguiu recuperar os valores de rate do server[UID="
+			+ std::to_string(m_si.uid) + "] no banco de dados. Utilizando valores padroes de rates.", CL_FILE_LOG_AND_CONSOLE));
+
 		m_si.rate.scratchy = 100;
 		m_si.rate.papel_shop_rare_item = 100;
 		m_si.rate.papel_shop_cookie_item = 100;
@@ -5002,7 +5119,7 @@ void game_server::config_init() {
 		m_si.rate.login_reward_event = 1u;		// Ativo por padrão
 		m_si.rate.bot_gm_event = 1u;			// Ativo por padrão
 		m_si.rate.smart_calculator = 1u;		// Atibo por padrão
-		
+
 		setAngelEvent(0u);						// Desativado por padrão
 		setRatePang(100u);
 		setRateExp(100u);
@@ -5010,8 +5127,9 @@ void game_server::config_init() {
 
 		// Atualiza no banco de dados
 		snmdb::NormalManagerDB::getInstance().add(8, new CmdUpdateRateConfigInfo(m_si.uid, m_si.rate), game_server::SQLDBResponse, this);
-	
-	}else {	// Conseguiu recuperar com sucesso os valores do server
+
+	}
+	else {	// Conseguiu recuperar com sucesso os valores do server
 
 		m_si.rate.scratchy = cmd_rci.getInfo().scratchy;
 		m_si.rate.papel_shop_rare_item = cmd_rci.getInfo().papel_shop_rare_item;
@@ -5284,7 +5402,8 @@ void game_server::reloadGlobalSystem(uint32_t _tipo) {
 		// Log
 		_smp::message_pool::getInstance().push(new message("[game_server::reloadGlobalSystem][Log] Recarregou o Sistema[Tipo=" + std::to_string(_tipo) + "] com sucesso!", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::reloadGlobalSystem][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -5294,11 +5413,11 @@ void game_server::updateRateAndEvent(uint32_t _tipo, uint32_t _qntd) {
 
 	try {
 
-		if (_qntd == 0u && _tipo != 9/*Grand Zodiac Event Time*/ && _tipo != 10/*Angel Event*/ 
+		if (_qntd == 0u && _tipo != 9/*Grand Zodiac Event Time*/ && _tipo != 10/*Angel Event*/
 			&& _tipo != 11/*Grand Prix Event*/ && _tipo != 12/*Golden Time Event*/ && _tipo != 13/*Login Reward Event*/
 			&& _tipo != 14/*Bot GM Event*/ && _tipo != 15/*Smart Calculator*/)
 			throw exception("[game_server::updateRateAndEvent][Error] Rate[TIPO=" + std::to_string(_tipo) + ", QNTD="
-					+ std::to_string(_qntd) + "], qntd is invalid(zero).", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 120, 0));
+				+ std::to_string(_qntd) + "], qntd is invalid(zero).", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 120, 0));
 
 		switch (_tipo) {
 		case 0: // Pang
@@ -5347,7 +5466,7 @@ void game_server::updateRateAndEvent(uint32_t _tipo, uint32_t _qntd) {
 		case 12: // Golden Time Event
 		{
 			m_si.rate.golden_time_event = (short)_qntd;
-			
+
 			// Recarrega o Golden Time Event se ele foi ativado
 			if (m_si.rate.golden_time_event)
 				reloadGlobalSystem(15/*Golden Time Event*/);
@@ -5371,7 +5490,7 @@ void game_server::updateRateAndEvent(uint32_t _tipo, uint32_t _qntd) {
 			// Recarrega o Bot GM Event se ele foi ativado
 			if (m_si.rate.bot_gm_event)
 				reloadGlobalSystem(17/*Bot GM Event*/);
-			
+
 			break;
 		}
 		case 15: // Smart Calculator
@@ -5386,7 +5505,7 @@ void game_server::updateRateAndEvent(uint32_t _tipo, uint32_t _qntd) {
 		}
 		default:
 			throw exception("[game_server::updateRateAndEvent][Error] troca Rate[TIPO=" + std::to_string(_tipo) + ", QNTD="
-					+ std::to_string(_qntd) + "], tipo desconhecido.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 120, 0));
+				+ std::to_string(_qntd) + "], tipo desconhecido.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 120, 0));
 		}
 
 		// Update no DB os server do server que foram alterados
@@ -5394,7 +5513,7 @@ void game_server::updateRateAndEvent(uint32_t _tipo, uint32_t _qntd) {
 
 		// Log
 		_smp::message_pool::getInstance().push(new message("[game_server::updateRateAndEvent][Log] New Rate[Tipo=" + std::to_string(_tipo) + ", QNTD="
-				+ std::to_string(_qntd) + "] com sucesso!", CL_FILE_LOG_AND_CONSOLE));
+			+ std::to_string(_qntd) + "] com sucesso!", CL_FILE_LOG_AND_CONSOLE));
 
 		// UPDATE ON GAME
 		packet p((unsigned short)0xF9);
@@ -5403,8 +5522,9 @@ void game_server::updateRateAndEvent(uint32_t _tipo, uint32_t _qntd) {
 
 		for (auto& el : v_channel)
 			packet_func::channel_broadcast(*el, p, 1);
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::updateRateAndEvent][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -5418,7 +5538,7 @@ void game_server::shutdown_time(int32_t _time_sec) {
 
 		// Se for correção de intervalo não notifica o cliente
 		bool fixing_interval = false;
-		
+
 		uint32_t wait = 0u;
 		int32_t rest = 0;
 
@@ -5439,8 +5559,9 @@ void game_server::shutdown_time(int32_t _time_sec) {
 				interval = 60000 * 30; // 30 minutos em milisegundos
 
 				wait = interval * (int)diff;	// 30 * diff minutos em milisegundos
-			
-			}else {
+
+			}
+			else {
 
 				// Correção do intervalo
 				wait = interval = (_time_sec % 1800) * 1000;
@@ -5451,16 +5572,18 @@ void game_server::shutdown_time(int32_t _time_sec) {
 
 			type = 0u; // minuto
 
-		}else if ((diff = ((_time_sec - 60/*1 minuto*/) / 600.f/*10 Minutos em segundos*/)) >= 1.f) {	// Intervalo de 10 min
+		}
+		else if ((diff = ((_time_sec - 60/*1 minuto*/) / 600.f/*10 Minutos em segundos*/)) >= 1.f) {	// Intervalo de 10 min
 
 			if ((_time_sec % 600) == 0) {
-				
+
 				// Intervalo
 				interval = 60000 * 10;	// 10 minutos em milisegundos
 
 				wait = interval * (int)diff;	// 10 * diff minutos em milisegundos
-			
-			}else {
+
+			}
+			else {
 
 				// Correção do intervalo
 				wait = interval = (_time_sec % 600) * 1000;
@@ -5471,17 +5594,19 @@ void game_server::shutdown_time(int32_t _time_sec) {
 
 			type = 0u;	// minuto
 
-		}else if ((diff = ((_time_sec - 10/*10 segundos*/) / 60.f/*1 Minuto em segundos*/)) >= 1.f) {	// Intervalo de 1 min
+		}
+		else if ((diff = ((_time_sec - 10/*10 segundos*/) / 60.f/*1 Minuto em segundos*/)) >= 1.f) {	// Intervalo de 1 min
 
-			
+
 			if ((_time_sec % 60) == 0) {
-				
+
 				// Intervalo
 				interval = 60 * 1000;	// 1 minuto
 
 				wait = interval * (int)diff;	// 1 * diff minutos em milisegundos
-			
-			}else {
+
+			}
+			else {
 
 				// Correção do intervalo
 				wait = interval = (_time_sec % 60) * 1000;
@@ -5492,16 +5617,18 @@ void game_server::shutdown_time(int32_t _time_sec) {
 
 			type = 0u;	// minuto
 
-		}else if ((diff = ((_time_sec - 1/*1 segundo*/) / 10.f/*10 segundos*/)) >= 1.f) {			// Intervalo de 10 segundos
-			
+		}
+		else if ((diff = ((_time_sec - 1/*1 segundo*/) / 10.f/*10 segundos*/)) >= 1.f) {			// Intervalo de 10 segundos
+
 			if ((_time_sec % 10) == 0) {
-			
+
 				// Intervalo
 				interval = 10 * 1000;	// 10 segundos
 
 				wait = interval * (int)diff;	// 10 * diff segundos em milisegundos
-			
-			}else {
+
+			}
+			else {
 
 				// Correção do intervalo
 				wait = interval = (_time_sec % 10) * 1000;
@@ -5510,13 +5637,14 @@ void game_server::shutdown_time(int32_t _time_sec) {
 
 			}
 
-		}else {		// Intervalo de 1 segundo
+		}
+		else {		// Intervalo de 1 segundo
 
 			diff = std::round(_time_sec / 1.f);
 
 			// Intervalo
 			interval = 1000;	// 1 segundo
-			
+
 			wait = interval * (int)diff;	// 1 * diff segundos em milesegundos
 
 		}
@@ -5536,8 +5664,8 @@ void game_server::shutdown_time(int32_t _time_sec) {
 		}
 
 		// Make Timer
-		if (m_shutdown == nullptr || m_shutdown->getState() == timer::STOP || 
-				m_shutdown->getState() == timer::STOPPING || m_shutdown->getState() == timer::STOPPED) {
+		if (m_shutdown == nullptr || m_shutdown->getState() == timer::STOP ||
+			m_shutdown->getState() == timer::STOPPING || m_shutdown->getState() == timer::STOPPED) {
 
 			// Make Time
 			job _job(server::end_time_shutdown, this, (void*)(size_t)_time_sec);
@@ -5603,14 +5731,17 @@ void* game_server::check_player() {
 #endif
 
 			throw exception("[game_server::check_player][Error] Erro ao esperar por um evento com WaitForSingleObject. Bug",
-					STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1000, last_error));
+				STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 1000, last_error));
 		}
-	
-	}catch (exception& e) {
+
+		}
+	catch (exception& e) {
 		_smp::message_pool::getInstance().push(new message("[game_server::check_player][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
-	}catch (std::exception& e) {
+	}
+	catch (std::exception& e) {
 		_smp::message_pool::getInstance().push(new message(std::string("[game_server::check_player][ErrorSystem] ") + e.what(), CL_FILE_LOG_AND_CONSOLE));
-	}catch (...) {
+	}
+	catch (...) {
 		std::cout << "[game_server::check_player][ErrorSystem] check_player() -> Exception (...) c++ nao tratada ou uma excessao de C(nullptr e etc)\n";
 	}
 
@@ -5621,7 +5752,7 @@ void* game_server::check_player() {
 #elif defined(__linux__)
 	return (void*)0u;
 #endif
-};
+	};
 
 void game_server::makeGrandZodiacEventRoom() {
 
@@ -5644,14 +5775,14 @@ void game_server::makeGrandZodiacEventRoom() {
 
 			// Arredonda para o próximo multiplo de 10, se a diferença for de 1min
 			auto resto = duration_event_interval % 10;
-			
+
 			// Até 1 minuto ele arredonda ele para um multiplo de 10
 			if (resto == 9)
 				duration_event_interval++;
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::makeGrandZodiacEventRom][Log] Grand Zodiac Event comecou, vai ficar ativo por " 
-					+ std::to_string(duration_event_interval) + "min.", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::makeGrandZodiacEventRom][Log] Grand Zodiac Event comecou, vai ficar ativo por "
+				+ std::to_string(duration_event_interval) + "min.", CL_FILE_LOG_AND_CONSOLE));
 
 			std::string msg = MESSAGE_ZODIAC_EVENT_START_PART1 + std::to_string(duration_event_interval) + MESSAGE_ZODIAC_EVENT_START_PART2;
 
@@ -5675,11 +5806,13 @@ void game_server::makeGrandZodiacEventRoom() {
 			for (auto& el : v_channel)
 				// Verifica se já tem room, criada no canal se não cria
 				el->makeGrandZodiacEventRoom(*rt);
-		
-		}else
+
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::makeGrandZodiacEventRoom][WARNING] Entrou no makeGrandZodiacEventRoom, mas nao tem nenhum range_time(interval) que o Grand Zodiac Event esta ativado.", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::makeGrandZodiacEventRoom][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -5688,7 +5821,7 @@ void game_server::makeGrandZodiacEventRoom() {
 void game_server::makeListOfPlayersToGoldenTime() {
 
 	try {
-		
+
 		// (Primeira mensagem) - Mensagem que o round do Golden Time começou
 		// ou Mensagem que o round do Golden Time vai ser calculado nesse momento
 
@@ -5719,15 +5852,16 @@ void game_server::makeListOfPlayersToGoldenTime() {
 			p.addUint32(1); // Count
 
 			p.addUint32(eBROADCAST_TYPES::BT_GOLDEN_TIME_START_OF_DAY);
-			p.addString("<PARAMS><EVENTSTARTTIME>" + _formatDate(current_round->time) + "</EVENTSTARTTIME><TYPEID>" + std::to_string(current_round->item._typeid) 
-				+ "</TYPEID><QTY>" + std::to_string(current_round->item.qntd_time > 0 ? current_round->item.qntd_time : current_round->item.qntd) 
+			p.addString("<PARAMS><EVENTSTARTTIME>" + _formatDate(current_round->time) + "</EVENTSTARTTIME><TYPEID>" + std::to_string(current_round->item._typeid)
+				+ "</TYPEID><QTY>" + std::to_string(current_round->item.qntd_time > 0 ? current_round->item.qntd_time : current_round->item.qntd)
 				+ "</QTY></PARAMS>");
 
 			for (auto& el : v_channel)
 				packet_func::channel_broadcast(*el, p, 1);
 
 			return; // Sai, essa msg é enviada assim que muda de dia
-		}else {
+		}
+		else {
 
 			// Send msg
 			packet p((unsigned short)0x1D3);
@@ -5758,9 +5892,9 @@ void game_server::makeListOfPlayersToGoldenTime() {
 		if (players.empty()) {
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::makeListOfPlayersToGoldenTime][Log] Nenhum player ganhou no Golden Time Event. Round(" 
-					+ _formatDate(current_round->time) + ")", CL_FILE_LOG_AND_CONSOLE));
-			
+			_smp::message_pool::getInstance().push(new message("[game_server::makeListOfPlayersToGoldenTime][Log] Nenhum player ganhou no Golden Time Event. Round("
+				+ _formatDate(current_round->time) + ")", CL_FILE_LOG_AND_CONSOLE));
+
 			// Nenhum player ganhou esse Golden Time
 			packet p((unsigned short)0x1D3);
 
@@ -5771,8 +5905,9 @@ void game_server::makeListOfPlayersToGoldenTime() {
 
 			for (auto& el : v_channel)
 				packet_func::channel_broadcast(*el, p, 1);
-			
-		}else {
+
+		}
+		else {
 
 			// Lambda[print XML all Player Nickname]
 			auto printXMLAllPlayerNickname = [this](std::vector< stPlayerReward >& _winners) -> std::string {
@@ -5788,7 +5923,7 @@ void game_server::makeListOfPlayersToGoldenTime() {
 				}
 
 				return ret;
-			};
+				};
 
 			// Lambda[print all Player UID]
 			auto printAllPlayerUID = [](std::vector< stPlayerReward >& _winners) -> std::string {
@@ -5798,7 +5933,7 @@ void game_server::makeListOfPlayersToGoldenTime() {
 				bool not_first = false;
 
 				for (auto& el : _winners) {
-					
+
 					ret += (not_first ? ", " : "") + std::to_string(el.uid);
 
 					if (!not_first)
@@ -5806,11 +5941,11 @@ void game_server::makeListOfPlayersToGoldenTime() {
 				}
 
 				return ret;
-			};
+				};
 
 			// Mensagem que o round do Golden Time está bombando, tem mais da metada da capacidade de players do servidor participando do Evento
 			if (players.size() > (uint32_t)m_si.max_user) {
-				
+
 				// Send msg
 				packet p((unsigned short)0x1D3);
 
@@ -5827,9 +5962,9 @@ void game_server::makeListOfPlayersToGoldenTime() {
 			auto reward = sGoldenTimeSystem::getInstance().calculeRoundReward(players);
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::makeListOfPlayersToGoldenTime][Log] Winners Of Round[" + _formatDate(current_round->time) 
-					+ "] ITEM[TYPEID=" + std::to_string(current_round->item._typeid) + ", QNTD=" + std::to_string(current_round->item.qntd) 
-					+ ", QNTD_TIME=" + std::to_string(current_round->item.qntd_time) + "] Player(s)[" + printAllPlayerUID(reward.players) + "]", CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::makeListOfPlayersToGoldenTime][Log] Winners Of Round[" + _formatDate(current_round->time)
+				+ "] ITEM[TYPEID=" + std::to_string(current_round->item._typeid) + ", QNTD=" + std::to_string(current_round->item.qntd)
+				+ ", QNTD_TIME=" + std::to_string(current_round->item.qntd_time) + "] Player(s)[" + printAllPlayerUID(reward.players) + "]", CL_FILE_LOG_AND_CONSOLE));
 
 			// Send Msg que o(s) players(s) ganharam, e coloca os itens no mail dele(s)
 			packet p((unsigned short)0x1D3);
@@ -5837,9 +5972,9 @@ void game_server::makeListOfPlayersToGoldenTime() {
 			p.addUint32(1); // Count
 
 			p.addUint32(eBROADCAST_TYPES::BT_GOLDEN_TIME_ROUND_REWARD_PLAYER);
-			p.addString("<PARAMS><EVENTSTARTTIME>" + _formatDate(current_round->time) + "</EVENTSTARTTIME><TYPEID>" + std::to_string(current_round->item._typeid) 
-					+ "</TYPEID><QTY>" + std::to_string(current_round->item.qntd_time > 0 ? current_round->item.qntd_time : current_round->item.qntd) 
-					+ "</QTY>" + printXMLAllPlayerNickname(reward.players) + "</PARAMS>");
+			p.addString("<PARAMS><EVENTSTARTTIME>" + _formatDate(current_round->time) + "</EVENTSTARTTIME><TYPEID>" + std::to_string(current_round->item._typeid)
+				+ "</TYPEID><QTY>" + std::to_string(current_round->item.qntd_time > 0 ? current_round->item.qntd_time : current_round->item.qntd)
+				+ "</QTY>" + printXMLAllPlayerNickname(reward.players) + "</PARAMS>");
 
 			for (auto& el : v_channel)
 				packet_func::channel_broadcast(*el, p, 1);
@@ -5873,7 +6008,8 @@ void game_server::makeListOfPlayersToGoldenTime() {
 			for (auto& el : v_channel)
 				packet_func::channel_broadcast(*el, p, 1);
 
-		}else if (isSameDay(next_round->time, current)) {
+		}
+		else if (isSameDay(next_round->time, current)) {
 
 			// Ainda é o Mesmo Golden Time Event (mesmo dia), round diferente
 			// Envia msg que acabou esse round e passa o horário e o item(Reward) do próximo
@@ -5882,15 +6018,16 @@ void game_server::makeListOfPlayersToGoldenTime() {
 			p.addUint32(1); // Count
 
 			p.addUint32(eBROADCAST_TYPES::BT_GOLDEN_TIME_FINISH_ROUND);
-			p.addString("<PARAMS><EVENTSTARTTIME>" + _formatDate(copy_round.time) + "</EVENTSTARTTIME><EVENTNEXTTIME>" 
-					+ _formatDate(next_round->time) + "</EVENTNEXTTIME><TYPEID>" + std::to_string(next_round->item._typeid) 
-					+ "</TYPEID><QTY>" + std::to_string(next_round->item.qntd_time > 0 ? next_round->item.qntd_time : next_round->item.qntd) 
-					+ "</QTY></PARAMS>");
+			p.addString("<PARAMS><EVENTSTARTTIME>" + _formatDate(copy_round.time) + "</EVENTSTARTTIME><EVENTNEXTTIME>"
+				+ _formatDate(next_round->time) + "</EVENTNEXTTIME><TYPEID>" + std::to_string(next_round->item._typeid)
+				+ "</TYPEID><QTY>" + std::to_string(next_round->item.qntd_time > 0 ? next_round->item.qntd_time : next_round->item.qntd)
+				+ "</QTY></PARAMS>");
 
 			for (auto& el : v_channel)
 				packet_func::channel_broadcast(*el, p, 1);
-		
-		}else {
+
+		}
+		else {
 
 			// Outro dia é outro Golden Time Event
 			// Envia msg que acabou o Golden Time Event de hoje e passa a data do próximo Golden Time Event (agendado)
@@ -5906,7 +6043,8 @@ void game_server::makeListOfPlayersToGoldenTime() {
 				packet_func::channel_broadcast(*el, p, 1);
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::makeListOfPlayersToGoldenTime][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
@@ -5925,7 +6063,7 @@ void game_server::makeBotGMEventRoom() {
 			ret = std::string(base->name);
 
 		return ret;
-	};
+		};
 
 	try {
 
@@ -5965,27 +6103,27 @@ void game_server::makeBotGMEventRoom() {
 			reward_str += "}";
 
 			// Log
-			_smp::message_pool::getInstance().push(new message("[game_server::makeBotGMEventRoom][Log] Bot GM Event comecou, criando a sala no canal[ID=" 
-					+ std::to_string((unsigned short)rt->m_channel_id) + "], o jogo comeca em " + std::to_string(duration_event_interval) 
-					+ " minutos. Reward(" + std::to_string(reward.size()) + ")" + reward_str, CL_FILE_LOG_AND_CONSOLE));
+			_smp::message_pool::getInstance().push(new message("[game_server::makeBotGMEventRoom][Log] Bot GM Event comecou, criando a sala no canal[ID="
+				+ std::to_string((unsigned short)rt->m_channel_id) + "], o jogo comeca em " + std::to_string(duration_event_interval)
+				+ " minutos. Reward(" + std::to_string(reward.size()) + ")" + reward_str, CL_FILE_LOG_AND_CONSOLE));
 
-			std::string msg = MESSAGE_BOT_GM_EVENT_START_PART1 
+			std::string msg = MESSAGE_BOT_GM_EVENT_START_PART1
 				+ [this, rt]() -> std::string {
 
-					std::string ret = "Canal (Livre 1)";
+				std::string ret = "Canal (Livre 1)";
 
-					auto c = findChannel(rt->m_channel_id);
+				auto c = findChannel(rt->m_channel_id);
 
-					if (c != nullptr)
-						ret = c->getInfo()->name;
+				if (c != nullptr)
+					ret = c->getInfo()->name;
 
-					return ret;
+				return ret;
 				}()
-				+ MESSAGE_BOT_GM_EVENT_START_PART2 
-				+ std::to_string(duration_event_interval)
-				+ MESSAGE_BOT_GM_EVENT_START_PART3
-				+ [&getItemName](std::vector< stReward >& _el) {
-					
+					+ MESSAGE_BOT_GM_EVENT_START_PART2
+					+ std::to_string(duration_event_interval)
+					+ MESSAGE_BOT_GM_EVENT_START_PART3
+					+ [&getItemName](std::vector< stReward >& _el) {
+
 					std::string ret = "";
 
 					for (auto it_r = _el.begin(); it_r != _el.end(); ++it_r) {
@@ -5997,20 +6135,20 @@ void game_server::makeBotGMEventRoom() {
 					}
 
 					return ret;
-				}(reward);
+					}(reward);
 
-			packet p((unsigned short)0x1D3);
+				packet p((unsigned short)0x1D3);
 
-			p.addUint32(2u); // Count
+				p.addUint32(2u); // Count
 
-			for (auto i = 0u; i < 2u; ++i) {
+				for (auto i = 0u; i < 2u; ++i) {
 
-				p.addUint32(eBROADCAST_TYPES::BT_MESSAGE_PLAIN);	// (Type MESSAGE PLAIN) Vou usar com o Bot GM Event
-				p.addString(msg);
-			}
+					p.addUint32(eBROADCAST_TYPES::BT_MESSAGE_PLAIN);	// (Type MESSAGE PLAIN) Vou usar com o Bot GM Event
+					p.addString(msg);
+				}
 
-			for (auto& el : v_channel)
-				packet_func::channel_broadcast(*el, p, 1);
+				for (auto& el : v_channel)
+					packet_func::channel_broadcast(*el, p, 1);
 		}
 
 		if (rt != nullptr) {
@@ -6021,17 +6159,19 @@ void game_server::makeBotGMEventRoom() {
 			if (c != nullptr)
 				// Verifica se já tem room, criada no canal se não cria
 				c->makeBotGMEventRoom(*rt, reward);
-		
-		}else
+
+		}
+		else
 			_smp::message_pool::getInstance().push(new message("[game_server::makeBotGMEventRoom][WARNING] Entrou no makeBotGMEventRoom, mas nao tem nenhum stRangeTime(interval) que o Bot GM Event esta ativado.", CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::makeBotGMEventRoom][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-bool game_server::checkSmartCalculatorCmd(player& _session, std::string& _msg, eTYPE_CALCULATOR_CMD _type) {
+bool game_server::checkSmartCalculatorCmd(player & _session, std::string & _msg, eTYPE_CALCULATOR_CMD _type) {
 	CHECK_SESSION_BEGIN("checkSmartCalculatorCmd");
 
 	bool ret = false;
@@ -6041,20 +6181,20 @@ bool game_server::checkSmartCalculatorCmd(player& _session, std::string& _msg, e
 		// Verifica se o Smart Calculator System está ativo
 		if (!m_si.rate.smart_calculator)
 			throw exception("[game_server::checkSmartCalculatorCmd][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] Smart Calculator esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 100002, 0));
+				+ "] Smart Calculator esta desativado.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 100002, 0));
 
 		// Verifica a permisão para usar o Smart Calculator
-		if (!_session.m_pi.m_cap.stBit.game_master && !_session.m_pi.m_cap.stBit.gm_normal 
-				&& (!_session.m_pi.m_cap.stBit.premium_user || (_type == eTYPE_CALCULATOR_CMD::SMART_CALCULATOR && !sPremiumSystem::getInstance().isPremium2(_session.m_pi.pt._typeid))
-					|| (_type == eTYPE_CALCULATOR_CMD::CALCULATOR_STADIUM && !sPremiumSystem::getInstance().isPremiumTicket(_session.m_pi.pt._typeid))))
+		if (!_session.m_pi.m_cap.stBit.game_master && !_session.m_pi.m_cap.stBit.gm_normal
+			&& (!_session.m_pi.m_cap.stBit.premium_user || (_type == eTYPE_CALCULATOR_CMD::SMART_CALCULATOR && !sPremiumSystem::getInstance().isPremium2(_session.m_pi.pt._typeid))
+				|| (_type == eTYPE_CALCULATOR_CMD::CALCULATOR_STADIUM && !sPremiumSystem::getInstance().isPremiumTicket(_session.m_pi.pt._typeid))))
 			throw exception("[game_server::checkSmartCalculatorCmd][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
-					+ "] nao tem permissao para executar esse comando.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10000, 0));
+				+ "] nao tem permissao para executar esse comando.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10000, 0));
 
 		auto c = findChannel(_session.m_pi.channel);
 
 		if (c == nullptr)
-			throw exception("[game_server::checkSmartCalculatorCmd][Error] Player[UID=" + std::to_string(_session.m_pi.uid) 
-					+ "] nao esta em nenhum canal.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10001, 0));
+			throw exception("[game_server::checkSmartCalculatorCmd][Error] Player[UID=" + std::to_string(_session.m_pi.uid)
+				+ "] nao esta em nenhum canal.", STDA_MAKE_ERROR(STDA_ERROR_TYPE::GAME_SERVER, 10001, 0));
 
 		ret = c->execSmartCalculatorCmd(_session, _msg, _type);
 
@@ -6073,11 +6213,12 @@ bool game_server::checkSmartCalculatorCmd(player& _session, std::string& _msg, e
 
 			// Log
 			_smp::message_pool::getInstance().push(new message("[game_server::checkSmartCalculatorCmd][Log] Player[UID="
-					+ std::to_string(_session.m_pi.uid) + "] mandou o comando(" + _msg + ") para o Smart Calculator.", CL_FILE_LOG_AND_CONSOLE));
+				+ std::to_string(_session.m_pi.uid) + "] mandou o comando(" + _msg + ") para o Smart Calculator.", CL_FILE_LOG_AND_CONSOLE));
 		}
 #endif // _DEBUG
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::checkSmartCalculatorCmd][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -6096,13 +6237,14 @@ void game_server::destroyRoom(unsigned char _channel_owner, short _number) {
 		if (c != nullptr)
 			c->destroyRoom(_number);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[game_server::destroyRoom][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 };
 
-void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _arg) {
+void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db & _pangya_db, void* _arg) {
 
 	if (_arg == nullptr) {
 		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Error] _arg is nullptr", CL_FILE_LOG_AND_CONSOLE));
@@ -6125,7 +6267,7 @@ void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 		// Atualiza daily quest
 		if (MgrDailyQuest::checkCurrentQuest(m_dqi)) {
 			MgrDailyQuest::updateDailyQuest(m_dqi);
-			
+
 			// Chama o outra de novo para pegar a date que foi atualizado
 			//cmd_dqi.exec();
 #if defined(_WIN32)
@@ -6151,27 +6293,27 @@ void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 	case 3:	// Atualiza Chat Macro User
 	{
 
-		auto cmd_ucmu = reinterpret_cast< CmdUpdateChatMacroUser* >(&_pangya_db);
+		auto cmd_ucmu = reinterpret_cast<CmdUpdateChatMacroUser*>(&_pangya_db);
 
 #ifdef _DEBUG
 		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] player[UID=" + std::to_string(cmd_ucmu->getUID()) + "] Atualizou Chat Macro[M1="
-				+ std::string(cmd_ucmu->getInfo().macro[0]) + ", M2=" + std::string(cmd_ucmu->getInfo().macro[1]) + ", M3=" + std::string(cmd_ucmu->getInfo().macro[2])
-				+ ", M4=" + std::string(cmd_ucmu->getInfo().macro[3]) + ", M5=" + std::string(cmd_ucmu->getInfo().macro[4]) + ", M6=" + std::string(cmd_ucmu->getInfo().macro[5])
-				+ ", M7=" + std::string(cmd_ucmu->getInfo().macro[6]) + ", M8=" + std::string(cmd_ucmu->getInfo().macro[7]) + ", M9=" + std::string(cmd_ucmu->getInfo().macro[8]) + "]", CL_FILE_LOG_AND_CONSOLE));
+			+ std::string(cmd_ucmu->getInfo().macro[0]) + ", M2=" + std::string(cmd_ucmu->getInfo().macro[1]) + ", M3=" + std::string(cmd_ucmu->getInfo().macro[2])
+			+ ", M4=" + std::string(cmd_ucmu->getInfo().macro[3]) + ", M5=" + std::string(cmd_ucmu->getInfo().macro[4]) + ", M6=" + std::string(cmd_ucmu->getInfo().macro[5])
+			+ ", M7=" + std::string(cmd_ucmu->getInfo().macro[6]) + ", M8=" + std::string(cmd_ucmu->getInfo().macro[7]) + ", M9=" + std::string(cmd_ucmu->getInfo().macro[8]) + "]", CL_FILE_LOG_AND_CONSOLE));
 #else
 		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] player[UID=" + std::to_string(cmd_ucmu->getUID()) + "] Atualizou Chat Macro[M1="
-				+ std::string(cmd_ucmu->getInfo().macro[0]) + ", M2=" + std::string(cmd_ucmu->getInfo().macro[1]) + ", M3=" + std::string(cmd_ucmu->getInfo().macro[2])
-				+ ", M4=" + std::string(cmd_ucmu->getInfo().macro[3]) + ", M5=" + std::string(cmd_ucmu->getInfo().macro[4]) + ", M6=" + std::string(cmd_ucmu->getInfo().macro[5])
-				+ ", M7=" + std::string(cmd_ucmu->getInfo().macro[6]) + ", M8=" + std::string(cmd_ucmu->getInfo().macro[7]) + ", M9=" + std::string(cmd_ucmu->getInfo().macro[8]) + "]", CL_ONLY_FILE_LOG));
+			+ std::string(cmd_ucmu->getInfo().macro[0]) + ", M2=" + std::string(cmd_ucmu->getInfo().macro[1]) + ", M3=" + std::string(cmd_ucmu->getInfo().macro[2])
+			+ ", M4=" + std::string(cmd_ucmu->getInfo().macro[3]) + ", M5=" + std::string(cmd_ucmu->getInfo().macro[4]) + ", M6=" + std::string(cmd_ucmu->getInfo().macro[5])
+			+ ", M7=" + std::string(cmd_ucmu->getInfo().macro[6]) + ", M8=" + std::string(cmd_ucmu->getInfo().macro[7]) + ", M9=" + std::string(cmd_ucmu->getInfo().macro[8]) + "]", CL_ONLY_FILE_LOG));
 #endif // _DEBUG
 		break;
 	}
 	case 4:	// Insert Msg Off
 	{
-		auto cmd_imo = reinterpret_cast< CmdInsertMsgOff* >(&_pangya_db);
+		auto cmd_imo = reinterpret_cast<CmdInsertMsgOff*>(&_pangya_db);
 
-		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] player[UID=" + std::to_string(cmd_imo->getUID()) + "] enviou Message Off[" 
-				+ cmd_imo->getMessage()  + "] para o player[UID=" + std::to_string(cmd_imo->getToUID()) + "]", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] player[UID=" + std::to_string(cmd_imo->getUID()) + "] enviou Message Off["
+			+ cmd_imo->getMessage() + "] para o player[UID=" + std::to_string(cmd_imo->getToUID()) + "]", CL_FILE_LOG_AND_CONSOLE));
 		break;
 	}
 	case 5:	// Register Player Logon ON DB, 0 Login, 1 Logout
@@ -6181,10 +6323,10 @@ void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 	}
 	case 6:	// Insert Ticker no DB
 	{
-		auto cmd_it = reinterpret_cast< CmdInsertTicker* >(&_pangya_db);
+		auto cmd_it = reinterpret_cast<CmdInsertTicker*>(&_pangya_db);
 
-		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] player[UID=" + std::to_string(cmd_it->getUID()) + "] enviou Ticker[MESSAGE=" 
-				+ cmd_it->getMessage() + "] do Server[UID=" + std::to_string(cmd_it->getServerUID()) + "] para o Banco de dados com sucesso!", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] player[UID=" + std::to_string(cmd_it->getUID()) + "] enviou Ticker[MESSAGE="
+			+ cmd_it->getMessage() + "] do Server[UID=" + std::to_string(cmd_it->getServerUID()) + "] para o Banco de dados com sucesso!", CL_FILE_LOG_AND_CONSOLE));
 
 		break;
 	}
@@ -6196,10 +6338,10 @@ void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 	case 8:	// Update Server Rate Config Info
 	{
 
-		auto cmd_urci = reinterpret_cast< CmdUpdateRateConfigInfo* >(&_pangya_db);
+		auto cmd_urci = reinterpret_cast<CmdUpdateRateConfigInfo*>(&_pangya_db);
 
-		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] Atualizou Rate Config Info[SERVER_UID=" + std::to_string(cmd_urci->getServerUID()) 
-				+ ", " + cmd_urci->getInfo().toString() + "]", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] Atualizou Rate Config Info[SERVER_UID=" + std::to_string(cmd_urci->getServerUID())
+			+ ", " + cmd_urci->getInfo().toString() + "]", CL_FILE_LOG_AND_CONSOLE));
 
 		break;
 	}
@@ -6209,10 +6351,10 @@ void game_server::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _
 
 #ifdef _DEBUG
 		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] Inseriu Block IP[IP=" + cmd_ibi->getIP()
-				+ ", MASK=" + cmd_ibi->getMask() + "] com sucesso.", CL_FILE_LOG_AND_CONSOLE));
+			+ ", MASK=" + cmd_ibi->getMask() + "] com sucesso.", CL_FILE_LOG_AND_CONSOLE));
 #else
 		_smp::message_pool::getInstance().push(new message("[game_server::SQLDBResponse][Log] Inseriu Block IP[IP=" + cmd_ibi->getIP()
-				+ ", MASK=" + cmd_ibi->getMask() + "] com sucesso.", CL_ONLY_FILE_LOG));
+			+ ", MASK=" + cmd_ibi->getMask() + "] com sucesso.", CL_ONLY_FILE_LOG));
 #endif // _DEBUG
 
 		break;

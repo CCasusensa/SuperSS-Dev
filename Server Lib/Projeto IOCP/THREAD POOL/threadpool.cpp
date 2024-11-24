@@ -1442,11 +1442,11 @@ void threadpool::send_new(session *_session, Buffer *lpBuffer, DWORD operation) 
 			if (errno != ECONNRESET && errno != EPIPE/*socket invalid*/)
 				throw exception("Erro no WSASend() -> threadpool::send_new()", STDA_MAKE_ERROR(STDA_ERROR_TYPE::THREADPOOL, 1, errno));
 			
-		}else {
+		} else {
 
 			// Not have space in socket tcp stack, release send for send again to late
 			try {
-				_session->setSendPartial();
+				_session->releaseSend();
 			}catch (exception& e) {
 
 				_smp::message_pool::getInstance().push(new message("[threadpool::send_new][Error] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
@@ -1469,15 +1469,13 @@ void threadpool::send_new(session *_session, Buffer *lpBuffer, DWORD operation) 
 
 		pthread_mutex_unlock(&m_cs);
 		
+		// !@ send partial
 		// send partial
 		if ((uint32_t)sendlen != lpBuffer->getWSABufToSend()->len) {
-
 			_smp::message_pool::getInstance().push(new message("[threadpool::send_new][WARNING] Player[UID=" + std::to_string(_session->getUID()) 
 					+ "] enviou dados partial[SENDLEN=" + std::to_string(sendlen) + "].", CL_FILE_LOG_AND_CONSOLE));
-
 			_session->setSendPartial();
 		}
-
 		// post to translate
 		postIoOperationS(_session, lpBuffer, sendlen, operation);
 	}

@@ -323,7 +323,6 @@ void* unit::monitor() {
 };
 
 void unit::waitAllThreadFinish(DWORD dwMilleseconds) {
-
 	// Libera todos que estão esperando o pangya_db ser executado
 	snmdb::NormalManagerDB::getInstance().freeAllWaiting("[unit::waitAllThreadFinish][Error] Libera todos que estao esperando pangya_db ser executado");
 
@@ -968,7 +967,7 @@ inline void unit::dispach_packet_same_thread(session& _session, packet *_packet)
 
 inline void unit::dispach_packet_sv_same_thread(session& _session, packet *_packet) {
 	CHECK_SESSION_BEGIN("dispach_packet_sv_same_thread");
-
+	
 	//ParamWorker pw = { *this, m_iocp_io, m_job_pool, m_session_pool, m_pangya_db, _packet };
 	func_arr::func_arr_ex* func = nullptr;
 

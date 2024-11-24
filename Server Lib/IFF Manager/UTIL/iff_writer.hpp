@@ -1,6 +1,6 @@
 // Aquivo iff_writer.hpp
 // Criado em 03/06/2019 as 19:44 por Acrisio
-// Definiï¿½ï¿½o da classe iff_writer
+// Definição da classe iff_writer
 
 #pragma once
 #ifndef _STDA_IFF_WRITER_HPP
@@ -72,7 +72,6 @@ namespace stdA {
 			void saveTikiSpecialTable();
 			void saveTimeLimitItem();
 			void saveTwinsItemTable();
-
 	};
 }
 

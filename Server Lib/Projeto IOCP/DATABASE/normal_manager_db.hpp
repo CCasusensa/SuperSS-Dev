@@ -11,61 +11,52 @@
 
 #include "../SOCKET/session.h"
 #include "../THREAD POOL/thread.h"
-
 #include "../TYPE/singleton.h"
 
 #define NUM_DB_THREAD   26ul
 
 namespace stdA {
     class NormalManagerDB {
+	public:
+		struct DownEvent {
 		public:
-			struct DownEvent {
-				public:
 #if defined(_WIN32)
-					typedef LONG _MY_LONG;
+			typedef LONG _MY_LONG;
 #elif defined(__linux__)
-					typedef int32_t _MY_LONG;
+			typedef int32_t _MY_LONG;
 #endif
-				public:
-					DownEvent();
-
-					void set(_MY_LONG _value = 0);
-					bool isLive();
-
-				protected:
-					_MY_LONG volatile m_continue;
-			};
-
+		public:
+			DownEvent();
+			void set(_MY_LONG _value = 0);
+			bool isLive();
+		protected:
+			_MY_LONG volatile m_continue;
+		};
         public:
             NormalManagerDB();
             ~NormalManagerDB();
 
-            void create(uint32_t _db_instance_num = NUM_DB_THREAD);
-
+			void create(uint32_t _db_instance_num = NUM_DB_THREAD);
 			void init();
 			void destroy();
 
 			void checkIsDeadAndRevive();
 
 			int add(NormalDB::msg_t* _msg);
-			int add(uint32_t _id, pangya_db *_pangya_db, callback_response _callback_response, void* _arg);
-
+			int add(uint32_t _id, pangya_db* _pangya_db, callback_response _callback_response, void* _arg);
 			void freeAllWaiting(std::string _msg);
 
         // Methods que o normal db faz para o server e o channel
         public:
-            void insertLoginLog(session& _session, NormalDB::msg_t* _msg);
-
+			void insertLoginLog(session& _session, NormalDB::msg_t* _msg);
 		protected:
-#if defined(_WIN32)
+	#if defined(_WIN32)
 			static DWORD CALLBACK _Revive(LPVOID lpParameter);
-
 			DWORD Revive();
-#elif defined(__linux__)
+	#elif defined(__linux__)
 			static void* _Revive(void* lpParameter);
-
 			void* Revive();
-#endif
+	#endif
 
 		private:
 			inline void checkDBInstanceNumAndFix();
@@ -76,8 +67,7 @@ namespace stdA {
             bool m_state;
 
 			uint32_t m_db_instance_num;
-
-            thread *m_pRevive;
+			thread* m_pRevive;
 			DownEvent m_continue_revive;
     };
 

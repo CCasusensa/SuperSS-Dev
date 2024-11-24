@@ -99,7 +99,7 @@ void* LoginManager::_checkTaskFinish(LPVOID _lpParameter) {
 #endif
 
 	if (_lpParameter != nullptr) {
-		auto lm = reinterpret_cast< LoginManager* >(_lpParameter);
+		auto lm = reinterpret_cast<LoginManager*>(_lpParameter);
 
 		return lm->checkTaskFinish();
 	}
@@ -127,7 +127,7 @@ void* LoginManager::checkTaskFinish() {
 
 	while (__atomic_compare_exchange_n(&m_check_task_finish_shutdown, &check_m, 1u, true, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {
 #endif
-		
+
 #if defined(_WIN32)
 		EnterCriticalSection(&m_cs);
 #elif defined(__linux__)
@@ -170,7 +170,7 @@ void* LoginManager::checkTaskFinish() {
 #elif defined(__linux__)
 	return (void*)0;
 #endif
-}
+	}
 
 LoginManager::LoginManager() : v_task(), m_pThread(nullptr) {
 
@@ -188,14 +188,15 @@ LoginManager::LoginManager() : v_task(), m_pThread(nullptr) {
 	__atomic_store_n(&m_check_task_finish_shutdown, 1u, __ATOMIC_RELAXED);
 #endif
 
-    v_task.reserve(2000); // tarefas ao mesmo tempo no maximo
+	v_task.reserve(2000); // tarefas ao mesmo tempo no maximo
 
 	try {
 		loadIni();
 
 		m_pThread = new thread(1, LoginManager::_checkTaskFinish, this, THREAD_PRIORITY_LOWEST);
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		_smp::message_pool::getInstance().push(new message("[LoginManager::LoginManager][Error] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 }
@@ -220,7 +221,8 @@ LoginManager::~LoginManager() {
 			delete m_pThread;
 		}
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[LoginManager::~LoginManager][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -244,9 +246,9 @@ LoginManager::~LoginManager() {
 void LoginManager::clear() {
 
 #if defined(_WIN32)
-		EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_lock(&m_cs);
+	pthread_mutex_lock(&m_cs);
 #endif
 
 	if (!v_task.empty()) {
@@ -261,9 +263,9 @@ void LoginManager::clear() {
 	}
 
 #if defined(_WIN32)
-		LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_unlock(&m_cs);
+	pthread_mutex_unlock(&m_cs);
 #endif
 }
 
@@ -272,81 +274,81 @@ size_t LoginManager::getSize() {
 	size_t size = 0u;
 
 #if defined(_WIN32)
-		EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_lock(&m_cs);
+	pthread_mutex_lock(&m_cs);
 #endif
 
 	size = v_task.size();
 
 #if defined(_WIN32)
-		LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_unlock(&m_cs);
+	pthread_mutex_unlock(&m_cs);
 #endif
 
 	return size;
 }
 
-LoginTask* LoginManager::createTask(player& _session, KeysOfLogin& _kol, player_info& _pi, ClientVersion& _cv, void* _gs) {
+LoginTask* LoginManager::createTask(player & _session, KeysOfLogin & _kol, player_info & _pi, ClientVersion & _cv, void* _gs) {
 
-    if (getSize() == 2000)
-        throw exception("[LoginManager::createTask][Error] Chegou ao limite task de login ao mesmo tempo", STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 1, 0));
+	if (getSize() == 2000)
+		throw exception("[LoginManager::createTask][Error] Chegou ao limite task de login ao mesmo tempo", STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 1, 0));
 
-    auto task = new LoginTask(_session, _kol, _pi, _cv, _gs);
+	auto task = new LoginTask(_session, _kol, _pi, _cv, _gs);
 
-    task->exec();
+	task->exec();
 
 #if defined(_WIN32)
-		EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_lock(&m_cs);
+	pthread_mutex_lock(&m_cs);
 #endif
 
-    v_task.push_back(task);
+	v_task.push_back(task);
 
 #if defined(_WIN32)
-		LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_unlock(&m_cs);
+	pthread_mutex_unlock(&m_cs);
 #endif
 
 	return task;
 }
 
-void LoginManager::deleteTask(LoginTask* _task) {
+void LoginManager::deleteTask(LoginTask * _task) {
 
 #if defined(_WIN32)
-		EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_lock(&m_cs);
+	pthread_mutex_lock(&m_cs);
 #endif
 
 	auto it = std::find(v_task.begin(), v_task.end(), _task);
-	
+
 	if (it != v_task.end()) {
 
-		delete *it;
+		delete* it;
 
 		v_task.erase(it);
 		v_task.shrink_to_fit();		// isso em concorrencia pode da erro se não usar proteção de thread(ex: CRITICAL_SECTION)
 	}
 
 #if defined(_WIN32)
-		LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 #elif defined(__linux__)
-		pthread_mutex_unlock(&m_cs);
+	pthread_mutex_unlock(&m_cs);
 #endif
 }
 
-void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* _arg) {
+void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db & _pangya_db, void* _arg) {
 
-    if (_arg == nullptr) {
-        _smp::message_pool::getInstance().push(new message("[LoginManager::SQLDBResponse][Error] _arg is nullptr na msg_id = " + std::to_string(_msg_id), CL_FILE_LOG_AND_CONSOLE));
-        return;
-    }
+	if (_arg == nullptr) {
+		_smp::message_pool::getInstance().push(new message("[LoginManager::SQLDBResponse][Error] _arg is nullptr na msg_id = " + std::to_string(_msg_id), CL_FILE_LOG_AND_CONSOLE));
+		return;
+	}
 
-	auto task = reinterpret_cast< LoginTask* >(_arg);
+	auto task = reinterpret_cast<LoginTask*>(_arg);
 
 	try {
 
@@ -592,7 +594,7 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 			// Att Capability do player
 			// Verifica se tem premium ticket para mandar o pacote do premium user e a comet
 			if (sPremiumSystem::getInstance().isPremiumTicket(pi->pt._typeid) && pi->pt.id != 0 && pi->pt.unix_sec_date > 0) {
-				
+
 				sPremiumSystem::getInstance().updatePremiumUser(task->getSession());
 
 				_smp::message_pool::getInstance().push(new message("[LoginManager::SQLDBResponse][Log] Player[UID=" + std::to_string(pi->uid) + "] is Premium User", CL_FILE_LOG_AND_CONSOLE));
@@ -813,7 +815,7 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 
 			// Verifica se tem Ticket Report Scroll no update item para abrir ele e excluir. Todos que estiver, não só 1
 			while ((ui_ticket_report_scroll = pi->findUpdateItemByTypeidAndType(TICKET_REPORT_SCROLL_TYPEID, UpdateItem::WAREHOUSE)) != pi->mp_ui.end()) {
-				
+
 				try {
 
 					auto pWi = pi->findWarehouseItemById(ui_ticket_report_scroll->second.id);
@@ -821,7 +823,8 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 					if (pWi != nullptr)
 						item_manager::openTicketReportScroll(task->getSession(), pWi->id, ((pWi->c[1] * 0x800) | pWi->c[2]));
 
-				}catch (exception& e) {
+				}
+				catch (exception& e) {
 
 					_smp::message_pool::getInstance().push(new message("[LoginManager::checkWarehouse][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -847,19 +850,21 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 				// [AJEITEI JA] (tem que ajeitar na hora que coloca no DB e no DB isso)
 				pi->ei.csi = { it->second.id, it->second._typeid, it->second.c };
 
-				IFF::ClubSet *cs = sIff::getInstance().findClubSet(it->second._typeid);
+				IFF::ClubSet* cs = sIff::getInstance().findClubSet(it->second._typeid);
 
 				if (cs != nullptr) {
 
 					for (auto i = 0u; i < (sizeof(pi->ei.csi.enchant_c) / sizeof(pi->ei.csi.enchant_c[0])); ++i)
 						pi->ei.csi.enchant_c[i] = cs->slot[i] + it->second.clubset_workshop.c[i];
 
-				}else
+				}
+				else
 					throw exception("[LoginManager::SQLDBResponse][Erro] player[UID=" + std::to_string(pi->uid) + "] tentou inicializar ClubSet[TYPEID="
-							+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "] equipado, mas ClubSet Not exists on IFF_STRUCT do Server. Bug",
-							STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 24, 0));
+						+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "] equipado, mas ClubSet Not exists on IFF_STRUCT do Server. Bug",
+						STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 24, 0));
 
-			}else {
+			}
+			else {
 
 				auto it = pi->findWarehouseItemItByTypeid(AIR_KNIGHT_SET);
 
@@ -873,22 +878,24 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 					// [AJEITEI JA] (tem que ajeitar na hora que coloca no DB e no DB isso)
 					pi->ei.csi = { it->second.id, it->second._typeid, it->second.c };
 
-					IFF::ClubSet *cs = sIff::getInstance().findClubSet(it->second._typeid);
+					IFF::ClubSet* cs = sIff::getInstance().findClubSet(it->second._typeid);
 
 					if (cs != nullptr) {
 
 						for (auto i = 0u; i < (sizeof(pi->ei.csi.enchant_c) / sizeof(pi->ei.csi.enchant_c[0])); ++i)
 							pi->ei.csi.enchant_c[i] = cs->slot[i] + it->second.clubset_workshop.c[i];
 
-					}else
+					}
+					else
 						throw exception("[LoginManager::SQLDBResponse][Erro] player[UID=" + std::to_string(pi->uid) + "] tentou inicializar ClubSet[TYPEID="
-								+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "] equipado, mas ClubSet Not exists on IFF_STRUCT do Server. Bug",
-								STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 23, 0));
+							+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "] equipado, mas ClubSet Not exists on IFF_STRUCT do Server. Bug",
+							STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 23, 0));
 
-				}else {	// Não tem add o ClubSet padrão para ele(CV1)
+				}
+				else {	// Não tem add o ClubSet padrão para ele(CV1)
 
 					_smp::message_pool::getInstance().push(new message("[LoginManager::SQLDBResponse][WARNING] Player[UID=" + std::to_string(pi->uid)
-							+ "] nao tem o ClubSet[TYPEID=" + std::to_string(AIR_KNIGHT_SET) + "] padrao.", CL_FILE_LOG_AND_CONSOLE));
+						+ "] nao tem o ClubSet[TYPEID=" + std::to_string(AIR_KNIGHT_SET) + "] padrao.", CL_FILE_LOG_AND_CONSOLE));
 
 					BuyItem bi{ 0 };
 					stItem item{ 0 };
@@ -910,22 +917,24 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 						// [AJEITEI JA] (tem que ajeitar na hora que coloca no DB e no DB isso)
 						pi->ei.csi = { it->second.id, it->second._typeid, it->second.c };
 
-						IFF::ClubSet *cs = sIff::getInstance().findClubSet(it->second._typeid);
+						IFF::ClubSet* cs = sIff::getInstance().findClubSet(it->second._typeid);
 
 						if (cs != nullptr) {
 
 							for (auto i = 0u; i < (sizeof(pi->ei.csi.enchant_c) / sizeof(pi->ei.csi.enchant_c[0])); ++i)
 								pi->ei.csi.enchant_c[i] = cs->slot[i] + it->second.clubset_workshop.c[i];
 
-						}else
+						}
+						else
 							throw exception("[LoginManager::SQLDBResponse][Erro] player[UID=" + std::to_string(pi->uid) + "] tentou inicializar ClubSet[TYPEID="
-									+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "] equipado, mas ClubSet Not exists on IFF_STRUCT do Server. Bug",
-									STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 22, 0));
+								+ std::to_string(it->second._typeid) + ", ID=" + std::to_string(it->second.id) + "] equipado, mas ClubSet Not exists on IFF_STRUCT do Server. Bug",
+								STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 22, 0));
 
-					}else
+					}
+					else
 						throw exception("[LoginManager::SQLDBResponse][Error] Player[UID=" + std::to_string(pi->uid)
-								+ "] nao conseguiu adicionar o ClubSet[TYPEID=" + std::to_string(AIR_KNIGHT_SET) + "] padrao para ele. Bug", 
-								STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 21, 0));
+							+ "] nao conseguiu adicionar o ClubSet[TYPEID=" + std::to_string(AIR_KNIGHT_SET) + "] padrao para ele. Bug",
+							STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 21, 0));
 				}
 
 			}
@@ -935,7 +944,8 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 
 				pi->ei.comet = &it->second;
 
-			}else { // Default Ball
+			}
+			else { // Default Ball
 
 				pi->ue.ball_typeid = DEFAULT_COMET_TYPEID;
 
@@ -946,7 +956,7 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 				else {	// não tem add a bola padrão para ele
 
 					_smp::message_pool::getInstance().push(new message("[LoginManager::SQLDBResponse][WARNING] Player[UID=" + std::to_string(pi->uid)
-							+ "] nao tem a Comet(Ball)[TYPEID=" + std::to_string(DEFAULT_COMET_TYPEID) + "] padrao.", CL_FILE_LOG_AND_CONSOLE));
+						+ "] nao tem a Comet(Ball)[TYPEID=" + std::to_string(DEFAULT_COMET_TYPEID) + "] padrao.", CL_FILE_LOG_AND_CONSOLE));
 
 					BuyItem bi{ 0 };
 					stItem item{ 0 };
@@ -962,10 +972,11 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 
 						pi->ei.comet = &it->second;
 
-					}else
+					}
+					else
 						throw exception("[LoginManager::SQLDBResponse][Error] Player[UID=" + std::to_string(pi->uid)
-								+ "] nao conseguiu adicionar a Comet(Ball)[TYPEID=" + std::to_string(DEFAULT_COMET_TYPEID) + "] padrao para ele. Bug", 
-								STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 20, 0));
+							+ "] nao conseguiu adicionar a Comet(Ball)[TYPEID=" + std::to_string(DEFAULT_COMET_TYPEID) + "] padrao para ele. Bug",
+							STDA_MAKE_ERROR(STDA_ERROR_TYPE::LOGIN_MANAGER, 20, 0));
 
 				}
 			}
@@ -1006,7 +1017,8 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 				// Add o Task + 1 por que não pede o achievement do db, porque criou ele aqui e salvo no DB
 				task->incremenetCount();
 
-			}else {
+			}
+			else {
 
 				snmdb::NormalManagerDB::getInstance().add(19, new CmdAchievementInfo(task->getSession().m_pi.uid), LoginManager::SQLDBResponse, task);
 			}
@@ -1117,7 +1129,7 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 		case 32:	// [MailBox] New Email(s), Agora é a inicialização do Cache do Mail Box
 		{
 			//auto& v_mb = reinterpret_cast<CmdMailBoxInfo*>(&_pangya_db)->getInfo();	// cmd_mbi.getInfo();
-			auto cmd_mbi2 = reinterpret_cast< CmdMailBoxInfo2* >(&_pangya_db);
+			auto cmd_mbi2 = reinterpret_cast<CmdMailBoxInfo2*>(&_pangya_db);
 
 			task->getSession().m_pi.m_mail_box.init(cmd_mbi2->getInfo(), task->getSession().m_pi.uid);
 
@@ -1198,19 +1210,19 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 		}
 		case 42:	// Grand Prix Clear
 		{
-			task->getSession().m_pi.v_gpc = reinterpret_cast< CmdGrandPrixClear* >(&_pangya_db)->getInfo();
+			task->getSession().m_pi.v_gpc = reinterpret_cast<CmdGrandPrixClear*>(&_pangya_db)->getInfo();
 
 			break;
 		}
 		case 43: // Grand Zodiac Pontos
 		{
-			task->getSession().m_pi.grand_zodiac_pontos = reinterpret_cast< CmdGrandZodiacPontos* >(&_pangya_db)->getPontos();
+			task->getSession().m_pi.grand_zodiac_pontos = reinterpret_cast<CmdGrandZodiacPontos*>(&_pangya_db)->getPontos();
 
 			break;
 		}
 		case 44: // Legacy Tiki Shop(PointShop)
 		{
-			task->getSession().m_pi.m_legacy_tiki_pts = reinterpret_cast< CmdLegacyTikiShopInfo* >(&_pangya_db)->getInfo();
+			task->getSession().m_pi.m_legacy_tiki_pts = reinterpret_cast<CmdLegacyTikiShopInfo*>(&_pangya_db)->getInfo();
 
 			break;
 		}
@@ -1233,8 +1245,9 @@ void LoginManager::SQLDBResponse(uint32_t _msg_id, pangya_db& _pangya_db, void* 
 		// Devolve (deixa a session livre) ou desconnecta ela se foi requisitado
 		if (task->getSession().devolve())
 			sgs::gs::getInstance().DisconnectSession(&task->getSession());
-	
-	}catch (exception& e) {
+
+	}
+	catch (exception& e) {
 
 		_smp::message_pool::getInstance().push(new message("[LoginManager::SQLDBResponse][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 
@@ -1271,7 +1284,8 @@ void LoginManager::loadIni() {
 
 	try {
 		LoginManager::m_same_id_login = ini.readInt("OPTION", "SAME_ID_LOGIN");
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		// Não precisa exibir mensagem se não encontrar essa opção no arquivo .ini
 		UNREFERENCED_PARAMETER(e);
 	}

@@ -48,9 +48,9 @@ result_set*& response::getResultSetAt(size_t _index) {
 };
 
 void response::setRowsAffected(int64_t _rows_affected) {
-	m_rows_affected = _rows_affected;
+    m_rows_affected = _rows_affected;
 };
 
 int64_t response::getRowsAffected() {
-	return m_rows_affected;
+    return m_rows_affected;
 };

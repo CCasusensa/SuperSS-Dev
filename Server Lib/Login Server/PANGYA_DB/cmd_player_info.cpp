@@ -23,7 +23,7 @@ CmdPlayerInfo::~CmdPlayerInfo() {
 };
 
 void CmdPlayerInfo::lineResult(result_set::ctx_res* _result, uint32_t /*_index_result*/) {
-    
+
     checkColumnNumber(8, (uint32_t)_result->cols);
 
     // Aqui faz as coisas
@@ -36,8 +36,8 @@ void CmdPlayerInfo::lineResult(result_set::ctx_res* _result, uint32_t /*_index_r
         STRCPY_TO_MEMORY_FIXED_SIZE(m_pi.pass, sizeof(m_pi.pass), _result->data[3]);
     m_pi.m_cap = IFNULL(atoi, _result->data[4]);
     m_pi.level = (unsigned short)IFNULL(atoi, _result->data[5]);
-	m_pi.block_flag.setIDState((uint64_t)IFNULL(atoll, _result->data[6]));
-	m_pi.block_flag.m_id_state.block_time = IFNULL(atoi, _result->data[7]);
+    m_pi.block_flag.setIDState((uint64_t)IFNULL(atoll, _result->data[6]));
+    m_pi.block_flag.m_id_state.block_time = IFNULL(atoi, _result->data[7]);
     // Fim
 
     if (m_pi.uid != m_uid)
@@ -47,7 +47,7 @@ void CmdPlayerInfo::lineResult(result_set::ctx_res* _result, uint32_t /*_index_r
 response* CmdPlayerInfo::prepareConsulta(database& _db) {
 
     m_pi.clear();
-    
+
     auto r = procedure(_db, m_szConsulta, std::to_string(m_uid));
 
     checkResponse(r, "nao conseguiu pegar o info do player: " + std::to_string(m_uid));
@@ -56,19 +56,19 @@ response* CmdPlayerInfo::prepareConsulta(database& _db) {
 };
 
 uint32_t CmdPlayerInfo::getUID() {
-	return m_uid;
+    return m_uid;
 };
 
 void CmdPlayerInfo::setUID(uint32_t _uid) {
-	m_uid = _uid;
+    m_uid = _uid;
 };
 
 player_info& CmdPlayerInfo::getInfo() {
-	return m_pi;
+    return m_pi;
 };
 
 void CmdPlayerInfo::updateInfo(player_info& _pi) {
-	m_pi = _pi;
+    m_pi = _pi;
 };
 
 

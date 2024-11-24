@@ -1059,7 +1059,7 @@ inline void unit_connect_base::dispach_packet_same_thread(session& _session, pac
 
 inline void unit_connect_base::dispach_packet_sv_same_thread(session& _session, packet *_packet) {
 	CHECK_SESSION_BEGIN("dispach_packet_sv_same_thread");
-
+	
 	func_arr::func_arr_ex* func = nullptr;
 
 	try {
@@ -1308,14 +1308,11 @@ void unit_connect_base::send_new(session* _session, Buffer* lpBuffer, DWORD oper
 		pthread_mutex_unlock(&m_cs);
 
 		// send partial
-		if((uint32_t)sendlen != lpBuffer->getWSABufToSend()->len) {
-
+		if ((uint32_t)sendlen != lpBuffer->getWSABufToSend()->len) {
 			_smp::message_pool::getInstance().push(new message("[unit_connect_base::send_new][WARNING] Player[UID=" + std::to_string(_session->getUID()) 
 					+ "] enviou dados partial[SENDLEN=" + std::to_string(sendlen) + "].", CL_FILE_LOG_AND_CONSOLE));
-
 			_session->setSendPartial();
 		}
-
 		// post to translate
 		postIoOperation(_session, lpBuffer, sendlen, operation);
 	}

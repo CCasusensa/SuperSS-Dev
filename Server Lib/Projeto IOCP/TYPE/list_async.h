@@ -102,7 +102,7 @@ namespace stdA {
 			_LA peekFirst(DWORD _dwMilliseconds = INFINITE);
 			_LA peekLast(DWORD _dwMilliseconds = INFINITE);
 
-			std::vector< _LA > getAll();
+            std::vector< _LA > getAll();
 
 			// Operators
 			_LA operator[](size_t _index);
@@ -367,7 +367,7 @@ namespace stdA {
     template< class _LA > _LA list_async< _LA >::getFirst(DWORD _dwMilliseconds) {
         _LA out;
 
-		try {
+	try {
 
 #if defined(_WIN32)
                 EnterCriticalSection(&m_cs);
@@ -386,7 +386,7 @@ namespace stdA {
                 pthread_mutex_unlock(&m_cs);
 #endif
 		
-		}catch (exception& e) {
+	}catch (exception& e) {
 
                 // Qualquer erro que não seja do LIST_ASYNC o critical section não foi liberado ainda
                 if (STDA_SOURCE_ERROR_DECODE(e.getCodeError()) != STDA_ERROR_TYPE::LIST_ASYNC)
@@ -402,51 +402,44 @@ namespace stdA {
 
         return out;
     };
+    template< class _LA > std::vector< _LA > list_async< _LA >::getAll() {
+        std::vector< _LA > _out;
+        try {
 
-	template< class _LA > std::vector< _LA > list_async< _LA >::getAll() {
-		std::vector< _LA > _out;
-
-		try {
-		
 #if defined(_WIN32)
             EnterCriticalSection(&m_cs);
 #elif defined(__linux__)
             pthread_mutex_lock(&m_cs);
 #endif
-
-			for (auto& el : m_deque)
-				_out.push_back(el);
-
-			m_deque.clear();
-			m_deque.shrink_to_fit();
-
+            for (auto& el : m_deque)
+                _out.push_back(el);
+            m_deque.clear();
+            m_deque.shrink_to_fit();
 #if defined(_WIN32)
             LeaveCriticalSection(&m_cs);
 #elif defined(__linux__)
             pthread_mutex_unlock(&m_cs);
 #endif
-		
-		}catch (exception& e) {
 
+        }
+        catch (exception& e) {
             // Qualquer erro que não seja do LIST_ASYNC o critical section não foi liberado ainda
             if (STDA_SOURCE_ERROR_DECODE(e.getCodeError()) != STDA_ERROR_TYPE::LIST_ASYNC)
 #if defined(_WIN32)
-                    LeaveCriticalSection(&m_cs);
+                LeaveCriticalSection(&m_cs);
 #elif defined(__linux__)
-                    pthread_mutex_unlock(&m_cs);
+                pthread_mutex_unlock(&m_cs);
 #endif
-
             // Relança
             throw exception(e.getMessageError(), e.getCodeError());
         }
-
         return _out;
-	};
+    };
 
     template< class _LA > _LA list_async< _LA >::getLast(DWORD _dwMilliseconds) {
         _LA out;
 
-		try {
+	try {
 		
 #if defined(_WIN32)
                 EnterCriticalSection(&m_cs);
@@ -465,7 +458,7 @@ namespace stdA {
                 pthread_mutex_unlock(&m_cs);
 #endif
 		
-			}catch (exception& e) {
+        }catch (exception& e) {
 
                 // Qualquer erro que não seja do LIST_ASYNC o critical section não foi liberado ainda
                 if (STDA_SOURCE_ERROR_DECODE(e.getCodeError()) != STDA_ERROR_TYPE::LIST_ASYNC)
@@ -489,7 +482,7 @@ namespace stdA {
     template< class _LA > _LA list_async< _LA >::peekFirst(DWORD _dwMilliseconds) {
         _LA out;
 
-		try {
+	try {
 		
 #if defined(_WIN32)
                 EnterCriticalSection(&m_cs);
@@ -527,7 +520,7 @@ namespace stdA {
     template< class _LA > _LA list_async< _LA >::peekLast(DWORD _dwMilliseconds) {
         _LA out;
 
-		try {
+	try {
 		
 #if defined(_WIN32)
                 EnterCriticalSection(&m_cs);

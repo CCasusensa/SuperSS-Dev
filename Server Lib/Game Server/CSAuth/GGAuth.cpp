@@ -31,10 +31,10 @@ using namespace stdA;
 								_type_class *pTP = reinterpret_cast<_type_class*>(lpParameter); \
 								if (pTP) {
 #elif defined(__linux__)
-	
-	#ifdef BEGIN_THREAD_SETUP
-		#undef BEGIN_THREAD_SETUP
-	#endif
+
+#ifdef BEGIN_THREAD_SETUP
+#undef BEGIN_THREAD_SETUP
+#endif
 
 #define BEGIN_THREAD_SETUP(_type_class) void* result = (void*)0; \
 						   try { \
@@ -43,9 +43,9 @@ using namespace stdA;
 #endif
 
 #if defined(__linux__)
-	#ifdef END_THREAD_SETUP
-		#undef END_THREAD_SETUP
-	#endif
+#ifdef END_THREAD_SETUP
+#undef END_THREAD_SETUP
+#endif
 #endif
 
 #define END_THREAD_SETUP(name_thread)	  } \
@@ -66,23 +66,23 @@ using namespace stdA;
 #include <cstdint>
 
 #if INTPTR_MAX == INT64_MAX
-	#if MY_GG_SRV_LIB == 1
-		#if defined(_DEBUG)
-			#pragma comment(lib, "../../GGSrvLib26-1/x64/Debug/GGSrvLib26-1.lib")
-		#else
-			#pragma comment(lib, "../../GGSrvLib26-1/x64/Release/GGSrvLib26-1.lib")
-		#endif
-	#endif
+#if MY_GG_SRV_LIB == 1
+#if defined(_DEBUG)
+#pragma comment(lib, "../../GGSrvLib26-1/x64/Debug/GGSrvLib26-1.lib")
+#else
+#pragma comment(lib, "../../GGSrvLib26-1/x64/Release/GGSrvLib26-1.lib")
+#endif
+#endif
 #elif INTPTR_MAX == INT32_MAX
-	#if MY_GG_SRV_LIB == 1
-		#if defined(_DEBUG)
-			#pragma comment(lib, "../../GGSrvLib26-1/Debug/GGSrvLib26-1.lib")
-		#else
-			#pragma comment(lib, "../../GGSrvLib26-1/Release/GGSrvLib26-1.lib")
-		#endif
-	#else
-		#pragma comment(lib, "../CSAuth/ggsrvlib26_MT.lib")
-	#endif
+#if MY_GG_SRV_LIB == 1
+#if defined(_DEBUG)
+#pragma comment(lib, "../../GGSrvLib26-1/Debug/GGSrvLib26-1.lib")
+#else
+#pragma comment(lib, "../../GGSrvLib26-1/Release/GGSrvLib26-1.lib")
+#endif
+#else
+#pragma comment(lib, "../CSAuth/ggsrvlib26_MT.lib")
+#endif
 #else
 #error Unknown pointer size or missing size macros!
 #endif
@@ -226,15 +226,15 @@ GGAUTHS_API void GGAuthUpdateCallback(PGG_UPREPORT report) // referenced by
 	_smp::message_pool::getInstance().push(new message(std::string("[game_server::GGAuthUpdateCallback][Log] ") + s, CL_FILE_LOG_AND_CONSOLE));
 };
 
-GGAuth::GGAuth(uint32_t _numActiveSession) : m_state(false), 
+GGAuth::GGAuth(uint32_t _numActiveSession) : m_state(false),
 #if defined(_WIN32)
-	m_quit_update_timer(INVALID_HANDLE_VALUE), 
-	m_thread_update_timer(INVALID_HANDLE_VALUE) 
+m_quit_update_timer(INVALID_HANDLE_VALUE),
+m_thread_update_timer(INVALID_HANDLE_VALUE)
 #elif defined(__linux__)
-	m_quit_update_timer(nullptr), 
-	m_thread_update_timer(nullptr) 
+m_quit_update_timer(nullptr),
+m_thread_update_timer(nullptr)
 #endif
-	{
+{
 
 	DWORD err = InitGameguardAuth(NULL, _numActiveSession, true, 0x03);
 
@@ -295,10 +295,11 @@ GGAuth::GGAuth(uint32_t _numActiveSession) : m_state(false),
 
 		_smp::message_pool::getInstance().push(new message("[GGAuth::GGAuth][Log] Criou thread GGAuthUpdateTimer com sucesso. ID=" + std::to_string(err), CL_FILE_LOG_AND_CONSOLE));
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		_smp::message_pool::getInstance().push(new message("[GGAuth::GGAuth][ErrorSytem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
-		
+
 #endif
 	m_state = true;
 }
@@ -328,7 +329,7 @@ GGAuth::~GGAuth() {
 
 		if (m_quit_update_timer != INVALID_HANDLE_VALUE && m_quit_update_timer != NULL)
 			CloseHandle(m_quit_update_timer);
-		
+
 		m_thread_update_timer = INVALID_HANDLE_VALUE;
 		m_quit_update_timer = INVALID_HANDLE_VALUE;
 #elif defined(__linux__)
@@ -356,7 +357,8 @@ GGAuth::~GGAuth() {
 		m_quit_update_timer = nullptr;
 #endif
 
-	}catch (exception& e) {
+	}
+	catch (exception& e) {
 		_smp::message_pool::getInstance().push(new message("[GGAuth::~GGAuth][ErrorSystem] " + e.getFullMessageError(), CL_FILE_LOG_AND_CONSOLE));
 	}
 
@@ -396,17 +398,17 @@ void* GGAuth::updateTimerProc(LPVOID lpParameter) {
 			_smp::message_pool::getInstance().push(new message("[GGAuth::updateTimerProc][Error] Nao conseguiu atualizar o GGAuthUpdateTimer. Error Code: " + std::to_string(err), CL_FILE_LOG_AND_CONSOLE));
 	}
 
-	_smp::message_pool::getInstance().push(new message("[GGAuth::updateTimerProc][Log] Finish Loop code: " + std::to_string(err) + (err != WAIT_OBJECT_0 
-		? 
+	_smp::message_pool::getInstance().push(new message("[GGAuth::updateTimerProc][Log] Finish Loop code: " + std::to_string(err) + (err != WAIT_OBJECT_0
+		?
 #if defined(_WIN32)
-			std::string(", Win Error: ") + std::to_string(GetLastError()) 
+		std::string(", Win Error: ") + std::to_string(GetLastError())
 #elif defined(__linux__)
-			std::string(", Linux Error: ") + std::to_string(errno) 
+		std::string(", Linux Error: ") + std::to_string(errno)
 #endif
 		: ""), CL_FILE_LOG_AND_CONSOLE));
 
 	END_THREAD_SETUP("updateTimerProc()");
-}
+	}
 #else
 #error Unknown pointer size or missing size macros!
 #endif
@@ -464,12 +466,12 @@ UINT32 CCSAuth2::GetAuthQuery() {
 		Init();
 
 	if (m_auth != nullptr && m_bAuth) {
-		
+
 		if ((error = GGAuthGetQuery(m_auth, &m_AuthQuery)) != ERROR_SUCCESS)
 			Close();
 		else {
 
-			_GG_AUTH_PROTOCOL *prol = (_GG_AUTH_PROTOCOL*)new unsigned char[1024];
+			_GG_AUTH_PROTOCOL* prol = (_GG_AUTH_PROTOCOL*)new unsigned char[1024];
 
 			auto ee = Info((char*)prol, 1024);
 
@@ -488,7 +490,7 @@ UINT32 CCSAuth2::CheckAuthAnswer() {
 		Init();
 
 	if (m_auth != nullptr && m_bAuth) {
-		
+
 		if ((error = GGAuthCheckAnswer(m_auth, &m_AuthAnswer)) != ERROR_SUCCESS)
 			Close();
 	}
@@ -497,14 +499,14 @@ UINT32 CCSAuth2::CheckAuthAnswer() {
 }
 
 UINT32 CCSAuth2::CheckUserCSAuth(bool bCheck) {
-	
+
 	UINT32 error = 1234;
 
 	if (!m_bAuth)
 		Init();
 
 	if (m_auth != nullptr && m_bAuth) {
-		
+
 		if ((error = GGAuthCheckUserCSAuth(m_auth, bCheck)) != ERROR_SUCCESS)
 			Close();
 	}
@@ -518,9 +520,9 @@ int CCSAuth2::Info(char* dest, int length) {
 
 	if (!m_bAuth)
 		Init();
-	
+
 	if (m_auth != nullptr && m_bAuth) {
-		
+
 		int error = GGAuthUserInfo(m_auth, dest, length);
 
 		if (error != ERROR_SUCCESS)
@@ -535,7 +537,7 @@ int CCSAuth2::CheckUpdated() {
 	int error = 1234;
 
 	if (m_auth != nullptr && m_bAuth) {
-		
+
 		if ((error = GGAuthCheckUpdated(m_auth)) != ERROR_SUCCESS)
 			Close();
 	}

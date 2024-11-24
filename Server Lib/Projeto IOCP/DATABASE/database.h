@@ -17,22 +17,21 @@
 
 namespace stdA {
     class database {
-		public:
-			enum ERROR_TYPE : uint32_t {
-				INVALID_HANDLE,
-				INVALID_PARAMETER,
-				ALLOC_HANDLE_FAIL_ENV,
-				ALLOC_HANDLE_FAIL_DBC,
-				ALLOC_HANDLE_FAIL_STMT,
-				SET_ATTR_ENV_FAIL,
-				CONNECT_DRIVER_FAIL,
-				EXEC_QUERY_FAIL,
-				FETCH_QUERY_FAIL,
-				MORE_RESULTS,
-				GERAL_ERROR,
-				HAS_CONNECT,
-			};
-
+        public:
+            enum ERROR_TYPE : uint32_t {
+                INVALID_HANDLE,
+                INVALID_PARAMETER,
+                ALLOC_HANDLE_FAIL_ENV,
+                ALLOC_HANDLE_FAIL_DBC,
+                ALLOC_HANDLE_FAIL_STMT,
+                SET_ATTR_ENV_FAIL,
+                CONNECT_DRIVER_FAIL,
+                EXEC_QUERY_FAIL,
+                FETCH_QUERY_FAIL,
+                MORE_RESULTS,
+                GERAL_ERROR,
+                HAS_CONNECT,
+            };
         public:
 			database(std::wstring _db_address, std::wstring _db_name, std::wstring _user_name, std::wstring _user_pass, unsigned short _db_port);
 			database(std::string _db_address, std::string _db_name, std::string _user_name, std::string _user_pass, unsigned short _db_port);
@@ -43,7 +42,7 @@ namespace stdA {
             bool is_valid();
             bool is_connected();
 
-			virtual bool hasGoneAway() = 0;
+            virtual bool hasGoneAway() = 0;
 
             virtual void connect() = 0;
 			virtual void connect(std::wstring _db_address, std::wstring _db_name, std::wstring _user_name, std::wstring _user_pass, unsigned short _db_port) = 0;
@@ -59,12 +58,11 @@ namespace stdA {
             virtual std::string makeText(std::string _value) = 0;
             virtual std::wstring makeText(std::wstring _value) = 0;
 
-			virtual std::string makeEscapeKeyword(std::string _value) = 0;
-			virtual std::wstring makeEscapeKeyword(std::wstring _value) = 0;
+            virtual std::string makeEscapeKeyword(std::string _value) = 0;
+            virtual std::wstring makeEscapeKeyword(std::wstring _value) = 0;
 
-			std::string parseEscapeKeyword(std::string _value);
-			std::wstring parseEscapeKeyword(std::wstring _value);
-
+            std::string parseEscapeKeyword(std::string _value);
+            std::wstring parseEscapeKeyword(std::wstring _value);
 		private:
 			bool members_empty();
 

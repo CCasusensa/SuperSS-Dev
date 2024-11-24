@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
 						common->shop.flag_shop.uFlagShop.us_flag_shop = el.second.shop.flag_shop.uFlagShop.us_flag_shop;
 						
 						// Desconto Shop
-						common->shop.desconto = el.second.shop.desconto;
+						common->shop.sell_price = el.second.shop.sell_price;
 						
 						// Preço Shop
 						common->shop.price = el.second.shop.price;
@@ -1053,7 +1053,7 @@ int main(int argc, char* argv[]) {
 					
 					_smp::message_pool::getInstance().push(new message(std::string("Card Pack:\nTypeid: ") + std::to_string(el.second._typeid) + " (0x" 
 							+ hex_util::ltoaToHex(el.second._typeid) + ")\nName: " + std::string(el.second.name) + "\nPrice: " 
-							+ std::to_string(el.second.shop.price) + "\tDescPrice: " + std::to_string(el.second.shop.desconto)
+							+ std::to_string(el.second.shop.price) + "\tDescPrice: " + std::to_string(el.second.shop.sell_price)
 							+ "\nCP Shop: " + (el.second.shop.flag_shop.uFlagShop.stFlagShop.is_cash ? "CP" : "Pang")
 							+ " -\t Saleable: " + (el.second.shop.flag_shop.uFlagShop.stFlagShop.is_saleable ? "Yes" : "No")
 							+ " -\t Giftable: " + (el.second.shop.flag_shop.uFlagShop.stFlagShop.is_giftable ? "Yes" : "No")
@@ -1448,17 +1448,14 @@ int main(int argc, char* argv[]) {
 			}
 
 			_smp::message_pool::getInstance().push(new message(insert_db, CL_ONLY_FILE_LOG_TEST));
-		
-		}else if (escolha == 15) {
-
+		} else if (escolha == 15) {
 			for (auto& el : iff.getGrandPrixData()) {
-
-				_smp::message_pool::getInstance().push(new message("GP[TYPEID: 0x" + hex_util::ltoaToHex(el.second._typeid) 
-						+ ", QNTD_HOLE: " 
-						+ std::to_string(el.second.course_info.qntd_hole) + "] BOT SCORE [MIN: " 
-						+ std::to_string(el.second.bot.score_min) + ", MED: " 
-						+ std::to_string(el.second.bot.score_med) + ", MAX: "
-						+ std::to_string(el.second.bot.score_max) + "]", CL_ONLY_FILE_LOG_TEST));
+				_smp::message_pool::getInstance().push(new message("GP[TYPEID: 0x" + hex_util::ltoaToHex(el.second._typeid)
+					+ ", QNTD_HOLE: "
+					+ std::to_string(el.second.course_info.qntd_hole) + "] BOT SCORE [MIN: "
+					+ std::to_string(el.second.bot.score_min) + ", MED: "
+					+ std::to_string(el.second.bot.score_med) + ", MAX: "
+					+ std::to_string(el.second.bot.score_max) + "]", CL_ONLY_FILE_LOG_TEST));
 			}
 		}
 

@@ -32,7 +32,6 @@ namespace stdA {
 				public:
 					Locker(PersonalShop& _shop);
 					~Locker();
-
 				protected:
 					PersonalShop& m_shop;
 			};

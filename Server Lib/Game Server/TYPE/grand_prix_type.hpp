@@ -34,7 +34,6 @@ namespace stdA {
 				MED_SCORE,
 				MAX_SCORE
 			};
-
 		public:
 			struct Hole {
 				Hole(uint32_t _ul = 0u) {

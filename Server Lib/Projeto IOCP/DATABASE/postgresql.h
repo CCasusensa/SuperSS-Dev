@@ -24,6 +24,7 @@
 
 namespace stdA {
     class postgresql : public database {
+
         public:
 			postgresql();
 			postgresql(std::wstring _db_address, std::wstring _db_name, std::wstring _user_name, std::wstring _user_pass, unsigned short _db_port);
@@ -33,7 +34,7 @@ namespace stdA {
             virtual void init() override;
             virtual void destroy();
 
-			virtual bool hasGoneAway() override;
+            virtual bool hasGoneAway() override;
 
             virtual void connect() override;
 			virtual void connect(std::wstring _db_address, std::wstring _db_name, std::wstring _user_name, std::wstring _user_pass, unsigned short _db_port) override;
@@ -49,8 +50,8 @@ namespace stdA {
             virtual std::string makeText(std::string _value) override;
             virtual std::wstring makeText(std::wstring _value) override;
 
-			virtual std::string makeEscapeKeyword(std::string _value) override;
-			virtual std::wstring makeEscapeKeyword(std::wstring _value) override;
+            virtual std::string makeEscapeKeyword(std::string _value) override;
+            virtual std::wstring makeEscapeKeyword(std::wstring _value) override;
 
 			virtual void clear_stmt(std::wstring _query);
 

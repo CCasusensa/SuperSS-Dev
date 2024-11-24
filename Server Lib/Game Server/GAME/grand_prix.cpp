@@ -1075,48 +1075,36 @@ void GrandPrix::init_bots() {
 
 		// Media score(Avg. Score) dos player(s) da sala
 		auto mediaScoreAllPlayerRoom = std::accumulate(m_players.begin(), m_players.end(), 0.f, [](float _sum, player* _player) -> float {
-			
+
 			// invalid player, pula ele
 			if (_player == nullptr)
 				return _sum;
-
-
 			return _sum + _player->m_pi.ui.getMediaScore();
-		}) / m_players.size();
-
+			}) / m_players.size();
 		// Function lambda que atualiza o bot score com base do Avg.Score da sala
 		auto lambdaBotScoreByFactorAvgScoreRoom = [](IFF::GrandPrixData& _gp, float _room_avg_score) -> IFF::GrandPrixData::BOT {
-
 			IFF::GrandPrixData::BOT bot;
-
 			unsigned char qntd_hole = _gp.course_info.qntd_hole == 0 ? 18 : _gp.course_info.qntd_hole;
 			float media_bot = ((_gp.bot.score_min + _gp.bot.score_med + _gp.bot.score_max) / 3.f) * 1.7f;
 			float media_score_por_hole = (((18.f / qntd_hole) * media_bot + 72) - _room_avg_score + 180.f) / 180.f;
-
 			auto bySign = [&media_score_por_hole](int32_t _score) -> int {
-
 				if (_score == 0)
 					return media_score_por_hole <= 0.8f ? 1 : (media_score_por_hole >= 1.4f ? -1 : _score);
-
 				if (_score < 0)
 					return (int)std::round(_score * media_score_por_hole);
-				
-				return (int)std::round(_score / (media_score_por_hole == 0.0f ? 0.001f : media_score_por_hole));
-			};
 
+				return (int)std::round(_score / (media_score_por_hole == 0.0f ? 0.001f : media_score_por_hole));
+				};
 			bot.score_min = bySign(_gp.bot.score_min);
 			bot.score_med = bySign(_gp.bot.score_med);
 			bot.score_max = bySign(_gp.bot.score_max);
-
 			return bot;
-		};
-
+			};
 		auto bot_score = lambdaBotScoreByFactorAvgScoreRoom(m_gp, mediaScoreAllPlayerRoom);
-
 #ifdef _DEBUG
-		_smp::message_pool::getInstance().push(new message("[GrandPrix::init_bots][Log] Media Score da sala: " + std::to_string(mediaScoreAllPlayerRoom) 
-				+ "\nBOT SCORE ORIGINAL [MIN: " + std::to_string(m_gp.bot.score_min) + ", MED: " + std::to_string(m_gp.bot.score_med) + ", MAX: " + std::to_string(m_gp.bot.score_max) 
-				+ "], BOT BY FACTOR SCORE [MIN: " + std::to_string(bot_score.score_min) + ", MED: " + std::to_string(bot_score.score_med) + ", MAX: " + std::to_string(bot_score.score_max) + "]", CL_FILE_LOG_AND_CONSOLE));
+		_smp::message_pool::getInstance().push(new message("[GrandPrix::init_bots][Log] Media Score da sala: " + std::to_string(mediaScoreAllPlayerRoom)
+			+ "\nBOT SCORE ORIGINAL [MIN: " + std::to_string(m_gp.bot.score_min) + ", MED: " + std::to_string(m_gp.bot.score_med) + ", MAX: " + std::to_string(m_gp.bot.score_max)
+			+ "], BOT BY FACTOR SCORE [MIN: " + std::to_string(bot_score.score_min) + ", MED: " + std::to_string(bot_score.score_med) + ", MAX: " + std::to_string(bot_score.score_max) + "]", CL_FILE_LOG_AND_CONSOLE));
 #endif
 
 		auto qntd = 30u - m_players.size();
@@ -1154,7 +1142,6 @@ void GrandPrix::init_bots() {
 		// Sortea os Bots e configura eles
 		Lottery::LotteryCtx *lc = nullptr;
 		Lottery lottery_score((uint64_t)this);
-
 		PlayerGameInfo tmp_pi{ 0 };
 
 		Hole *hole = nullptr;
@@ -1170,9 +1157,7 @@ void GrandPrix::init_bots() {
 
 		// multiplicador de probabilidade depedendo do vento e do tipo
 		auto lambdaWindFactor = [](Hole& _hole, Bot::eTYPE_SCORE _type, bool _same_type) -> uint32_t {
-
 			uint32_t factor = 1u;
-
 			if (_hole.getWind().wind >= 0 && _hole.getWind().wind < 3 && _type == Bot::eTYPE_SCORE::MAX_SCORE)		// fraco
 				factor = 2u;
 			else if (_hole.getWind().wind >= 3 && _hole.getWind().wind < 6 && _type == Bot::eTYPE_SCORE::MED_SCORE)	// medio
@@ -1181,14 +1166,11 @@ void GrandPrix::init_bots() {
 				factor = 6u;
 			else if (_hole.getWind().wind >= 8 && _type == Bot::eTYPE_SCORE::MIN_SCORE)								// super wind
 				factor = 7u;
-
 			// Chuva ou Neve
 			if (_hole.getWeather() == 2 && (_type == Bot::eTYPE_SCORE::MED_SCORE || _type == Bot::eTYPE_SCORE::MIN_SCORE))
 				factor += 2u;
-
 			if (_same_type)
 				factor += 2u;
-
 			return factor;
 		};
 
@@ -1202,20 +1184,19 @@ void GrandPrix::init_bots() {
 				bot.id = (uint32_t)lc->value;
 
 				bot.type_score = (sRandomGen::getInstance().rIbeMt19937_64_chrono() % 5 == 0
-									? Bot::eTYPE_SCORE::MAX_SCORE
-									: (sRandomGen::getInstance().rIbeMt19937_64_chrono() % 3 == 0
-										? Bot::eTYPE_SCORE::MED_SCORE
-										: Bot::eTYPE_SCORE::MIN_SCORE
-										)
-									);
-
-				bot.max_record = (bot.type_score == Bot::eTYPE_SCORE::MAX_SCORE 
-									? bot_score.score_max + (int)(sRandomGen::getInstance().rIbeMt19937_64_chrono() % 3)				// Esse pode variar 3 para baixo
-									: (bot.type_score == Bot::eTYPE_SCORE::MED_SCORE
-										? bot_score.score_med + (int)(sRandomGen::getInstance().rIbeMt19937_64_chronoRange(0, 6) - 3)	// Esse pode variar 3 para cima e 3 para baixo
-										: bot_score.score_min + (int)(sRandomGen::getInstance().rIbeMt19937_64_chronoRange(0, 5) - 3)	// Esse pode variar 2 para cima e 3 para baixo
-									  )
-								);
+					? Bot::eTYPE_SCORE::MAX_SCORE
+					: (sRandomGen::getInstance().rIbeMt19937_64_chrono() % 3 == 0
+						? Bot::eTYPE_SCORE::MED_SCORE
+						: Bot::eTYPE_SCORE::MIN_SCORE
+						)
+					);
+				bot.max_record = (bot.type_score == Bot::eTYPE_SCORE::MAX_SCORE
+					? bot_score.score_max + (int)(sRandomGen::getInstance().rIbeMt19937_64_chrono() % 3)				// Esse pode variar 3 para baixo
+					: (bot.type_score == Bot::eTYPE_SCORE::MED_SCORE
+						? bot_score.score_med + (int)(sRandomGen::getInstance().rIbeMt19937_64_chronoRange(0, 6) - 3)	// Esse pode variar 3 para cima e 3 para baixo
+						: bot_score.score_min + (int)(sRandomGen::getInstance().rIbeMt19937_64_chronoRange(0, 5) - 3)	// Esse pode variar 2 para cima e 3 para baixo
+					)
+				);
 
 				bot.qntd_hole = m_ri.qntd_hole;
 
@@ -1243,7 +1224,6 @@ void GrandPrix::init_bots() {
 							diff_max_shot = (hole->getPar().total_shot - bot.med_shot_per_hole);
 
 							if (bot.med_shot_per_hole < hole->getPar().par) {
-
 								// min shot, max score
 								lottery_score.push
 								(
@@ -1268,27 +1248,25 @@ void GrandPrix::init_bots() {
 								),
 								Bot::eTYPE_SCORE::MED_SCORE
 							);
-
 							// max shot, min score
 							lottery_score.push
 							(
 								1000u * diff_min_shot * lambdaWindFactor
 								(
-									*hole, 
-									Bot::eTYPE_SCORE::MIN_SCORE, 
+									*hole,
+									Bot::eTYPE_SCORE::MIN_SCORE,
 									bot.type_score == Bot::eTYPE_SCORE::MIN_SCORE
-								), 
+								),
 								Bot::eTYPE_SCORE::MIN_SCORE
 							);
-
 							if ((lc = lottery_score.spinRoleta(true)) == nullptr) {
-								
+
 								_smp::message_pool::getInstance().push(new message("[GrandPrix::init_bots][WARNING] nao conseguiu rodar a roleta para o score do bot, usando o med_shot_per_hole.", CL_FILE_LOG_AND_CONSOLE));
 
 								score = bot.med_shot_per_hole - hole->getPar().par;
-							
-							}else {
 
+							}
+							else {
 								if (lc->value == Bot::eTYPE_SCORE::MAX_SCORE)
 									score = (bot.med_shot_per_hole - (int32_t)sRandomGen::getInstance().rIbeMt19937_64_chronoRange(0, diff_min_shot)) - hole->getPar().par;
 								else if (lc->value == Bot::eTYPE_SCORE::MED_SCORE)
@@ -1330,9 +1308,8 @@ void GrandPrix::init_bots() {
 
 #ifdef _DEBUG
 				_smp::message_pool::getInstance().push(new message("[GrandPrix::init_bots][Log] Bot[ID="
-						+ std::to_string(bot.id) + ", MAX_RECORD: " + std::to_string(bot.max_record) + ", RECORD: " + std::to_string(bot.record) + "]", CL_FILE_LOG_AND_CONSOLE));
+					+ std::to_string(bot.id) + ", MAX_RECORD: " + std::to_string(bot.max_record) + ", RECORD: " + std::to_string(bot.record) + "]", CL_FILE_LOG_AND_CONSOLE));
 #endif
-
 				// Add bot ao vector
 				m_bot.push_back(bot);
 

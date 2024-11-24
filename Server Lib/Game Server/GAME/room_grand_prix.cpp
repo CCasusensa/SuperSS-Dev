@@ -726,7 +726,6 @@ void RoomGrandPrix::count_down_to_start(int64_t _sec_to_start) {
 				// tenta de novo daqui a 10 segundos, por que pode ter convidado na sala, 
 				// GP não tem, o cliente não deixa, mas vai que algum hacker conseguiu
 				count_down_to_start(10);
-
 		}else {
 
 			uint32_t wait = 0u;

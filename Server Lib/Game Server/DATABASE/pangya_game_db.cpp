@@ -1395,8 +1395,8 @@ KeysOfLogin pangya_db::getKeysOfLogin(int32_t uid) {
 
 	BEGIN_RESULT_READ(3, 31)
 
-		if (is_valid_c_string(_result->data[0]))
-			strcpy_s(kol.keys[0], _result->data[0]);
+	if (is_valid_c_string(_result->data[0]))
+		strcpy_s(kol.keys[0], _result->data[0]);
 	if (is_valid_c_string(_result->data[1]))
 		strcpy_s(kol.keys[1], _result->data[1]);
 	kol.valid = (unsigned char)IFNULL(atoi, _result->data[2]);

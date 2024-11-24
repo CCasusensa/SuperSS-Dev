@@ -643,7 +643,6 @@ int packet_func::pacote00F(packet& p, player *_session, int option) {
 	p.addUint32(5);								// valor 5 Unknown
 	p.addFixedString(formatDateLocal(0), 19);	// Time Build Login Server (ACHO)								- JP S9 ler mais ignora ele
 	p.addString("302540");						// Alguma AuthKey aleatória para minha conta que eu não sei		- JP S9 ler mais ignora ele
-
 	return 0;
 };
 

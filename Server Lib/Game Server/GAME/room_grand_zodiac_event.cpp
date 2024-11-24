@@ -273,7 +273,7 @@ void* RoomGrandZodiacEvent::waitTimeStart() {
 
 								m_state_rgze.setState(eSTATE_ROOM_GRAND_ZODIAC_EVENT_SYNC::WAIT_10_SECONDS_START);
 
-							}else if (_getRealNumPlayersWithoutInvited() == m_ri.max_player) {
+							} else if (_getRealNumPlayersWithoutInvited() == m_ri.max_player) {
 
 								// A sala atingiu o n�mero m�ximo de player
 								// Come�a o Grand Zodiac Event em 10 segundos
@@ -381,7 +381,6 @@ void RoomGrandZodiacEvent::count_down(int64_t _sec_to_start) {
 				// Coloca para começar espera o tempo de começar o jogo de novo, por que não conseguiu criar a sala
 				// Pode ter convidado na sala, aí não pode iniciar o jogo por que o cliente trava
 				count_down(10);
-
 		}else {
 
 			uint32_t wait = 0u;
